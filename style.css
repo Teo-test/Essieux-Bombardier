@@ -1,0 +1,39 @@
+/* style.css - Style général de l'application */
+
+/* ========== RESET ==========*/
+
+{ margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+
+body { background-color: #f9f9f9; color: #222; min-height: 100vh; padding-bottom: 80px; /* pour ne pas cacher le contenu sous la bottom nav */ }
+
+/* ========== HEADER ========== */ header { background-color: #1976d2; color: white; padding: 1rem; text-align: center; font-size: 1.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+/* ========== FORMULAIRE ET CONTENU ========== */ .form-container { padding: 1rem; max-width: 700px; margin: auto; }
+
+form label { display: block; margin-bottom: 0.2rem; font-weight: 500; }
+
+form input, form textarea { width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+
+form textarea { resize: vertical; min-height: 80px; }
+
+button { background-color: #1976d2; color: white; padding: 0.7rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+
+button:hover { background-color: #125aa8; }
+
+h2 { margin: 1rem 0 0.5rem; color: #333; border-bottom: 2px solid #1976d2; padding-bottom: 0.2rem; }
+
+ul { margin-left: 1rem; list-style: square; }
+
+/* ========== BOTTOM NAV ========== */ .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background-color: #ffffff; border-top: 1px solid #ccc; box-shadow: 0 -1px 5px rgba(0,0,0,0.1); padding: 0.6rem 0; z-index: 1000; }
+
+.bottom-nav a { text-decoration: none; color: #666; font-size: 0.9rem; font-weight: 500; }
+
+.bottom-nav a.active { color: #1976d2; font-weight: bold; }
+
+/* ========== MESSAGES ET INFOS ========== */ p { margin-bottom: 1rem; line-height: 1.6; }
+
+/* ========== LOGO EN PDF (optionnel) ========== */ .logo-container { display: flex; justify-content: center; margin-top: 1rem; }
+
+.logo-container img { height: 50px; }
+

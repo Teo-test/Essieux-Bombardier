@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mesures</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+
+<script>
+  document.getElementById("form-mesures").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const data = {};
+    const inputs = this.querySelectorAll("input, textarea");
+    inputs.forEach(input => {
+      data[input.name] = input.value;
+    });
+
+    // Sauvegarde dans le stockage local
+    localStorage.setItem("mesures", JSON.stringify(data));
+
+    // Redirige vers la page résultats
+    window.location.href = "resultats.html";
+  });
+</script>
+
+<body>
+
+  <header>
+    <h1>Mesures</h1>
+  </header>
+
+  <main class="form-container">
+    <form id="form-mesures">
+    <h2>Avant démontage</h2>
+
+    <label for="jm">Jeu axial "jm" (mm)</label>
+    <input type="number" step="0.01" name="jm" id="jm" required />
+
+    <label for="x">Valeur "x" mesurée (mm)</label>
+    <input type="number" step="0.01" name="x" id="x" required />
+
+    <label for="u">Valeur "u" mesurée (mm)</label>
+    <input type="number" step="0.01" name="u" id="u" required />
+
+    <label for="v">Valeur "v" mesurée (mm)</label>
+    <input type="number" step="0.01" name="v" id="v" required />
+
+        <hr />
+
+        <h2>Mesures de calage</h2>
+
+    <label for="a1">Cale A1 (mm)</label>
+    <input type="number" step="0.01" name="a1" id="a1" />
+
+    <label for="a2">Cale A2 (mm)</label>
+    <input type="number" step="0.01" name="a2" id="a2" />
+
+    <label for="a3">Cale A3 (mm)</label>
+    <input type="number" step="0.01" name="a3" id="a3" />
+
+    <label for="a4">Cale A4 (mm)</label>
+    <input type="number" step="0.01" name="a4" id="a4" />
+
+    <hr />
+
+    <h2>Jeux de fonctionnement</h2>
+
+    <label for="jeu_longitudinal">Jeu longitudinal (mm)</label>
+    <input type="number" step="0.01" name="jeu_longitudinal" id="jeu_longitudinal" />
+
+    <label for="jeu_vertical">Jeu vertical (mm)</label>
+    <input type="number" step="0.01" name="jeu_vertical" id="jeu_vertical" />
+
+    <label for="jeu_lateral">Jeu latéral (mm)</label>
+    <input type="number" step="0.01" name="jeu_lateral" id="jeu_lateral" />
+
+    <hr />
+
+    <h2>Observations</h2>
+    <label for="observations">Commentaires ou remarques</label>
+    <textarea id="observations" name="observations" rows="4" placeholder="Saisir les remarques…"></textarea>
+
+    <button type="submit">Enregistrer</button>
+    </form>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="../index.html">Accueil</a>
+    <a href="mesures.html" class="active">Mesures</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="PDF.html">PDF</a>
+  </nav>
+
+  <script src="../app.js"></script>
+</body>
+</html>
