@@ -71,7 +71,7 @@
       <!-- Submit Button -->
       <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Valider</button>
     </form>
-    <div id="confirmation" class="hidden text-green-600 mt-4">Mesures enregistrées !</div>
+    <div id="confirmation" class="hidden text-green-600 mt-4"></div>
   </main>
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
@@ -91,7 +91,7 @@
       { title: "Grand Rayon 2", fields: ["grandRayonVertical2A", "grandRayonHorizontal2A", "grandRayonVertical2B", "grandRayonHorizontal2B"], label: "Côté" },
       { title: "Grand Rayon 3", fields: ["grandRayonVertical3A", "grandRayonHorizontal3A", "grandRayonVertical3B", "grandRayonHorizontal3B"], label: "Côté" },
       { title: "Petit Rayon 1", fields: ["petitRayonVertical1A", "petitRayonHorizontal1A", "petitRayonVertical1B", "petitRayonHorizontal1B"], label: "Côté" },
-      { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "petitRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"], label: "Côté" },
+      { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "grandRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"], label: "Côté" },
       { title: "Petit Rayon 3", fields: ["petitRayonVertical3A", "petitRayonHorizontal3A", "petitRayonVertical3B", "petitRayonHorizontal3B"], label: "Côté" },
       { title: "Valeurs 'x' mesurées", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "Valeurs 'y' mesurées", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
@@ -128,15 +128,45 @@
     });
 
     // Form submission handling
-    document.getElementById('mesuresForm').addEventListener('submit', (e) => {
+    const form = document.getElementById('mesuresForm');
+    const confirmation = document.getElementById('confirmation');
+
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
+      const formData = new FormData(form);
       const data = Object.fromEntries(formData);
-      localStorage.setItem('mesuresData', JSON.stringify(data));
-      const confirmation = document.getElementById('confirmation');
+      const bogieNo = data.bogieNo;
+
+      // Check if form is mostly empty (except bogieNo) to determine retrieve action
+      const isFormEmpty = Object.entries(data).every(([key, value]) => 
+        key === 'bogieNo' || !value
+      );
+
+      if (isFormEmpty && bogieNo) {
+        // Retrieve data for bogieNo
+        const storedData = JSON.parse(localStorage.getItem('mesuresData') || '{}')[bogieNo];
+        if (storedData) {
+          // Populate form fields
+          Object.entries(storedData).forEach(([key, value]) => {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) input.value = value;
+          });
+          confirmation.textContent = 'Données récupérées !';
+        } else {
+          confirmation.textContent = 'Aucune donnée trouvée pour ce Bogie N°.';
+        }
+      } else {
+        // Save data
+        const allData = JSON.parse(localStorage.getItem('mesuresData') || '{}');
+        allData[bogieNo] = data;
+        localStorage.setItem('mesuresData', JSON.stringify(allData));
+        confirmation.textContent = 'Données enregistrées !';
+        form.reset();
+      }
+
+      // Show confirmation message
       confirmation.classList.remove('hidden');
       setTimeout(() => confirmation.classList.add('hidden'), 3000);
-      e.target.reset();
     });
   </script>
 </body>
