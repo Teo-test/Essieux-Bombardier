@@ -4,35 +4,114 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Résultats</title>
-  <link rel="stylesheet" href="../styles/style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff" />
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body id="page-resultats">
-  <header>
-    <h1>Compte Rendu des Mesures</h1>
-  </header>
-  <main class="form-container">
-    <table class="rapport-table">
-      <thead>
-        <tr>
-          <th>Mesure</th>
-          <th>Valeur</th>
-        </tr>
-      </thead>
-      <tbody id="rapportContent">
-        <tr>
-          <td colspan="2">Chargement des données...</td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
-  <nav class="bottom-nav">
-    <a href="../index.html">Accueil</a>
-    <a href="mesures.html">Mesures</a>
-    <a href="resultats.html" class="active">Résultats</a>
-    <a href="pdf.html">PDF</a>
+<body class="bg-gray-100 min-h-screen flex flex-col" id="page-resultats">
+
+    <!-- Navigation Bar -->
+  <nav class="bg-gray-800 text-white p-4">
+    <div class="container mx-auto flex justify-around">
+      <a href="../index.html" class="hover:underline">Accueil</a>
+      <a href="mesures.html" class="hover:underline">Mesures</a>
+      <a href="resultats.html" class="hover:underline">Résultats</a>
+      <a href="pdf.html" class="underline">PDF</a>
+    </div>
   </nav>
-  <script src="../scripts/script.js"></script>
+  <header class="bg-blue-600 text-white p-4">
+    <h1 class="text-2xl font-bold">Résultats des Mesures</h1>
+  </header>
+  <main class="flex-grow container mx-auto p-4">
+    <div class="bg-white p-6 rounded-lg shadow space-y-6">
+      <!-- Section pour afficher les informations générales -->
+      <section>
+        <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <p class="text-sm font-medium">Date: <span id="display-date" class="font-normal"></span></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium">OM: <span id="display-om" class="font-normal"></span></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium">Bogie N°: <span id="display-bogieNo" class="font-normal"></span></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium">Type N°: <span id="display-typeNo" class="font-normal"></span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section pour afficher les résultats des mesures -->
+      <section>
+        <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
+        <div id="results-container" class="space-y-4"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Récupérer les données du localStorage
+    const savedData = JSON.parse(localStorage.getItem('mesuresData'));
+
+    // Afficher les informations générales
+    if (savedData) {
+      document.getElementById('display-date').textContent = savedData.date || 'Non spécifié';
+      document.getElementById('display-om').textContent = savedData.om || 'Non spécifié';
+      document.getElementById('display-bogieNo').textContent = savedData.bogieNo || 'Non spécifié';
+      document.getElementById('display-typeNo').textContent = savedData.typeNo || 'Non spécifié';
+
+      // Afficher les résultats des mesures
+      const resultsContainer = document.getElementById('results-container');
+
+      // Configuration des groupes de mesures
+      const measurementGroups = [
+        { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"] },
+        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
+        { title: "Grand Rayon 1", fields: ["grandRayonVertical1A", "grandRayonHorizontal1A", "grandRayonVertical1B", "grandRayonHorizontal1B"] },
+        { title: "Grand Rayon 2", fields: ["grandRayonVertical2A", "grandRayonHorizontal2A", "grandRayonVertical2B", "grandRayonHorizontal2B"] },
+        { title: "Grand Rayon 3", fields: ["grandRayonVertical3A", "grandRayonHorizontal3A", "grandRayonVertical3B", "grandRayonHorizontal3B"] },
+        { title: "Petit Rayon 1", fields: ["petitRayonVertical1A", "petitRayonHorizontal1A", "petitRayonVertical1B", "petitRayonHorizontal1B"] },
+        { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "petitRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"] },
+        { title: "Petit Rayon 3", fields: ["petitRayonVertical3A", "petitRayonHorizontal3A", "petitRayonVertical3B", "petitRayonHorizontal3B"] },
+        { title: "Valeurs 'x' mesurées", fields: ["measured-value-x-A", "measured-value-x-B"] },
+        { title: "Valeurs 'y' mesurées", fields: ["measured-value-y-A", "measured-value-y-B"] },
+        { title: "Valeurs 'z' mesurées", fields: ["measured-value-z-A", "measured-value-z-B"] },
+        { title: "Valeurs 'u' mesurées", fields: ["measured-value-u-A", "measured-value-u-B"] },
+        { title: "Valeurs 'wm' mesurées", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
+        { title: "Valeurs 'bottom-nav' mesurées", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
+        { title: "Valeurs 'v' mesurées", fields: ["measured-value-v-A", "measured-value-v-B"] },
+        { title: "Valeurs 'bu' mesurées", fields: ["measured-value-bu-A", "measured-value-bu-B"] },
+        { title: "Valeurs 'd' mesurées", fields: ["measured-value-d-A", "measured-value-d-B"] },
+        { title: "Valeurs 'e' mesurées", fields: ["measured-value-e-A", "measured-value-e-B"] },
+        { title: "Valeurs 'eu' mesurées", fields: ["measured-value-eu-A", "measured-value-eu-B"] },
+        { title: "Jeu axial 'jm' mesuré Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
+        { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"] }
+      ];
+
+      // Générer dynamiquement les sections de résultats
+      measurementGroups.forEach(group => {
+        const section = document.createElement('div');
+        section.className = 'bg-gray-50 p-4 rounded-lg';
+        section.innerHTML = `<h3 class="font-medium mb-2">${group.title}</h3>`;
+
+        const fieldsContainer = document.createElement('div');
+        fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4';
+
+        group.fields.forEach(field => {
+          const fieldDiv = document.createElement('div');
+          const fieldId = field.split('-').pop();
+          fieldDiv.innerHTML = `
+            <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${savedData[field] || 'Non spécifié'}</span></p>
+          `;
+          fieldsContainer.appendChild(fieldDiv);
+        });
+
+        section.appendChild(fieldsContainer);
+        resultsContainer.appendChild(section);
+      });
+    } else {
+      resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
+    }
+  </script>
 </body>
 </html>
