@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gérer les PDF</title>
+  <link rel="stylesheet" href="../styles/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Gestion des PDF</h1>
+  </header>
+  <main class="form-container">
+    <p>Vous pouvez télécharger ou consulter vos PDF générés ici.</p>
+    <button class="button-link" onclick="generatePDF()">Générer et Télécharger le PDF</button>
+  </main>
+  <nav class="bottom-nav">
+    <a href="../index.html">Accueil</a>
+    <a href="mesures.html">Mesures</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="pdf.html" class="active">PDF</a>
+  </nav>
+  <script>
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const data = JSON.parse(localStorage.getItem('mesuresData'));
+
+      if (data) {
+        // Titre principal
+        doc.setFontSize(20);
+        doc.setTextColor(0, 51, 102); // Bleu foncé
+        doc.text("Check-List REE paliers d'essieu à roue libre", 105, 15, { align: 'center' });
+
+        // Sous-titre
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0); // Noir
+        doc.text("des BP BOMBARDIER", 105, 25, { align: 'center' });
+
+        // Ligne de séparation
+        doc.setDrawColor(0, 51, 102); // Bleu foncé
+        doc.line(20, 30, 190, 30);
+
+        // Informations générales
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0); // Noir
+        doc.text(`Date: ${data.date}`, 20, 40);
+        doc.text(`OM: ${data.om}`, 20, 50);
+        doc.text(`Bogie N°: ${data.bogieNo}`, 20, 60);
+        doc.text(`Type N°: ${data.typeNo}`, 20, 70);
+        doc.text(`Fabrick: ${data.fabrick}`, 20, 80);
+        doc.text(`Année de Fabrication: ${data.anneeFab}`, 20, 90);
+        doc.text(`Localisation: ${data.localisation}`, 20, 100);
+        doc.text(`N° de série de la roue: ${data.serieRoue}`, 20, 110);
+
+        // Section des mesures
+        doc.setFontSize(16);
+        doc.setTextColor(0, 51, 102); // Bleu foncé
+        doc.text("Mesures", 20, 130);
+
+        // Ligne de séparation
+        doc.setDrawColor(0, 51, 102); // Bleu foncé
+        doc.line(20, 135, 190, 135);
+
+        // Détails des mesures
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0); // Noir
+        doc.text(`Jeu Axial 'Jm' mesuré: ${data.jeuAxialJm}`, 20, 145);
+
+        // Ajoutez ici d'autres champs et calculs si nécessaire
+        if (data.moyenneVerticale) {
+          doc.text(`Moyenne Verticale: ${data.moyenneVerticale.toFixed(3)}`, 20, 155);
+        }
+        if (data.moyenneHorizontale) {
+          doc.text(`Moyenne Horizontale: ${data.moyenneHorizontale.toFixed(3)}`, 20, 165);
+        }
+
+        // Générer un horodatage pour le nom du fichier
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const fileName = `compte-rendu-${timestamp}.pdf`;
+
+        // Sauvegarder le PDF
+        doc.save(fileName);
+
+        // Ouvrir le PDF dans une nouvelle fenêtre
+        const pdfOutput = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfOutput);
+        window.open(pdfUrl, '_blank');
+      } else {
+        alert("Aucune donnée disponible pour générer le PDF.");
+      }
+    }
+  </script>
+</body>
+</html>

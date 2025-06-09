@@ -1,85 +1,36 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Résultats</title>
-  <link rel="stylesheet" href="../style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="../styles/style.css">
 </head>
-<body>  <header>
-    <h1>Résultats calculés</h1>
-  </header>  <main class="form-container" id="resultats-container">
-    <p>Chargement des données…</p>
-  </main>  <div class="form-container">
-    <button id="export-pdf">Exporter en PDF</button>
-  </div>  <nav class="bottom-nav">
+<body id="page-resultats">
+  <header>
+    <h1>Compte Rendu des Mesures</h1>
+  </header>
+  <main class="form-container">
+    <table class="rapport-table">
+      <thead>
+        <tr>
+          <th>Mesure</th>
+          <th>Valeur</th>
+        </tr>
+      </thead>
+      <tbody id="rapportContent">
+        <tr>
+          <td colspan="2">Chargement des données...</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+  <nav class="bottom-nav">
     <a href="../index.html">Accueil</a>
     <a href="mesures.html">Mesures</a>
     <a href="resultats.html" class="active">Résultats</a>
-    <a href="PDF.html">PDF</a>
-  </nav>  <script>
-    const donnees = JSON.parse(localStorage.getItem("mesures")) || {};
-    const container = document.getElementById("resultats-container");
-
-    if (Object.keys(donnees).length === 0) {
-      container.innerHTML = "<p>Aucune donnée disponible. Veuillez d'abord remplir les mesures.</p>";
-    } else {
-      const totalCales = (
-        parseFloat(donnees.a1 || 0) +
-        parseFloat(donnees.a2 || 0) +
-        parseFloat(donnees.a3 || 0) +
-        parseFloat(donnees.a4 || 0)
-      ).toFixed(2);
-
-      const moyenneJeux = (
-        (parseFloat(donnees.jeu_longitudinal || 0) +
-         parseFloat(donnees.jeu_vertical || 0) +
-         parseFloat(donnees.jeu_lateral || 0)) / 3
-      ).toFixed(2);
-
-      container.innerHTML = `
-        <h2>Résumé des mesures</h2>
-        <ul style="line-height: 1.6;">
-          <li>Jeu axial jm : <strong>${donnees.jm} mm</strong></li>
-          <li>x = <strong>${donnees.x} mm</strong>, u = <strong>${donnees.u} mm</strong>, v = <strong>${donnees.v} mm</strong></li>
-          <li>Cales : A1=${donnees.a1 || 0}, A2=${donnees.a2 || 0}, A3=${donnees.a3 || 0}, A4=${donnees.a4 || 0} mm</li>
-          <li>Jeux : Long.=${donnees.jeu_longitudinal || 0} mm, Vert.=${donnees.jeu_vertical || 0} mm, Lat.=${donnees.jeu_lateral || 0} mm</li>
-        </ul>
-
-        <h2>Calculs automatiques</h2>
-        <p>Total des cales : <strong>${totalCales} mm</strong></p>
-        <p>Moyenne des jeux mesurés : <strong>${moyenneJeux} mm</strong></p>
-
-        <h2>Observations</h2>
-        <p>${donnees.observations || "<i>Aucune remarque</i>"}</p>
-      `;
-    }
-
-    document.getElementById("export-pdf").addEventListener("click", () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 10;
-      doc.setFontSize(14);
-      doc.text("Compte rendu des mesures", 10, y);
-      y += 10;
-
-      const lignes = [
-        `Jeu axial jm : ${donnees.jm} mm`,
-        `x = ${donnees.x} mm, u = ${donnees.u} mm, v = ${donnees.v} mm`,
-        `Cales : A1=${donnees.a1 || 0}, A2=${donnees.a2 || 0}, A3=${donnees.a3 || 0}, A4=${donnees.a4 || 0}`,
-        `Total cales = ${totalCales} mm`,
-        `Jeux mesurés : L=${donnees.jeu_longitudinal || 0}, V=${donnees.jeu_vertical || 0}, Lat=${donnees.jeu_lateral || 0}`,
-        `Moyenne jeux = ${moyenneJeux} mm`,
-        `Observations : ${donnees.observations || "Aucune"}`
-      ];
-
-      doc.setFontSize(11);
-      lignes.forEach(ligne => {
-        doc.text(ligne, 10, y);
-        y += 8;
-      });
-
-      doc.save("compte-rendu.pdf");
-    });
-  </script></body>
+    <a href="pdf.html">PDF</a>
+  </nav>
+  <script src="../scripts/script.js"></script>
+</body>
 </html>
