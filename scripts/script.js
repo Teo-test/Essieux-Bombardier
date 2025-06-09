@@ -1,3 +1,9 @@
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('Service Worker enregistré'))
+    .catch(err => console.log('Erreur Service Worker', err));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('mesuresForm');
   const confirmation = document.getElementById('confirmation');
