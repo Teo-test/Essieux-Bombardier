@@ -36,20 +36,53 @@ main {
 }
 
 .form-container {
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
   background: var(--card);
-  padding: 2rem;
+  padding: 1rem;
   border-radius: var(--radius);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   margin-bottom: 4.5rem;
 }
 
+h2, h3 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: var(--secondary);
+}
+
+.form-group input {
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
 .button-link {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  margin: 0.5rem 0;
-  text-align: center;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem;
   background-color: var(--primary);
   color: white;
   border: none;
@@ -58,34 +91,11 @@ main {
   font-weight: 500;
   transition: var(--transition);
   cursor: pointer;
-  width: 100%;
 }
 
 .button-link:hover {
   background-color: #0b5ed7;
   transform: translateY(-2px);
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 0.6rem;
-  margin-bottom: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-label {
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-  display: block;
 }
 
 .bottom-nav {
@@ -129,6 +139,34 @@ input:required {
 }
 
 input:required:valid {
-  border-left: 3px solid #198754;
-;
+  border-left: 3px solid #00ff00;
+}
+
+/* Ajout de styles pour améliorer l'UI */
+.form-row {
+  background-color: rgba(13, 110, 253, 0.05);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  outline: none;
+}
+
+.button-link {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-link:hover {
+  background-color: #0b5ed7;
 }

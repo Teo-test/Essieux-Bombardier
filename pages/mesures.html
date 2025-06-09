@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mesures</title>
   <link rel="stylesheet" href="../styles/style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff" />
 </head>
 <body id="page-mesures">
   <header>
@@ -14,57 +12,378 @@
   </header>
   <main class="form-container">
     <form id="mesuresForm">
-      <label for="date">Date:</label>
-      <input type="date" id="date" name="date" required>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="date">Date:</label>
+          <input type="date" id="date" name="date" required>
+        </div>
+        <div class="form-group">
+          <label for="om">OM:</label>
+          <input type="text" id="om" name="om" required>
+        </div>
+        <div class="form-group">
+          <label for="bogieNo">Bogie N°:</label>
+          <input type="text" id="bogieNo" name="bogieNo" required>
+        </div>
+        <div class="form-group">
+          <label for="typeNo">Type N°:</label>
+          <input type="text" id="typeNo" name="typeNo" required>
+        </div>
+      </div>
 
-      <label for="om">OM:</label>
-      <input type="text" id="om" name="om" required>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Fabrick">Fabrick (N° de Fab.):</label>
+          <input type="text" id="Fabrick" name="Fabrick">
+        </div>
+        <div class="form-group">
+          <label for="Auftrags">Auftrags (N° de Cde):</label>
+          <input type="text" id="Auftrags" name="Auftrags">
+        </div>
+        <div class="form-group">
+          <label for="Baujahr">Baujahr (Année de Fab.):</label>
+          <input type="text" id="Baujahr" name="Baujahr">
+        </div>
+      </div>
 
-      <label for="bogieNo">Bogie N°:</label>
-      <input type="text" id="bogieNo" name="bogieNo" required>
+      <div class="form-row">
+        <h2>Localisation :</h2>
+        <div class="form-group">
+          <h3>Côté A</h3>
+        </div>
+        <div class="form-group">
+          <h3>Côté B</h3>
+        </div>
+      </div>
 
-      <label for="typeNo">Type N°:</label>
-      <input type="text" id="typeNo" name="typeNo" required>
+      <div class="form-row">
+        <h3>N° de série de la roue :</h3>
+        <div class="form-group">
+          <label for="series-wheel-A">N° de série roue droite:</label>
+          <input type="number" id="series-wheel-A" name="series-wheel-A" step="1">
+        </div>
+        <div class="form-group">
+          <label for="series-wheel-B">N° de série roue gauche:</label>
+          <input type="number" id="series-wheel-B" name="series-wheel-B" step="1">
+        </div>
+      </div>
 
-      <label for="fabrick">Fabrick:</label>
-      <input type="text" id="fabrick" name="fabrick" required>
+      <h2><strong>Les calculs et mesures sont effectués à 0,01mm près</strong></h2>
 
-      <label for="anneeFab">Année de Fabrication:</label>
-      <input type="text" id="anneeFab" name="anneeFab" required>
+      <div class="form-row">
+        <h2>Jeu axial "Jm" mesuré <strong>Avant Démontage</strong></h2>
+        <div class="form-group">
+          <label for="axial-play-A">Côté A:</label>
+          <input type="number" id="axial-play-A" name="axial-play-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="axial-play-B">Côté B:</label>
+          <input type="number" id="axial-play-B" name="axial-play-B" step="0.01">
+        </div>
+      </div>
 
-      <label for="autre">Autre:</label>
-      <input type="text" id="autre" name="autre">
+      <div class="form-row">
+        <h2>Contrôle visuel des soudures</h2>
+        <div class="form-group">
+          <label for="soud-vis-A">Côté A:</label>
+          <input type="text" id="soud-vis-A" name="soud-vis-A">
+        </div>
+        <div class="form-group">
+          <label for="soud-vis-B">Côté B:</label>
+          <input type="text" id="soud-vis-B" name="soud-vis-B">
+        </div>
+      </div>
 
-      <label for="localisation">Localisation:</label>
-      <input type="text" id="localisation" name="localisation" required>
+      <h2>Diamètres d'appui des paliers</h2>
 
-      <label for="serieRoue">N° de série de la roue:</label>
-      <input type="text" id="serieRoue" name="serieRoue" required>
+      <h2>Grand Rayon</h2>
 
-      <h3>Mesures avant démontage</h3>
+      <div class="form-row">
+        <h3>Grand Rayon 1</h3>
+        <div class="form-group">
+          <label for="grandRayonVertical1A">Vertical A:</label>
+          <input type="number" id="grandRayonVertical1A" name="grandRayonVertical1A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonHorizontal1A">Horizontal A:</label>
+          <input type="number" id="grandRayonHorizontal1A" name="grandRayonHorizontal1A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonVertical1B">Vertical B:</label>
+          <input type="number" id="grandRayonVertical1B" name="grandRayonVertical1B" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonHorizontal1B">Horizontal B:</label>
+          <input type="number" id="grandRayonHorizontal1B" name="grandRayonHorizontal1B" step="0.01">
+        </div>
+      </div>
 
-      <label for="jeuAxialJm">Jeu Axial 'Jm' mesuré:</label>
-      <input type="number" id="jeuAxialJm" name="jeuAxialJm" step="0.001" required>
+      <div class="form-row">
+        <h3>Grand Rayon 2</h3>
+        <div class="form-group">
+          <label for="grandRayonVertical2A">Vertical A:</label>
+          <input type="number" id="grandRayonVertical2A" name="grandRayonVertica2A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonHorizontal2A">Horizontal A:</label>
+          <input type="number" id="grandRayonHorizontal2A" name="grandRayonHorizontal2A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonVertical2B">Vertical B:</label>
+          <input type="number" id="grandRayonVertical2B" name="grandRayonVertical2B" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonHorizontal2B">Horizontal B:</label>
+          <input type="number" id="grandRayonHorizontal2B" name="grandRayonHorizontal2B" step="0.01">
+        </div>
+      </div>
 
-      <h3>Diamètres d'appui des paliers</h3>
+      <div class="form-row">
+        <h3>Grand Rayon 3</h3>
+        <div class="form-group">
+          <label for="grandRayonVertical3A">Vertical A:</label>
+          <input type="number" id="grandRayonVertical3A" name="grandRayonVertical3A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonHorizontal3A">Horizontal A:</label>
+          <input type="number" id="grandRayonHorizontal3A" name="grandRayonHorizontal3A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonVertical3B">Vertical B:</label>
+          <input type="number" id="grandRayonVertical3B" name="grandRayonVertical3B" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="grandRayonHorizontal1B">Horizontal B:</label>
+          <input type="number" id="grandRayonHorizontal3B" name="grandRayonHorizontal3B" step="0.01">
+        </div>
+      </div>
 
-      <label for="grandModeleVertical1">Grand Modèle Vertical 1:</label>
-      <input type="number" id="grandModeleVertical1" name="grandModeleVertical1" step="0.001">
+      <h2>Petit Rayon</h2>
 
-      <label for="grandModeleVertical2">Grand Modèle Vertical 2:</label>
-      <input type="number" id="grandModeleVertical2" name="grandModeleVertical2" step="0.001">
+      <div class="form-row">
+        <h3>Petit Rayon 1</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="petitRayonVertical1A">Vertical A:</label>
+            <input type="number" id="petitRayonVertical1A" name="petitRayonVertical1A" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonHorizontal1A">Horizontal A:</label>
+            <input type="number" id="petitRayonHorizontal1A" name="petitRayonHorizontal1A" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonVertical1B">Vertical B:</label>
+            <input type="number" id="petitRayonVertical1B" name="petitRayonVertical1B" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonHorizontal1B">Horizontal B:</label>
+            <input type="number" id="petitRayonHorizontal1B" name="petitRayonHorizontal1B" step="0.01">
+          </div>
+        </div>
+      </div>
 
-      <label for="grandModeleVertical3">Grand Modèle Vertical 3:</label>
-      <input type="number" id="grandModeleVertical3" name="grandModeleVertical3" step="0.001">
+      <div class="form-row">
+        <h3>Petit Rayon 2</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="petitRayonVertical2A">Vertical A:</label>
+            <input type="number" id="petitRayonVertical2A" name="petitRayonVertical2A" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonHorizontal2A">Horizontal A:</label>
+            <input type="number" id="petitRayonHorizontal2A" name="petitRayonHorizontal2A" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonVertical2B">Vertical B:</label>
+            <input type="number" id="petitRayonVertical2B" name="petitRayonVertical2B" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonHorizontal2B">Horizontal B:</label>
+            <input type="number" id="petitRayonHorizontal2B" name="petitRayonHorizontal2B" step="0.01">
+          </div>
+        </div>
+      </div>
 
-      <label for="grandModeleHorizontal1">Grand Modèle Horizontal 1:</label>
-      <input type="number" id="grandModeleHorizontal1" name="grandModeleHorizontal1" step="0.001">
+      <div class="form-row">
+        <h3>Petit Rayon 3</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="petitRayonVertical3A">Vertical A:</label>
+            <input type="number" id="petitRayonVertical3A" name="petitRayonVertical3A" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonHorizontal3A">Horizontal A:</label>
+            <input type="number" id="petitRayonHorizontal3A" name="petitRayonHorizontal3A" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonVertical3B">Vertical B:</label>
+            <input type="number" id="petitRayonVertical3B" name="petitRayonVertical3B" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="petitRayonHorizontal3B">Horizontal B:</label>
+            <input type="number" id="petitRayonHorizontal3B" name="petitRayonHorizontal3B" step="0.01">
+          </div>
+        </div>
+      </div>
 
-      <label for="grandModeleHorizontal2">Grand Modèle Horizontal 2:</label>
-      <input type="number" id="grandModeleHorizontal2" name="grandModeleHorizontal2" step="0.001">
 
-      <label for="grandModeleHorizontal3">Grand Modèle Horizontal 3:</label>
-      <input type="number" id="grandModeleHorizontal3" name="grandModeleHorizontal3" step="0.001">
+      <div class="form-row">
+        <h3>Valeurs "x" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-x-A">Côté A:</label>
+          <input type="number" id="measured-value-x-A" name="measured-value-x-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-x-B">Côté B:</label>
+          <input type="number" id="measured-value-x-B" name="measured-value-x-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "y" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-y-A">Côté A:</label>
+          <input type="number" id="measured-value-y-A" name="measured-value-y-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-y-B">Côté B:</label>
+          <input type="number" id="measured-value-y-B" name="measured-value-y-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "z" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-z-A">Côté A:</label>
+          <input type="number" id="measured-value-z-A" name="measured-value-z-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-z-B">Côté B:</label>
+          <input type="number" id="measured-value-z-B" name="measured-value-z-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "u" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-u-A">Côté A:</label>
+          <input type="number" id="measured-value-u-A" name="measured-value-u-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-u-B">Côté B:</label>
+          <input type="number" id="measured-value-u-B" name="measured-value-u-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "wm" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-wm-A">Côté A:</label>
+          <input type="number" id="measured-value-wm-A" name="measured-value-wm-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-wm-B">Côté B:</label>
+          <input type="number" id="measured-value-wm-B" name="measured-value-wm-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "bottom-nav" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-bm-A">Côté A:</label>
+          <input type="number" id="measured-value-bm-A" name="measured-value-bm-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-bm-B">Côté B:</label>
+          <input type="number" id="measured-value-bm-B" name="measured-value-bm-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "v" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-v-A">Côté A:</label>
+          <input type="number" id="measured-value-v-A" name="measured-value-v-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-v-B">Côté B:</label>
+          <input type="number" id="measured-value-v-B" name="measured-value-v-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "bu" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-bu-A">Côté A:</label>
+          <input type="number" id="measured-value-bu-A" name="measured-value-bu-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-bu-B">Côté B:</label>
+          <input type="number" id="measured-value-bu-B" name="measured-value-bu-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "d" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-d-A">Côté A:</label>
+          <input type="number" id="measured-value-d-A" name="measured-value-d-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-d-B">Côté B:</label>
+          <input type="number" id="measured-value-d-B" name="measured-value-d-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "e" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-e-A">Côté A:</label>
+          <input type="number" id="measured-value-e-A" name="measured-value-e-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-x-B">Côté B:</label>
+          <input type="number" id="measured-value-e-B" name="measured-value-e-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Valeurs "eu" mesurées</h3>
+        <div class="form-group">
+          <label for="measured-value-eu-A">Côté A:</label>
+          <input type="number" id="measured-value-eu-A" name="measured-value-eu-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="measured-value-eu-B">Côté B:</label>
+          <input type="number" id="measured-value-eu-B" name="measured-value-eu-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Jeu axial "jm" mesuré <br> Après remise en état</h3>
+        <div class="form-group">
+          <label for="axial-play-after-A">Côté A:</label>
+          <input type="number" id="axial-play-after-A" name="axial-play-after-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="axial-play-after-B">Côté B:</label>
+          <input type="number" id="axial-play-after-B" name="axial-play-after-B" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <h3>Ecartement des roues</h3>
+        <div class="form-group">
+          <label for="wheel-ecart-A">Côté A:</label>
+          <input type="number" id="wheel-ecart-A" name="wheel-ecart-A" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="wheel-ecart-B">Côté B:</label>
+          <input type="number" id="wheel-ecart-B" name="wheel-ecart-B" step="0.01">
+        </div>
+      </div>
+
+
 
       <button type="submit" id="validerBtn" class="button-link">Valider</button>
     </form>

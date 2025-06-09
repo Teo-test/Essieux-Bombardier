@@ -1,31 +1,83 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accueil</title>
-  <link rel="stylesheet" href="styles/style.css" />
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff" />
+  <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
   <header>
-    <h1>Application de mesures</h1>
+    <h1>Application de Mesures</h1>
   </header>
   <main class="form-container">
-    <p>Bienvenue sur l'application. Choisissez une section :</p>
-    <div class="menu-buttons">
-      <a href="pages/mesures.html" class="button-link">📝 Remplir les mesures</a>
-      <a href="pages/resultats.html" class="button-link">📄 Voir les résultats</a>
-      <a href="pages/pdf.html" class="button-link">📤 Gérer les PDF</a>
-    </div>
+    <section class="hero">
+      <h2>Bienvenue sur l'Application de Mesures</h2>
+      <p>Notre application vous permet de saisir, calculer et générer des rapports PDF pour vos mesures de manière simple et efficace.</p>
+    </section>
+
+    <section class="how-it-works">
+      <h2>Comment ça marche ?</h2>
+      <div class="steps">
+        <div class="step">
+          <h3>1. Remplir les Mesures</h3>
+          <p>Commencez par saisir les mesures nécessaires dans le formulaire dédié. Vous pouvez entrer les détails des essieux, les diamètres des roues, et d'autres paramètres pertinents.</p>
+        </div>
+        <div class="step">
+          <h3>2. Calculer les Résultats</h3>
+          <p>Une fois les mesures saisies, l'application calcule automatiquement les résultats. Vous pouvez consulter les moyennes, les écarts et d'autres calculs pertinents.</p>
+        </div>
+        <div class="step">
+          <h3>3. Générer un Rapport PDF</h3>
+          <p>Enfin, vous pouvez générer un rapport PDF détaillé de vos mesures et résultats. Ce rapport peut être téléchargé ou partagé selon vos besoins.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary">
+      <h2>Résumé des Résultats</h2>
+      <p>Consultez un résumé des dernières mesures et résultats calculés. Vous pouvez voir les moyennes, les écarts et d'autres statistiques pertinentes pour une vue d'ensemble rapide.</p>
+      <div id="results-summary">
+        <!-- Le résumé des résultats sera affiché ici -->
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Prêt à commencer ?</h2>
+      <div class="cta-buttons">
+        <a href="pages/mesures.html" class="button-link">Remplir les Mesures</a>
+        <a href="pages/resultats.html" class="button-link">Voir les Résultats</a>
+        <a href="pages/pdf.html" class="button-link">Générer un PDF</a>
+      </div>
+    </section>
   </main>
+
   <nav class="bottom-nav">
     <a href="index.html" class="active">Accueil</a>
     <a href="pages/mesures.html">Mesures</a>
     <a href="pages/resultats.html">Résultats</a>
     <a href="pages/pdf.html">PDF</a>
   </nav>
+
+  <script src="scripts/script.js"></script>
+  <script>
+    // Exemple de script pour afficher un résumé des résultats
+    document.addEventListener('DOMContentLoaded', function() {
+      const summaryContainer = document.getElementById('results-summary');
+      const data = JSON.parse(localStorage.getItem('mesuresData'));
+
+      if (data) {
+        const moyenneVerticale = (parseFloat(data.grandModeleVertical1) + parseFloat(data.grandModeleVertical2) + parseFloat(data.grandModeleVertical3)) / 3;
+        const moyenneHorizontale = (parseFloat(data.grandModeleHorizontal1) + parseFloat(data.grandModeleHorizontal2) + parseFloat(data.grandModeleHorizontal3)) / 3;
+
+        summaryContainer.innerHTML = `
+          <p><strong>Moyenne Verticale:</strong> ${moyenneVerticale.toFixed(2)} mm</p>
+          <p><strong>Moyenne Horizontale:</strong> ${moyenneHorizontale.toFixed(2)} mm</p>
+        `;
+      } else {
+        summaryContainer.innerHTML = '<p>Aucune donnée disponible pour le moment.</p>';
+      }
+    });
+  </script>
 </body>
-  <script src="../script.js"></script>
 </html>
