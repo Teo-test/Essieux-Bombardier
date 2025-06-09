@@ -64,7 +64,7 @@
 
       <!-- Measurement Sections (Dynamically Generated) -->
       <section class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Mesures (0,01 mm près)</h2>
+        <h2 class="text-xl font-semibold mb-4">Mesures (0,001 mm près)</h2>
         <div id="measurements"></div>
       </section>
 
@@ -72,6 +72,7 @@
       <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Valider</button>
     </form>
     <div id="confirmation" class="hidden text-green-600 mt-4"></div>
+    <div id="error-message" class="hidden text-red-600 mt-4"></div>
   </main>
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
@@ -91,7 +92,7 @@
       { title: "Grand Rayon 2", fields: ["grandRayonVertical2A", "grandRayonHorizontal2A", "grandRayonVertical2B", "grandRayonHorizontal2B"], label: "Côté" },
       { title: "Grand Rayon 3", fields: ["grandRayonVertical3A", "grandRayonHorizontal3A", "grandRayonVertical3B", "grandRayonHorizontal3B"], label: "Côté" },
       { title: "Petit Rayon 1", fields: ["petitRayonVertical1A", "petitRayonHorizontal1A", "petitRayonVertical1B", "petitRayonHorizontal1B"], label: "Côté" },
-      { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "grandRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"], label: "Côté" },
+      { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "petitRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"], label: "Côté" },
       { title: "Petit Rayon 3", fields: ["petitRayonVertical3A", "petitRayonHorizontal3A", "petitRayonVertical3B", "petitRayonHorizontal3B"], label: "Côté" },
       { title: "Valeurs 'x' mesurées", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "Valeurs 'y' mesurées", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
@@ -127,15 +128,45 @@
       measurementsContainer.appendChild(section);
     });
 
+    // Round number inputs to 3 decimal places on input
+    document.querySelectorAll('input[type="number"][step="0.001"]').forEach(input => {
+      input.addEventListener('change', (e) => {
+        if (e.target.value) {
+          e.target.value = parseFloat(e.target.value).toFixed(3);
+        }
+      });
+    });
+
     // Form submission handling
     const form = document.getElementById('mesuresForm');
     const confirmation = document.getElementById('confirmation');
+    const errorMessage = document.getElementById('error-message');
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const formData = new FormData(form);
       const data = Object.fromEntries(formData);
       const bogieNo = data.bogieNo;
+
+      // Validate number inputs for 3 decimal places
+      let hasInvalidInput = false;
+      for (const [key, value] of Object.entries(data)) {
+        const input = form.querySelector(`[name="${key}"]`);
+        if (input.type === 'number' && input.step === '0.001' && value) {
+          const numValue = parseFloat(value);
+          if (numValue.toString() !== parseFloat(numValue.toFixed(3)).toString()) {
+            hasInvalidInput = true;
+            break;
+          }
+        }
+      }
+
+      if (hasInvalidInput) {
+        errorMessage.textContent = 'Veuillez entrer les valeurs avec trois chiffres après la virgule.';
+        errorMessage.classList.remove('hidden');
+        setTimeout(() => errorMessage.classList.add('hidden'), 3000);
+        return;
+      }
 
       // Check if form is mostly empty (except bogieNo) to determine retrieve action
       const isFormEmpty = Object.entries(data).every(([key, value]) => 
