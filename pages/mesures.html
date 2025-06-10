@@ -73,7 +73,7 @@
 
       <!-- Measurement Sections (Dynamically Generated) -->
       <section class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Mesures (0,01 mm près)</h2>
+        <h2 class="text-xl font-semibold mb-4">Mesures (0,001 mm près)</h2>
         <div id="measurements"></div>
       </section>
 
@@ -120,7 +120,7 @@
           ${group.fields.map(field => `
             <div>
               <label for="${field}" class="block text-sm font-medium">${group.label} ${field.split('-').pop()}:</label>
-              <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.01'}" class="mt-1 p-2 w-full border rounded">
+              <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded">
             </div>
           `).join('')}
         </div>
