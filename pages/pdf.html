@@ -150,6 +150,8 @@
 
     doc.setFontSize(16);
     doc.text("Résultats des mesures", 10, y);
+    const bogieNumber = data && data["bogie-number"] ? data["bogie-number"] : "inconnu";
+    doc.text(`Bogie n°: ${bogieNumber}`, 90, y);
     y += 10;
 
     if (data) {
@@ -185,8 +187,10 @@
         }
         if (y > 180) { doc.addPage(); y = 15; }
       });
-      doc.save("resultats_mesures.pdf");
-    } else {
+      // Récupère le numéro de bogie depuis les données (champ "bogie-number" attendu)
+      const bogieNumber = data && data["bogie-number"] ? data["bogie-number"] : "inconnu";
+      doc.save(`resultats_mesures_bogie_${bogieNumber}.pdf`);
+        } else {
       doc.text("Aucune donnée disponible.", 10, y);
       doc.save("resultats_mesures.pdf");
     }
