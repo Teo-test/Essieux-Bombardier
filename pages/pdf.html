@@ -73,44 +73,124 @@
   </main>
 
   <script>
-    // Affiche les résultats dans le rapport
-    document.addEventListener('DOMContentLoaded', function() {
-      const data = JSON.parse(localStorage.getItem('mesuresData'));
-      const rapportContent = document.getElementById('rapportContent');
-      if (data) {
-        let html = '<h2 class="text-xl font-semibold mb-4">Résultats</h2><table class="min-w-full"><tbody>';
-        for (const [key, value] of Object.entries(data)) {
-          html += `<tr><td class="border px-2 py-1 font-semibold">${key}</td><td class="border px-2 py-1">${value}</td></tr>`;
-        }
-        html += '</tbody></table>';
-        rapportContent.innerHTML = html;
-      } else {
-        rapportContent.innerHTML = '<p>Aucune donnée disponible.</p>';
-      }
-    });
+  // Même configuration que dans resultats.html
+  const measurementGroups = [
+    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"] },
+    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
+    { title: "Grand Rayon 1", fields: ["grandRayonVertical1A", "grandRayonHorizontal1A", "grandRayonVertical1B", "grandRayonHorizontal1B"] },
+    { title: "Grand Rayon 2", fields: ["grandRayonVertical2A", "grandRayonHorizontal2A", "grandRayonVertical2B", "grandRayonHorizontal2B"] },
+    { title: "Grand Rayon 3", fields: ["grandRayonVertical3A", "grandRayonHorizontal3A", "grandRayonVertical3B", "grandRayonHorizontal3B"] },
+    { title: "Petit Rayon 1", fields: ["petitRayonVertical1A", "petitRayonHorizontal1A", "petitRayonVertical1B", "petitRayonHorizontal1B"] },
+    { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "petitRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"] },
+    { title: "Petit Rayon 3", fields: ["petitRayonVertical3A", "petitRayonHorizontal3A", "petitRayonVertical3B", "petitRayonHorizontal3B"] },
+    { title: "Valeurs 'x' mesurées", fields: ["measured-value-x-A", "measured-value-x-B"] },
+    { title: "Valeurs 'y' mesurées", fields: ["measured-value-y-A", "measured-value-y-B"] },
+    { title: "Valeurs 'z' mesurées", fields: ["measured-value-z-A", "measured-value-z-B"] },
+    { title: "Valeurs 'u' mesurées", fields: ["measured-value-u-A", "measured-value-u-B"] },
+    { title: "Valeurs 'wm' mesurées", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
+    { title: "Valeurs 'bottom-nav' mesurées", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
+    { title: "Valeurs 'v' mesurées", fields: ["measured-value-v-A", "measured-value-v-B"] },
+    { title: "Valeurs 'bu' mesurées", fields: ["measured-value-bu-A", "measured-value-bu-B"] },
+    { title: "Valeurs 'd' mesurées", fields: ["measured-value-d-A", "measured-value-d-B"] },
+    { title: "Valeurs 'e' mesurées", fields: ["measured-value-e-A", "measured-value-e-B"] },
+    { title: "Valeurs 'eu' mesurées", fields: ["measured-value-eu-A", "measured-value-eu-B"] },
+    { title: "Jeu axial 'jm' mesuré Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
+    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"] }
+  ];
 
-    // Génération du PDF
-    document.getElementById('exportPDF').addEventListener('click', function() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const data = JSON.parse(localStorage.getItem('mesuresData'));
-      let y = 10;
-      doc.setFontSize(16);
-      doc.text("Résultats des mesures", 10, y);
-      y += 10;
-      if (data) {
-        doc.setFontSize(10);
-        for (const [key, value] of Object.entries(data)) {
-          doc.text(`${key} : ${value}`, 10, y);
-          y += 7;
-          if (y > 280) { doc.addPage(); y = 10; }
-        }
-        doc.save("resultats_mesures.pdf");
-      } else {
-        doc.text("Aucune donnée disponible.", 10, y);
-        doc.save("resultats_mesures.pdf");
+  // Affichage HTML (tableau dynamique)
+  document.addEventListener('DOMContentLoaded', function() {
+    const data = JSON.parse(localStorage.getItem('mesuresData'));
+    const rapportContent = document.getElementById('rapportContent');
+    if (data) {
+      let html = `
+        <h2 class="text-xl font-semibold mb-4">Résultats</h2>
+        <div class="overflow-x-auto">
+        <table class="min-w-full border">
+          <thead>
+            <tr>
+              <th class="border px-2 py-1">Catégorie</th>
+              ${(() => {
+                // Génère dynamiquement les entêtes selon le plus grand nombre de champs
+                let maxFields = Math.max(...measurementGroups.map(g => g.fields.length));
+                let headers = [];
+                for (let i = 0; i < maxFields; i++) {
+                  headers.push(`<th class="border px-2 py-1">Valeur ${i + 1}</th>`);
+                }
+                return headers.join('');
+              })()}
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      measurementGroups.forEach(group => {
+        html += `<tr>
+          <td class="border px-2 py-1 font-semibold">${group.title}</td>
+          ${group.fields.map(field => `<td class="border px-2 py-1">${data[field] ?? ''}</td>`).join('')}
+          ${(() => {
+            // Ajoute des cellules vides si moins de champs que le max
+            let empty = Math.max(...measurementGroups.map(g => g.fields.length)) - group.fields.length;
+            return '<td class="border px-2 py-1"></td>'.repeat(empty);
+          })()}
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      rapportContent.innerHTML = html;
+    } else {
+      rapportContent.innerHTML = '<p>Aucune donnée disponible.</p>';
+    }
+  });
+
+  // Génération du PDF en tableau dynamique
+  document.getElementById('exportPDF').addEventListener('click', function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape" });
+    const data = JSON.parse(localStorage.getItem('mesuresData'));
+    let y = 15;
+
+    doc.setFontSize(16);
+    doc.text("Résultats des mesures", 10, y);
+    y += 10;
+
+    if (data) {
+      doc.setFontSize(10);
+      // Génère dynamiquement les entêtes selon le plus grand nombre de champs
+      let maxFields = Math.max(...measurementGroups.map(g => g.fields.length));
+      let headers = ["Catégorie"];
+      for (let i = 0; i < maxFields; i++) {
+        headers.push("Valeur " + (i + 1));
       }
-    });
-  </script>
+      let x = 10;
+      headers.forEach((h, i) => {
+        doc.text(h, x, y);
+        x += 45;
+      });
+      y += 7;
+      doc.line(10, y, 10 + 45 * headers.length, y);
+
+      // Lignes du tableau
+      measurementGroups.forEach(group => {
+        y += 7;
+        let x = 10;
+        doc.text(group.title, x, y);
+        x += 45;
+        group.fields.forEach(field => {
+          doc.text(String(data[field] ?? ''), x, y);
+          x += 45;
+        });
+        // Cellules vides si moins de champs
+        let empty = maxFields - group.fields.length;
+        for (let i = 0; i < empty; i++) {
+          x += 45;
+        }
+        if (y > 180) { doc.addPage(); y = 15; }
+      });
+      doc.save("resultats_mesures.pdf");
+    } else {
+      doc.text("Aucune donnée disponible.", 10, y);
+      doc.save("resultats_mesures.pdf");
+    }
+  });
+</script>
 </body>
 </html>
