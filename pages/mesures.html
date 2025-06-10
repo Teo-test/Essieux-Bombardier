@@ -82,7 +82,9 @@
       </section>
 
       <!-- Submit Button -->
-      <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Valider</button>
+      <div class="flex justify-end">
+        <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Valider</button>
+      </div>
     </form>
     <div id="confirmation" class="hidden text-green-600 mt-4">Mesures enregistrées !</div>
   </main>
@@ -138,9 +140,32 @@
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData);
       localStorage.setItem('mesuresData', JSON.stringify(data));
+
+      // Vérification de l'enregistrement
+      const saved = localStorage.getItem('mesuresData');
       const confirmation = document.getElementById('confirmation');
-      confirmation.classList.remove('hidden');
-      setTimeout(() => confirmation.classList.add('hidden'), 3000);
+      const validerBtn = document.getElementById('validerBtn');
+      if (saved) {
+        confirmation.textContent = "Mesures enregistrées avec succès !";
+        confirmation.classList.remove('hidden', 'text-red-600');
+        confirmation.classList.add('text-green-600');
+        // Changement couleur bouton en vert
+        validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-red-600', 'hover:bg-red-700');
+        validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+      } else {
+        confirmation.textContent = "Erreur : données non enregistrées.";
+        confirmation.classList.remove('hidden', 'text-green-600');
+        confirmation.classList.add('text-red-600');
+        // Changement couleur bouton en rouge
+        validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-green-600', 'hover:bg-green-700');
+        validerBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+      }
+      setTimeout(() => {
+        confirmation.classList.add('hidden');
+        // Retour à la couleur bleue d'origine
+        validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
+        validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      }, 3000);
       e.target.reset();
     });
   </script>
