@@ -4,62 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accueil</title>
-  <link rel="stylesheet" href="styles/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <header>
-    <h1>Application de Mesures</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+  <!-- Navigation Bar -->
+  <nav class="bg-gray-800 text-white p-4">
+    <div class="container mx-auto flex justify-around">
+      <a href="index.html" class="underline">Accueil</a>
+      <a href="pages/mesures.html" class="hover:underline">Mesures</a>
+      <a href="pages/resultats.html" class="hover:underline">Résultats</a>
+      <a href="pages/pdf.html" class="hover:underline">PDF</a>
+    </div>
+  </nav>
+  <header class="bg-blue-600 text-white p-4">
+    <h1 class="text-2xl font-bold">Application de Mesures</h1>
   </header>
-  <main class="form-container">
-    <section class="hero">
-      <h2>Bienvenue sur l'Application de Mesures</h2>
-      <p>Notre application vous permet de saisir, calculer et générer des rapports PDF pour vos mesures de manière simple et efficace.</p>
+  <main class="flex-grow container mx-auto p-4">
+    <section class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold mb-2">Bienvenue sur l'Application de Mesures</h2>
+      <p class="mb-2">Notre application vous permet de saisir, calculer et générer des rapports PDF pour vos mesures de manière simple et efficace.</p>
     </section>
 
-    <section class="how-it-works">
-      <h2>Comment ça marche ?</h2>
-      <div class="steps">
-        <div class="step">
-          <h3>1. Remplir les Mesures</h3>
+    <section class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold mb-4">Comment ça marche ?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 p-4 rounded shadow">
+          <h3 class="font-bold mb-2">1. Remplir les Mesures</h3>
           <p>Commencez par saisir les mesures nécessaires dans le formulaire dédié. Vous pouvez entrer les détails des essieux, les diamètres des roues, et d'autres paramètres pertinents.</p>
         </div>
-        <div class="step">
-          <h3>2. Calculer les Résultats</h3>
+        <div class="bg-gray-50 p-4 rounded shadow">
+          <h3 class="font-bold mb-2">2. Calculer les Résultats</h3>
           <p>Une fois les mesures saisies, l'application calcule automatiquement les résultats. Vous pouvez consulter les moyennes, les écarts et d'autres calculs pertinents.</p>
         </div>
-        <div class="step">
-          <h3>3. Générer un Rapport PDF</h3>
+        <div class="bg-gray-50 p-4 rounded shadow">
+          <h3 class="font-bold mb-2">3. Générer un Rapport PDF</h3>
           <p>Enfin, vous pouvez générer un rapport PDF détaillé de vos mesures et résultats. Ce rapport peut être téléchargé ou partagé selon vos besoins.</p>
         </div>
       </div>
     </section>
 
-    <section class="summary">
-      <h2>Résumé des Résultats</h2>
-      <p>Consultez un résumé des dernières mesures et résultats calculés. Vous pouvez voir les moyennes, les écarts et d'autres statistiques pertinentes pour une vue d'ensemble rapide.</p>
-      <div id="results-summary">
-        <!-- Le résumé des résultats sera affiché ici -->
-      </div>
+    <section class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold mb-2">Résumé des Résultats</h2>
+      <p class="mb-2">Consultez un résumé des dernières mesures et résultats calculés. Vous pouvez voir les moyennes, les écarts et d'autres statistiques pertinentes pour une vue d'ensemble rapide.</p>
+      <div id="results-summary" class="bg-gray-50 p-4 rounded"></div>
     </section>
 
-    <section class="cta">
-      <h2>Prêt à commencer ?</h2>
-      <div class="cta-buttons">
-        <a href="pages/mesures.html" class="button-link">Remplir les Mesures</a>
-        <a href="pages/resultats.html" class="button-link">Voir les Résultats</a>
-        <a href="pages/pdf.html" class="button-link">Générer un PDF</a>
+    <section class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">Prêt à commencer ?</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <a href="pages/mesures.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center">Remplir les Mesures</a>
+        <a href="pages/resultats.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-center">Voir les Résultats</a>
+        <a href="pages/pdf.html" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 text-center">Générer un PDF</a>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav">
-    <a href="index.html" class="active">Accueil</a>
-    <a href="pages/mesures.html">Mesures</a>
-    <a href="pages/resultats.html">Résultats</a>
-    <a href="pages/pdf.html">PDF</a>
-  </nav>
-
-  <script src="scripts/script.js"></script>
   <script>
     // Exemple de script pour afficher un résumé des résultats
     document.addEventListener('DOMContentLoaded', function() {
@@ -67,12 +66,27 @@
       const data = JSON.parse(localStorage.getItem('mesuresData'));
 
       if (data) {
-        const moyenneVerticale = (parseFloat(data.grandModeleVertical1) + parseFloat(data.grandModeleVertical2) + parseFloat(data.grandModeleVertical3)) / 3;
-        const moyenneHorizontale = (parseFloat(data.grandModeleHorizontal1) + parseFloat(data.grandModeleHorizontal2) + parseFloat(data.grandModeleHorizontal3)) / 3;
+        // Adaptez ici selon la structure réelle des données stockées
+        const moyenneVerticale = (
+          (parseFloat(data.grandRayonVertical1A || 0) +
+           parseFloat(data.grandRayonVertical2A || 0) +
+           parseFloat(data.grandRayonVertical3A || 0) +
+           parseFloat(data.grandRayonVertical1B || 0) +
+           parseFloat(data.grandRayonVertical2B || 0) +
+           parseFloat(data.grandRayonVertical3B || 0)) / 6
+        );
+        const moyenneHorizontale = (
+          (parseFloat(data.grandRayonHorizontal1A || 0) +
+           parseFloat(data.grandRayonHorizontal2A || 0) +
+           parseFloat(data.grandRayonHorizontal3A || 0) +
+           parseFloat(data.grandRayonHorizontal1B || 0) +
+           parseFloat(data.grandRayonHorizontal2B || 0) +
+           parseFloat(data.grandRayonHorizontal3B || 0)) / 6
+        );
 
         summaryContainer.innerHTML = `
-          <p><strong>Moyenne Verticale:</strong> ${moyenneVerticale.toFixed(2)} mm</p>
-          <p><strong>Moyenne Horizontale:</strong> ${moyenneHorizontale.toFixed(2)} mm</p>
+          <p><strong>Moyenne Verticale:</strong> ${isNaN(moyenneVerticale) ? 'N/A' : moyenneVerticale.toFixed(2)} mm</p>
+          <p><strong>Moyenne Horizontale:</strong> ${isNaN(moyenneHorizontale) ? 'N/A' : moyenneHorizontale.toFixed(2)} mm</p>
         `;
       } else {
         summaryContainer.innerHTML = '<p>Aucune donnée disponible pour le moment.</p>';
