@@ -66,84 +66,50 @@
       <section>
         <h2 class="text-xl font-semibold mb-4">Exportation des Résultats</h2>
         <p class="mb-4">Cliquez sur le bouton ci-dessous pour exporter les résultats des mesures en PDF.</p>
-        <button id="exportPdfBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Exporter en PDF</button>
+        <button id="exportPDF" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 mt-4">Exporter en PDF</button>
+        <div id="rapportContent" class="mt-6"></div>
       </section>
     </div>
   </main>
 
   <script>
-    document.getElementById('exportPdfBtn').addEventListener('click', function() {
+    // Affiche les résultats dans le rapport
+    document.addEventListener('DOMContentLoaded', function() {
+      const data = JSON.parse(localStorage.getItem('mesuresData'));
+      const rapportContent = document.getElementById('rapportContent');
+      if (data) {
+        let html = '<h2 class="text-xl font-semibold mb-4">Résultats</h2><table class="min-w-full"><tbody>';
+        for (const [key, value] of Object.entries(data)) {
+          html += `<tr><td class="border px-2 py-1 font-semibold">${key}</td><td class="border px-2 py-1">${value}</td></tr>`;
+        }
+        html += '</tbody></table>';
+        rapportContent.innerHTML = html;
+      } else {
+        rapportContent.innerHTML = '<p>Aucune donnée disponible.</p>';
+      }
+    });
+
+    // Génération du PDF
+    document.getElementById('exportPDF').addEventListener('click', function() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-
-      // Exemple de données, remplacez-les par vos propres données récupérées
-      const savedData = {
-        date: '2023-10-01',
-        om: 'OM123',
-        bogieNo: 'Bogie456',
-        typeNo: 'Type789',
-        Fabrick: 'Fab123',
-        Auftrags: 'Cde456',
-        Baujahr: '2023',
-        "axial-play-A": "0.01",
-        "axial-play-B": "0.02",
-        "soud-vis-A": "OK",
-        "soud-vis-B": "OK",
-        // Ajoutez d'autres données ici
-      };
-
-      // Ajouter un titre
-      doc.setFontSize(22);
-      doc.setTextColor(41, 128, 185);
-      doc.text('Rapport des Mesures', 105, 20, { align: 'center' });
-
-      // Ajouter les informations générales
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Date: ${savedData.date || 'Non spécifié'}`, 20, 40);
-      doc.text(`OM: ${savedData.om || 'Non spécifié'}`, 20, 50);
-      doc.text(`Bogie N°: ${savedData.bogieNo || 'Non spécifié'}`, 20, 60);
-      doc.text(`Type N°: ${savedData.typeNo || 'Non spécifié'}`, 20, 70);
-
-      // Configuration des groupes de mesures
-      const measurementGroups = [
-        { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"] },
-        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
-        // Ajoutez d'autres groupes ici
-      ];
-
-      let yOffset = 80;
-      measurementGroups.forEach(group => {
-        doc.setFontSize(14);
-        doc.setTextColor(41, 128, 185);
-        doc.text(group.title, 20, yOffset);
-        yOffset += 10;
-
-        const headers = [['Côté', 'Valeur']];
-        const rows = group.fields.map(field => {
-          const fieldId = field.split('-').pop();
-          return [fieldId, savedData[field] || 'Non spécifié'];
-        });
-
-        doc.autoTable({
-          head: headers,
-          body: rows,
-          startY: yOffset,
-          styles: { fontSize: 10 },
-          headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [240, 240, 240] }
-        });
-
-        yOffset = doc.lastAutoTable.finalY + 10;
-      });
-
-      // Ajouter un pied de page
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text('Document généré automatiquement - Tous droits réservés', 105, yOffset + 10, { align: 'center' });
-
-      // Sauvegarder le PDF
-      doc.save('Rapport_Mesures.pdf');
+      const data = JSON.parse(localStorage.getItem('mesuresData'));
+      let y = 10;
+      doc.setFontSize(16);
+      doc.text("Résultats des mesures", 10, y);
+      y += 10;
+      if (data) {
+        doc.setFontSize(10);
+        for (const [key, value] of Object.entries(data)) {
+          doc.text(`${key} : ${value}`, 10, y);
+          y += 7;
+          if (y > 280) { doc.addPage(); y = 10; }
+        }
+        doc.save("resultats_mesures.pdf");
+      } else {
+        doc.text("Aucune donnée disponible.", 10, y);
+        doc.save("resultats_mesures.pdf");
+      }
     });
   </script>
 </body>
