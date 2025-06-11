@@ -243,91 +243,109 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // === TABLEAU entre les deux groupes ===
   html += `
-    <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
-    <div class="overflow-x-auto">
-    <table class="min-w-full text-xs border border-black">
-      <thead>
-        <tr>
-          <th rowspan="2" class="border border-black px-2 py-1 align-middle"> </th>
-          <th colspan="2" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
-          <th colspan="2" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
-          <th rowspan="2" class="border border-black px-2 py-1 align-middle"> </th>
-        </tr>
-        <tr>
-          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Vertical</th>
-          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Horizontal</th>
-          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Vertical</th>
-          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Horizontal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="border border-black px-2 py-1">Grand modèle 1</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
-          <td class="border border-black px-2 py-1" rowspan="3" style="vertical-align:middle;text-align:center;" colspan="1">
-            <div class="text-red-600 font-bold text-xs">117,450 &lt; Ø &lt; 117,475</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1">Grand modèle 2</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1">Grand modèle 3</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1 font-bold bg-gray-100">Moyenne</td>
-          <td class="border border-black px-2 py-1">${val('GD-Moyenne Verticale')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Moyenne Horizontale')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Moyenne Verticale')}</td>
-          <td class="border border-black px-2 py-1">${val('GD-Moyenne Horizontale')}</td>
-          <td class="border border-black px-2 py-1"></td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1">Petit modèle 1</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
-          <td class="border border-black px-2 py-1" rowspan="3" style="vertical-align:middle;text-align:center;" colspan="1">
-            <div class="text-red-600 font-bold text-xs">89,920 &lt; Ø &lt; 89,945</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1">Petit modèle 2</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1">Petit modèle 3</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
-        </tr>
-        <tr>
-          <td class="border border-black px-2 py-1 font-bold bg-gray-100">Moyenne</td>
-          <td class="border border-black px-2 py-1">${val('PD-Moyenne Verticale')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Moyenne Horizontale')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Moyenne Verticale')}</td>
-          <td class="border border-black px-2 py-1">${val('PD-Moyenne Horizontale')}</td>
-          <td class="border border-black px-2 py-1"></td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
+<h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
+<div class="overflow-x-auto">
+  <table class="min-w-full text-xs border border-black mb-8" style="border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th rowspan="2" class="border border-black px-2 py-1"></th>
+        <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
+        <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
+        <th rowspan="2" class="border border-black px-2 py-1"></th>
+      </tr>
+      <tr>
+        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
+        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">horizontal</th>
+        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
+        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">horizontal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Grand Diamètre -->
+      <tr>
+        <td class="border border-black px-2 py-1 align-middle" rowspan="4" style="text-align:center;">Grand Diamètre</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1-B')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4-B')}</td>
+        <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;">
+          <span class="text-red-600 font-bold text-xs">117,450 < Ø < 117,475</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2-B')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5-B')}</td>
+      </tr>
+      <tr>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3-B')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6-B')}</td>
+      </tr>
+      <tr>
+        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
+        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
+      </tr>
+      <!-- Séparateur -->
+      <tr>
+        <td colspan="11" class="border border-black px-2 py-1"></td>
+      </tr>
+      <!-- Petit Diamètre -->
+      <tr>
+        <td class="border border-black px-2 py-1 align-middle" rowspan="4" style="text-align:center;">Petit Diamètre</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1-B')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4-B')}</td>
+        <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;">
+          <span class="text-red-600 font-bold text-xs">89,920 < Ø < 89,945</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2-B')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5-B')}</td>
+      </tr>
+      <tr>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3-B')}</td>
+        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6-B')}</td>
+      </tr>
+      <tr>
+        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
+        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   `;
 
   // Groupes APRES le tableau
