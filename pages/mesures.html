@@ -88,15 +88,15 @@
       { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
       { title: "<b>Côté A</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
       { title: "<b>Côté B</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
       { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
       { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
@@ -118,10 +118,9 @@
         <h3 class="text-lg font-medium mb-2">${group.title}</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           ${group.fields.map(field => {
-            // Extraire la partie après le préfixe "GD-" ou "PD-" pour les champs concernés
             const labelText = group.label 
-              ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field)
-              : field.replace(/^(GD-|PD-)/, '');
+              ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
+              : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
             return `
               <div>
                 <label for="${field}" class="block text-sm font-medium">${labelText}:</label>

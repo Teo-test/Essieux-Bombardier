@@ -1,3 +1,8 @@
+J'ai modifié votre script pour m'assurer que les tableaux soient affichés en entier sur les pages lors de l'exportation PDF. La principale modification consiste à appliquer la propriété CSS `page-break-inside: avoid;` aux tableaux pour empêcher les sauts de page à l'intérieur de ceux-ci. J'ai aussi ajouté une classe `.table-no-break` pour cela.
+
+Voici le script complet mis à jour :
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,6 +11,7 @@
   <title>Export PDF</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -42,9 +48,23 @@
     .button:hover {
       background-color: #0b5ed7;
     }
+    .page-break {
+      page-break-before: always;
+      break-before: always;
+    }
+    .no-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-no-break { /* Nouvelle classe pour les tableaux */
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .bg-white { background: #fff !important; }
+    .shadow { box-shadow: none !important; }
   </style>
 </head>
-
+<body class="bg-gray-100 min-h-screen flex flex-col">
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
@@ -54,334 +74,236 @@
     </div>
   </nav>
   
-<body class="bg-gray-100 min-h-screen flex flex-col">
   <header class="bg-blue-600 text-white p-4">
     <h1 class="text-2xl font-bold">Export PDF des Mesures</h1>
   </header>
-
-
 
   <main class="flex-grow container mx-auto p-4">
     <div class="bg-white p-6 rounded-lg shadow space-y-6">
       <section>
         <h2 class="text-xl font-semibold mb-4">Exportation des Résultats</h2>
         <p class="mb-4">Cliquez sur le bouton ci-dessous pour exporter les résultats des mesures en PDF.</p>
-        <button id="exportPDF" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 mt-4">Exporter en PDF</button>
+        <button id="exportPDF" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">Exporter en PDF</button>
         <div id="rapportContent" class="mt-6"></div>
       </section>
     </div>
   </main>
 
   <script>
-  // Même configuration que dans mesures.html et resultats.html
-  const measurementGroups = [
-    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
-    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
-    { title: "<b>Côté A</b>", fields: [], label: "" },
-    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
-    { title: "<b>Côté B</b>", fields: [], label: "" },
-    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
-    { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
-    { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
-    { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
-    { title: "<b>Valeurs 'u' mesurées</b> = hauteur petit et grand roulement montés sur la roue", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-    { title: "<b>Valeurs 'wm' mesurées</b> = profondeur du couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-    { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
-    { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
-    { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
-    { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
-    { title: "<b>Jeu axial 'jm' mesuré Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
-    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-  ];
+    const data = JSON.parse(localStorage.getItem('mesuresData')) || {};
+    function val(key) { return data[key] ?? ""; }
 
-  // Affichage HTML (tableau dynamique)
-  document.addEventListener('DOMContentLoaded', function() {
-    const data = JSON.parse(localStorage.getItem('mesuresData'));
-    const rapportContent = document.getElementById('rapportContent');
-    if (data) {
-      // Informations générales
+    // Calculate average of an array of values, ignoring empty strings
+    function calcAverage(values) {
+      const validNums = values.filter(v => v !== "").map(Number).filter(v => !isNaN(v));
+      return validNums.length ? (validNums.reduce((sum, v) => sum + v, 0) / validNums.length).toFixed(3) : "";
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // First page content: Informations Générales, Localisation, and Table
       let html = `
-        <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div><span class="font-medium">Date:</span> ${data.date || ''}</div>
-          <div><span class="font-medium">OM:</span> ${data.om || ''}</div>
-          <div><span class="font-medium">Bogie N°:</span> ${data.bogieNo || ''}</div>
-          <div><span class="font-medium">Type N°:</span> ${data.typeNo || ''}</div>
-          <div><span class="font-medium">Fabrick:</span> ${data.Fabrick || ''}</div>
-          <div><span class="font-medium">Auftrags:</span> ${data.Auftrags || ''}</div>
-          <div><span class="font-medium">Baujahr:</span> ${data.Baujahr || ''}</div>
+        <div id="firstPageContent" class="no-break">
+          <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div><span class="font-medium">Date:</span> ${val('date')}</div>
+            <div><span class="font-medium">OM:</span> ${val('om')}</div>
+            <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo')}</div>
+            <div><span class="font-medium">Type N°:</span> ${val('typeNo')}</div>
+            <div><span class="font-medium">Fabrick:</span> ${val('Fabrick')}</div>
+            <div><span class="font-medium">Auftrags:</span> ${val('Auftrags')}</div>
+            <div><span class="font-medium">Baujahr:</span> ${val('Baujahr')}</div>
+          </div>
+          <h2 class="text-xl font-semibold mb-4">Localisation</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div><span class="font-medium">N° de série roue droite (Côté A):</span> ${val('series-wheel-A')}</div>
+            <div><span class="font-medium">N° de série roue gauche (Côté B):</span> ${val('series-wheel-B')}</div>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-base border border-black mb-8 table-no-break" style="border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th rowspan="2" class="border border-black px-2 py-1" style="width:100px;"></th>
+                  <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
+                  <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
+                  <th rowspan="2" class="border border-black px-2 py-1" style="width:100px;"></th>
+                </tr>
+                <tr>
+                  <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
+                  <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">horizontal</th>
+                  <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
+                  <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">horizontal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="border border-black px-2 py-1 align-middle" rowspan="3" style="text-align:center;width:100px;">Grand Diamètre</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 1-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 4-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 1-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 4-B')}</td> <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
+                    <span class="text-red-600 font-bold text-xs">117,450<br> < Ø < <br>117,475</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 2-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 5-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 2-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 5-B')}</td> </tr>
+                <tr>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 3-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 6-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 3-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 6-B')}</td> </tr>
+
+                <tr>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('GD-Côte Verticale 1-A'), val('GD-Côte Verticale 2-A'), val('GD-Côte Verticale 3-A')
+                      ])}
+                  </td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('GD-Côte Horizontale 4-A'), val('GD-Côte Horizontale 5-A'), val('GD-Côte Horizontale 6-A')
+                      ])}
+                  </td>
+
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('GD-Côte Verticale 1-B'), val('GD-Côte Verticale 2-B'), val('GD-Côte Verticale 3-B'),
+                      ])}
+                  </td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('GD-Côte Horizontale 4-B'), val('GD-Côte Horizontale 5-B'), val('GD-Côte Horizontale 6-B')
+                      ])}
+                    </td>
+
+                </tr>
+                <tr>
+                  <td colspan="10" class="border border-black px-2 py-1"></td>
+                </tr>
+                <tr>
+                  <td class="border border-black px-2 py-1 align-middle" rowspan="3" style="text-align:center;width:100px;">Petit Diamètre</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 1-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 4-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 1-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 4-B')}</td> <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
+                    <span class="text-red-600 font-bold text-xs">89,920<br> < Ø < <br>89,945</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 2-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 5-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 2-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 5-B')}</td> </tr>
+                <tr>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 3-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 6-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 3-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 6-B')}</td> </tr>
+
+                <tr>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('PD-Côte Verticale 1-A'), val('PD-Côte Verticale 2-A'), val('PD-Côte Verticale 3-A')
+                      ])}
+                  </td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('PD-Côte Horizontale 4-A'), val('PD-Côte Horizontale 5-A'), val('PD-Côte Horizontale 6-A')
+                      ])}
+                  </td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('PD-Côte Verticale 1-B'), val('PD-Côte Verticale 2-B'), val('PD-Côte Verticale 3-B'),
+                      ])}
+                  </td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                    ${calcAverage([
+                      val('PD-Côte Horizontale 4-B'), val('PD-Côte Horizontale 5-B'), val('PD-Côte Horizontale 6-B')
+                      ])}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
-        <div class="space-y-4">
+        <div class="page-break"></div>
+        <div id="subsequentPagesContent">
+          <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-base border border-black mb-8 table-no-break" style="border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:400px;">Mesure</th> 
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
+                </tr>
+              </thead>
+              <tbody>
       `;
+
+      // Measurement groups for subsequent pages
+      const measurementGroups = [
+        { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"]},
+        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], type: "text" },
+        { title: "Valeurs 'x' mesurées = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"]},
+        { title: "Valeurs 'y' mesurées = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"]},
+        { title: "Valeurs 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"]},
+        { title: "Valeurs 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"]},
+        { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"]},
+        { title: "Valeurs 'bm' mesurées = hauteur douille écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
+        { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"]},
+        { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"]},
+        { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"]},
+        { title: "Jeu axial 'jm' Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"]},
+        { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"]}
+      ];
+
       measurementGroups.forEach(group => {
-        if (!group.fields.length) {
-          html += `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
-          return;
-        }
-        html += `<div class="bg-gray-50 p-4 rounded-lg">
-          <h3 class="font-medium mb-2">${group.title}</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
-        group.fields.forEach(field => {
-          const fieldId = field.split('-').pop();
-          const value = data[field] || 'Non spécifié';
-          html += `
-            <div>
-              <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
-            </div>
-          `;
-        });
-        html += `</div></div>`;
+        const valueA = data[group.fields[0]] || 'Non spécifié';
+        const valueB = data[group.fields[1]] || 'Non spécifié';
+        html += `
+          <tr>
+            <td class="border border-black px-2 py-1">${group.title}</td>
+            <td class="border border-black px-2 py-1 text-center">${valueA}</td>
+            <td class="border border-black px-2 py-1 text-center">${valueB}</td>
+          </tr>
+        `;
       });
-      html += '</div>';
-      rapportContent.innerHTML = html;
-    } else {
-      rapportContent.innerHTML = '<p>Aucune donnée disponible.</p>';
-    }
-  });
 
-  // Génération du PDF en tableau dynamique
-  document.getElementById('exportPDF').addEventListener('click', function() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: "landscape" });
-    const data = JSON.parse(localStorage.getItem('mesuresData'));
-    let y = 15;
-
-    doc.setFontSize(16);
-    doc.text("Résultats des mesures", 10, y);
-    y += 10;
-
-    // Informations générales
-    if (data) {
-      doc.setFontSize(10);
-      doc.text(`Date: ${data.date || ''}`, 10, y);
-      doc.text(`OM: ${data.om || ''}`, 60, y);
-      doc.text(`Bogie N°: ${data.bogieNo || ''}`, 110, y);
-      doc.text(`Type N°: ${data.typeNo || ''}`, 160, y);
-      y += 7;
-      doc.text(`Fabrick: ${data.Fabrick || ''}`, 10, y);
-      doc.text(`Auftrags: ${data.Auftrags || ''}`, 60, y);
-      doc.text(`Baujahr: ${data.Baujahr || ''}`, 110, y);
-      y += 10;
-
-      // Affichage des groupes
-      measurementGroups.forEach(group => {
-        if (!group.fields.length) {
-          y += 10;
-          doc.setFont(undefined, "bold");
-          doc.text(group.title.replace(/<[^>]+>/g, ''), 10, y);
-          doc.setFont(undefined, "normal");
-          return;
-        }
-        y += 7;
-        doc.setFont(undefined, "bold");
-        doc.text(group.title.replace(/<[^>]+>/g, ''), 10, y);
-        doc.setFont(undefined, "normal");
-        group.fields.forEach(field => {
-          y += 7;
-          const fieldId = field.split('-').pop();
-          const value = data[field] || 'Non spécifié';
-          doc.text(`${fieldId}: ${value}`, 20, y);
-        });
-        if (y > 180) { doc.addPage(); y = 15; }
-      });
-      doc.save("resultats_mesures.pdf");
-    } else {
-      doc.text("Aucune donnée disponible.", 10, y);
-      doc.save("resultats_mesures.pdf");
-    }
-  });
-</script>
-<script>
-const data = JSON.parse(localStorage.getItem('mesuresData')) || {};
-function val(key) { return data[key] ?? ""; }
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Informations générales
-  let html = `
-    <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div><span class="font-medium">Date:</span> ${val('date') ? val('date') : ""}</div>
-      <div><span class="font-medium">OM:</span> ${val('om') ? val('om') : ""}</div>
-      <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo') ? val('bogieNo') : ""}</div>
-      <div><span class="font-medium">Type N°:</span> ${val('typeNo') ? val('typeNo') : ""}</div>
-      <div><span class="font-medium">Fabrick:</span> ${val('Fabrick') ? val('Fabrick') : ""}</div>
-      <div><span class="font-medium">Auftrags:</span> ${val('Auftrags') ? val('Auftrags') : ""}</div>
-      <div><span class="font-medium">Baujahr:</span> ${val('Baujahr') ? val('Baujahr') : ""}</div>
-    </div>
-    <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
-    <div class="space-y-4 mb-6">
-  `;
-
-  // Groupes AVANT le tableau
-  const measurementGroups = [
-    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
-    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" }
-  ];
-  measurementGroups.forEach(group => {
-    if (!group.fields.length) return;
-    html += `<div class="bg-gray-50 p-4 rounded-lg">
-      <h3 class="font-medium mb-2">${group.title}</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
-    group.fields.forEach(field => {
-      const fieldId = field.split('-').pop();
-      const value = data[field] || 'Non spécifié';
       html += `
-        <div>
-          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
+      document.getElementById('rapportContent').innerHTML = html;
+
+      // PDF generation
+      document.getElementById('exportPDF').addEventListener('click', function() {
+        const element = document.getElementById('rapportContent');
+        const opt = {
+          margin: [0.5, 0.2, 0.5, 0.2], // top, right, bottom, left
+          filename: 'resultats_mesures.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+          pagebreak: { mode: ['css', 'legacy'], before: '.page-break', avoid: ['.no-break', '.table-no-break'] }
+        };
+        html2pdf().set(opt).from(element).save();
+      });
     });
-    html += `</div></div>`;
-  });
-
-  // === TABLEAU entre les deux groupes ===
-  html += `
-<h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
-<div class="overflow-x-auto">
-  <table class="min-w-full text-xs border border-black mb-8" style="border-collapse:collapse;">
-    <thead>
-      <tr>
-        <th rowspan="2" class="border border-black px-2 py-1"></th>
-        <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
-        <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
-        <th rowspan="2" class="border border-black px-2 py-1"></th>
-      </tr>
-      <tr>
-        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
-        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">horizontal</th>
-        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
-        <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">horizontal</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Grand Diamètre -->
-      <tr>
-        <td class="border border-black px-2 py-1 align-middle" rowspan="4" style="text-align:center;">Grand Diamètre</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1-B')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4-B')}</td>
-        <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;">
-          <span class="text-red-600 font-bold text-xs">117,450 < Ø < 117,475</span>
-        </td>
-      </tr>
-      <tr>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2-B')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5-B')}</td>
-      </tr>
-      <tr>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3-B')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6-B')}</td>
-      </tr>
-      <tr>
-        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
-        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
-      </tr>
-      <!-- Séparateur -->
-      <tr>
-        <td colspan="11" class="border border-black px-2 py-1"></td>
-      </tr>
-      <!-- Petit Diamètre -->
-      <tr>
-        <td class="border border-black px-2 py-1 align-middle" rowspan="4" style="text-align:center;">Petit Diamètre</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1-B')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4-B')}</td>
-        <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;">
-          <span class="text-red-600 font-bold text-xs">89,920 < Ø < 89,945</span>
-        </td>
-      </tr>
-      <tr>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2-B')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5-B')}</td>
-      </tr>
-      <tr>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3-B')}</td>
-        <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6-B')}</td>
-      </tr>
-      <tr>
-        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
-        <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-  `;
-
-  // Groupes APRES le tableau
-  const afterTableGroups = [
-    { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
-    { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
-    { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
-    { title: "<b>Valeurs 'u' mesurées</b> = hauteur petit et grand roulement montés sur la roue", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-    { title: "<b>Valeurs 'wm' mesurées</b> = profondeur du couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-    { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
-    { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
-    { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
-    { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
-    { title: "<b>Jeu axial 'jm' mesuré Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
-    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" }
-  ];
-  afterTableGroups.forEach(group => {
-    if (!group.fields.length) return;
-    html += `<div class="bg-gray-50 p-4 rounded-lg">
-      <h3 class="font-medium mb-2">${group.title}</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
-    group.fields.forEach(field => {
-      const fieldId = field.split('-').pop();
-      const value = data[field] || 'Non spécifié';
-      html += `
-        <div>
-          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
-        </div>
-      `;
-    });
-    html += `</div></div>`;
-  });
-
-  html += '</div>';
-  document.getElementById('rapportContent').innerHTML = html;
-});
-</script>
+  </script>
 </body>
 </html>
+```

@@ -7,15 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col" id="page-resultats">
-
-  <!-- Navigation Bar -->
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
       <a href="mesures.html" class="hover:underline">Mesures</a>
       <a href="resultats.html" class="underline">Résultats</a>
       <a href="pdf.html" class="hover:underline">PDF</a>
-      <!-- Correction : la page active est Résultats, pas PDF -->
     </div>
   </nav>
   <header class="bg-blue-600 text-white p-4">
@@ -23,7 +20,6 @@
   </header>
   <main class="flex-grow container mx-auto p-4">
     <div class="bg-white p-6 rounded-lg shadow space-y-6">
-      <!-- Section pour afficher les informations générales -->
       <section>
         <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -50,8 +46,17 @@
           </div>
         </div>
       </section>
-
-      <!-- Section pour afficher les résultats des mesures -->
+      <section>
+        <h2 class="text-xl font-semibold mb-4">Localisation</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm font-medium">N° de série roue droite (Côté A): <span id="display-series-wheel-A" class="font-normal"></span></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium">N° de série roue gauche (Côté B): <span id="display-series-wheel-B" class="font-normal"></span></p>
+          </div>
+        </div>
+      </section>
       <section>
         <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
         <div id="results-container" class="space-y-4"></div>
@@ -60,50 +65,51 @@
   </main>
 
   <script>
-    // Même configuration que dans mesures.html
     const measurementGroups = [
       { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
       { title: "<b>Côté A</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "Côté" },
-      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "Côté" },
-      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "Côté" },
-      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "Côté" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
       { title: "<b>Côté B</b>", fields: [], label: "" },
       { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
       { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
-      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
       { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
       { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
-      { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
-      { title: "<b>Valeurs 'u' mesurées</b> = hauteur petit et grand roulement montés sur la roue", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur du couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
+      { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
       { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
       { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
       { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
-      { title: "<b>Jeu axial 'jm' mesuré Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
+      { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
       { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
     ];
 
-    // Lecture correcte des données du localStorage
     const savedData = JSON.parse(localStorage.getItem('mesuresData')) || {};
 
-    // Afficher les informations générales
-    document.getElementById('display-date').textContent = savedData.date ? savedData.date : "";
-    document.getElementById('display-om').textContent = savedData.om ? savedData.om : "";
-    document.getElementById('display-bogieNo').textContent = savedData.bogieNo ? savedData.bogieNo : "";
-    document.getElementById('display-typeNo').textContent = savedData.typeNo ? savedData.typeNo : "";
-    document.getElementById('display-Fabrick').textContent = savedData.Fabrick ? savedData.Fabrick : "";
-    document.getElementById('display-Auftrags').textContent = savedData.Auftrags ? savedData.Auftrags : "";
-    document.getElementById('display-Baujahr').textContent = savedData.Baujahr ? savedData.Baujahr : "";
+    // Display general information
+    document.getElementById('display-date').textContent = savedData.date || "";
+    document.getElementById('display-om').textContent = savedData.om || "";
+    document.getElementById('display-bogieNo').textContent = savedData.bogieNo || "";
+    document.getElementById('display-typeNo').textContent = savedData.typeNo || "";
+    document.getElementById('display-Fabrick').textContent = savedData.Fabrick || "";
+    document.getElementById('display-Auftrags').textContent = savedData.Auftrags || "";
+    document.getElementById('display-Baujahr').textContent = savedData.Baujahr || "";
 
-    // Afficher les résultats des mesures
+    // Display wheel serial numbers
+    document.getElementById('display-series-wheel-A').textContent = savedData['series-wheel-A'] || "";
+    document.getElementById('display-series-wheel-B').textContent = savedData['series-wheel-B'] || "";
+
+    // Display measurement results
     const resultsContainer = document.getElementById('results-container');
     if (Object.keys(savedData).length > 0) {
       measurementGroups.forEach(group => {
-        // N'affiche pas les groupes sans champs
         if (!group.fields.length) {
           resultsContainer.innerHTML += `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
           return;
@@ -113,14 +119,16 @@
         section.innerHTML = `<h3 class="font-medium mb-2">${group.title}</h3>`;
 
         const fieldsContainer = document.createElement('div');
-        fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4';
+        fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2';
 
         group.fields.forEach(field => {
-          const fieldId = field.split('-').pop();
-          const value = savedData[field];
+          const labelText = group.label 
+            ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
+            : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+          const value = savedData[field] || "";
           fieldsContainer.innerHTML += `
             <div>
-              <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value ? value : ""}</span></p>
+              <p class="text-sm font-medium">${labelText}: <span class="font-normal">${value}</span></p>
             </div>
           `;
         });
