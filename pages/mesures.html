@@ -118,10 +118,13 @@
         <h3 class="text-lg font-medium mb-2">${group.title}</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           ${group.fields.map(field => {
-            const labelText = field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field;
+            // Extraire la partie après le préfixe "GD-" ou "PD-" pour les champs concernés
+            const labelText = group.label 
+              ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field)
+              : field.replace(/^(GD-|PD-)/, '');
             return `
               <div>
-                <label for="${field}" class="block text-sm font-medium">${group.label ? labelText : field}:</label>
+                <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
                 <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded">
               </div>
             `;
