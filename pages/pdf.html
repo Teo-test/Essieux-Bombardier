@@ -1,8 +1,3 @@
-J'ai modifié votre script pour m'assurer que les tableaux soient affichés en entier sur les pages lors de l'exportation PDF. La principale modification consiste à appliquer la propriété CSS `page-break-inside: avoid;` aux tableaux pour empêcher les sauts de page à l'intérieur de ceux-ci. J'ai aussi ajouté une classe `.table-no-break` pour cela.
-
-Voici le script complet mis à jour :
-
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -56,10 +51,6 @@ Voici le script complet mis à jour :
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    .table-no-break { /* Nouvelle classe pour les tableaux */
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
     .bg-white { background: #fff !important; }
     .shadow { box-shadow: none !important; }
   </style>
@@ -90,7 +81,23 @@ Voici le script complet mis à jour :
   </main>
 
   <script>
-    const data = JSON.parse(localStorage.getItem('mesuresData')) || {};
+    // Fonction pour obtenir la dernière clé utilisée (valider ou ouvrir)
+    function getLastMesuresKey() {
+      return localStorage.getItem('mesuresData_last') || null;
+    }
+
+    function getLastMesuresData() {
+      const key = getLastMesuresKey();
+      if (!key) return null;
+      try {
+        return JSON.parse(localStorage.getItem(key));
+      } catch {
+        return null;
+      }
+    }
+
+    // Utilise toujours la dernière saisie ou ouverture
+    const data = getLastMesuresData() || {};
     function val(key) { return data[key] ?? ""; }
 
     // Calculate average of an array of values, ignoring empty strings
@@ -100,6 +107,10 @@ Voici le script complet mis à jour :
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      if (Object.keys(data).length === 0) {
+        document.getElementById('rapportContent').innerHTML = '';
+        return;
+      }
       // First page content: Informations Générales, Localisation, and Table
       let html = `
         <div id="firstPageContent" class="no-break">
@@ -120,7 +131,7 @@ Voici le script complet mis à jour :
           </div>
           <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
           <div class="overflow-x-auto">
-            <table class="min-w-full text-base border border-black mb-8 table-no-break" style="border-collapse:collapse;">
+            <table class="min-w-full text-base border border-black mb-8" style="border-collapse:collapse;">
               <thead>
                 <tr>
                   <th rowspan="2" class="border border-black px-2 py-1" style="width:100px;"></th>
@@ -241,7 +252,7 @@ Voici le script complet mis à jour :
         <div id="subsequentPagesContent">
           <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
           <div class="overflow-x-auto">
-            <table class="min-w-full text-base border border-black mb-8 table-no-break" style="border-collapse:collapse;">
+            <table class="min-w-full text-base border border-black mb-8" style="border-collapse:collapse;">
               <thead>
                 <tr>
                   <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:400px;">Mesure</th> 
@@ -261,7 +272,7 @@ Voici le script complet mis à jour :
         { title: "Valeurs 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"]},
         { title: "Valeurs 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"]},
         { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"]},
-        { title: "Valeurs 'bm' mesurées = hauteur douille écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
+        { title: "Valeurs 'bm' mesurées = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
         { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"]},
         { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"]},
         { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"]},
@@ -270,8 +281,8 @@ Voici le script complet mis à jour :
       ];
 
       measurementGroups.forEach(group => {
-        const valueA = data[group.fields[0]] || 'Non spécifié';
-        const valueB = data[group.fields[1]] || 'Non spécifié';
+        const valueA = data[group.fields[0]] !== undefined && data[group.fields[0]] !== null && data[group.fields[0]] !== "" ? data[group.fields[0]] : "";
+        const valueB = data[group.fields[1]] !== undefined && data[group.fields[1]] !== null && data[group.fields[1]] !== "" ? data[group.fields[1]] : "";
         html += `
           <tr>
             <td class="border border-black px-2 py-1">${group.title}</td>
@@ -298,7 +309,7 @@ Voici le script complet mis à jour :
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
-          pagebreak: { mode: ['css', 'legacy'], before: '.page-break', avoid: ['.no-break', '.table-no-break'] }
+          pagebreak: { mode: ['css', 'legacy'], before: '.page-break', avoid: '.no-break' }
         };
         html2pdf().set(opt).from(element).save();
       });
@@ -306,4 +317,3 @@ Voici le script complet mis à jour :
   </script>
 </body>
 </html>
-```

@@ -24,25 +24,25 @@
         <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <p class="text-sm font-medium">Date: <span id="display-date" class="font-normal"></span></p>
+            <p class="text-sm font-medium">Date:<span class="font-normal ml-4" id="display-date"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">OM: <span id="display-om" class="font-normal"></span></p>
+            <p class="text-sm font-medium">OM:<span class="font-normal ml-4" id="display-om"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">Bogie N°: <span id="display-bogieNo" class="font-normal"></span></p>
+            <p class="text-sm font-medium">Bogie N°:<span class="font-normal ml-4" id="display-bogieNo"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">Type N°: <span id="display-typeNo" class="font-normal"></span></p>
+            <p class="text-sm font-medium">Type N°:<span class="font-normal ml-4" id="display-typeNo"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">Fabrick: <span id="display-Fabrick" class="font-normal"></span></p>
+            <p class="text-sm font-medium">Fabrick:<span class="font-normal ml-4" id="display-Fabrick"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">Auftrags: <span id="display-Auftrags" class="font-normal"></span></p>
+            <p class="text-sm font-medium">Auftrags:<span class="font-normal ml-4" id="display-Auftrags"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">Baujahr: <span id="display-Baujahr" class="font-normal"></span></p>
+            <p class="text-sm font-medium">Baujahr:<span class="font-normal ml-4" id="display-Baujahr"></span></p>
           </div>
         </div>
       </section>
@@ -50,10 +50,10 @@
         <h2 class="text-xl font-semibold mb-4">Localisation</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p class="text-sm font-medium">N° de série roue droite (Côté A): <span id="display-series-wheel-A" class="font-normal"></span></p>
+            <p class="text-sm font-medium">N° de série roue droite (Côté A):<span class="font-normal ml-4" id="display-series-wheel-A"></span></p>
           </div>
           <div>
-            <p class="text-sm font-medium">N° de série roue gauche (Côté B): <span id="display-series-wheel-B" class="font-normal"></span></p>
+            <p class="text-sm font-medium">N° de série roue gauche (Côté B):<span class="font-normal ml-4" id="display-series-wheel-B"></span></p>
           </div>
         </div>
       </section>
@@ -91,20 +91,36 @@
       { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
     ];
 
-    const savedData = JSON.parse(localStorage.getItem('mesuresData')) || {};
+    // Recherche la dernière clé utilisée lors du clic sur "Valider"
+    function getLastMesuresKey() {
+      return localStorage.getItem('mesuresData_last') || null;
+    }
 
-    // Display general information
-    document.getElementById('display-date').textContent = savedData.date || "";
-    document.getElementById('display-om').textContent = savedData.om || "";
-    document.getElementById('display-bogieNo').textContent = savedData.bogieNo || "";
-    document.getElementById('display-typeNo').textContent = savedData.typeNo || "";
-    document.getElementById('display-Fabrick').textContent = savedData.Fabrick || "";
-    document.getElementById('display-Auftrags').textContent = savedData.Auftrags || "";
-    document.getElementById('display-Baujahr').textContent = savedData.Baujahr || "";
+    function getLastMesuresData() {
+      const key = getLastMesuresKey();
+      if (!key) return null;
+      try {
+        return JSON.parse(localStorage.getItem(key));
+      } catch {
+        return null;
+      }
+    }
 
-    // Display wheel serial numbers
-    document.getElementById('display-series-wheel-A').textContent = savedData['series-wheel-A'] || "";
-    document.getElementById('display-series-wheel-B').textContent = savedData['series-wheel-B'] || "";
+    // Remplace la récupération des données par :
+    const savedData = getLastMesuresData() || {};
+
+    // Affichage des informations générales
+    document.getElementById('display-date').textContent = savedData.date ? savedData.date : "";
+    document.getElementById('display-om').textContent = savedData.om ? savedData.om : "";
+    document.getElementById('display-bogieNo').textContent = savedData.bogieNo ? savedData.bogieNo : "";
+    document.getElementById('display-typeNo').textContent = savedData.typeNo ? savedData.typeNo : "";
+    document.getElementById('display-Fabrick').textContent = savedData.Fabrick ? savedData.Fabrick : "";
+    document.getElementById('display-Auftrags').textContent = savedData.Auftrags ? savedData.Auftrags : "";
+    document.getElementById('display-Baujahr').textContent = savedData.Baujahr ? savedData.Baujahr : "";
+
+    // Affichage des numéros de série roues (localisation)
+    document.getElementById('display-series-wheel-A').textContent = savedData['series-wheel-A'] ? savedData['series-wheel-A'] : "";
+    document.getElementById('display-series-wheel-B').textContent = savedData['series-wheel-B'] ? savedData['series-wheel-B'] : "";
 
     // Display measurement results
     const resultsContainer = document.getElementById('results-container');
@@ -125,12 +141,16 @@
           const labelText = group.label 
             ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
             : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-          const value = savedData[field] || "";
-          fieldsContainer.innerHTML += `
-            <div>
-              <p class="text-sm font-medium">${labelText}: <span class="font-normal">${value}</span></p>
-            </div>
-          `;
+          // Affiche la valeur uniquement si elle existe
+          const value = (savedData[field] !== undefined && savedData[field] !== null && savedData[field] !== "") ? savedData[field] : "";
+          // Pour les groupes "Jeu axial" et "Contrôle visuel des soudures", même logique :
+          if (value !== "") {
+            fieldsContainer.innerHTML += `
+              <div>
+                <p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p>
+              </div>
+            `;
+          }
         });
 
         section.appendChild(fieldsContainer);
@@ -138,6 +158,20 @@
       });
     } else {
       resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
+    }
+
+    // Si aucune donnée, la page reste vierge (pas de résultats affichés)
+    if (Object.keys(savedData).length === 0) {
+      document.getElementById('results-container').innerHTML = '';
+      document.getElementById('display-date').textContent = "";
+      document.getElementById('display-om').textContent = "";
+      document.getElementById('display-bogieNo').textContent = "";
+      document.getElementById('display-typeNo').textContent = "";
+      document.getElementById('display-Fabrick').textContent = "";
+      document.getElementById('display-Auftrags').textContent = "";
+      document.getElementById('display-Baujahr').textContent = "";
+      document.getElementById('display-series-wheel-A').textContent = "";
+      document.getElementById('display-series-wheel-B').textContent = "";
     }
   </script>
 </body>

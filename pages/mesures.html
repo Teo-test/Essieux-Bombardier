@@ -33,7 +33,7 @@
           </div>
           <div>
             <label for="bogieNo" class="block text-sm font-medium">Bogie N°:</label>
-            <input type="text" id="bogieNo" name="bogieNo" required class="mt-1 p-2 w-full border rounded">
+            <input type="text" id="bogieNo" name="bogieNo"  class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
             <label for="typeNo" class="block text-sm font-medium">Type N°:</label>
@@ -84,84 +84,178 @@
   </main>
 
   <script>
-    const measurementGroups = [
-      { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
-      { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
-      { title: "<b>Côté A</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
-      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
-      { title: "<b>Côté B</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
-      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
-      { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
-      { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
-      { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
-      { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
-      { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
-      { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
-      { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
-      { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
-      { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-    ];
+  const measurementGroups = [
+    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
+    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
+    { title: "<b>Côté A</b>", fields: [], label: "" },
+    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
+    { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
+    { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
+    { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
+    { title: "<b>Côté B</b>", fields: [], label: "" },
+    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
+    { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
+    { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
+    { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
+    { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
+    { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
+    { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
+    { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+    { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+    { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+    { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
+    { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
+    { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
+    { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
+    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+  ];
 
-    const measurementsContainer = document.getElementById('measurements');
-    measurementGroups.forEach((group) => {
-      const section = document.createElement('div');
-      section.className = 'mb-6';
-      section.innerHTML = `
-        <h3 class="text-lg font-medium mb-2">${group.title}</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          ${group.fields.map(field => {
-            const labelText = group.label 
-              ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
-              : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-            return `
-              <div>
-                <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
-                <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded">
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-      measurementsContainer.appendChild(section);
-    });
+  const measurementsContainer = document.getElementById('measurements');
+  measurementGroups.forEach((group) => {
+    const section = document.createElement('div');
+    section.className = 'mb-6';
+    section.innerHTML = `
+      <h3 class="text-lg font-medium mb-2">${group.title}</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        ${group.fields.map(field => {
+          const labelText = group.label 
+            ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
+            : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+          return `
+            <div>
+              <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
+              <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded">
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    measurementsContainer.appendChild(section);
+  });
 
-    document.getElementById('mesuresForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
-      localStorage.setItem('mesuresData', JSON.stringify(data));
+  // Sauvegarde par OM+date
+  document.getElementById('mesuresForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
 
-      const saved = localStorage.getItem('mesuresData');
-      const confirmation = document.getElementById('confirmation');
-      const validerBtn = document.getElementById('validerBtn');
-      if (saved) {
-        confirmation.textContent = "Mesures enregistrées avec succès !";
-        confirmation.classList.remove('hidden', 'text-red-600');
-        confirmation.classList.add('text-green-600');
-        validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-red-600', 'hover:bg-red-700');
-        validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-      } else {
-        confirmation.textContent = "Erreur : données non enregistrées.";
-        confirmation.classList.remove('hidden', 'text-green-600');
-        confirmation.classList.add('text-red-600');
-        validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-green-600', 'hover:bg-green-700');
-        validerBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+    // Clé unique : OM + date (date peut être vide)
+    const om = data.om ? data.om.trim() : '';
+    const date = data.date ? data.date.trim() : '';
+    if (!om) {
+      alert("Merci de renseigner l'OM.");
+      return;
+    }
+    // Si pas de date, on utilise 'nodate'
+    const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}_nodate`;
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem('mesuresData_last', key); // <-- Cette ligne permet à pdf.html de toujours charger la dernière saisie
+
+    const confirmation = document.getElementById('confirmation');
+    const validerBtn = document.getElementById('validerBtn');
+    confirmation.textContent = "Mesures enregistrées avec succès !";
+    confirmation.classList.remove('hidden', 'text-red-600');
+    confirmation.classList.add('text-green-600');
+    validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-red-600', 'hover:bg-red-700');
+    validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+    setTimeout(() => {
+      confirmation.classList.add('hidden');
+      validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
+      validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+    }, 3000);
+    e.target.reset();
+  });
+
+  // Fonction utilitaire pour trouver toutes les clés par OM
+  function findKeysByOM(om) {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key.startsWith(`mesuresData_${om}_`)) {
+        keys.push(key);
       }
+    }
+    return keys;
+  }
+
+  // Fonction "Ouvrir" : charge les données si OM (et éventuellement date) sont renseignés
+  document.getElementById('OuvrirBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    const om = document.getElementById('om').value.trim();
+    const date = document.getElementById('date').value.trim();
+
+    if (!om) {
+      alert("Merci de renseigner l'OM pour ouvrir un dossier.");
+      return;
+    }
+
+    let key;
+    if (date) {
+      key = `mesuresData_${om}_${date}`;
+      const saved = localStorage.getItem(key);
+      if (!saved) {
+        alert("Aucune mesure trouvée pour cette combinaison OM/date.");
+        return;
+      }
+      localStorage.setItem('mesuresData_last', key); // <-- Ajout ici aussi pour que PDF soit à jour après ouverture
+      const data = JSON.parse(saved);
+      Object.entries(data).forEach(([k, v]) => {
+        const input = document.querySelector(`[name="${k}"]`);
+        if (input) input.value = v;
+      });
+      document.getElementById('confirmation').textContent = "Mesures chargées !";
+      document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
+      document.getElementById('confirmation').classList.add('text-green-600');
       setTimeout(() => {
-        confirmation.classList.add('hidden');
-        validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
-        validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      }, 3000);
-      e.target.reset();
-    });
+        document.getElementById('confirmation').classList.add('hidden');
+      }, 2000);
+    } else {
+      // Recherche toutes les clés correspondant à l'OM
+      const keys = findKeysByOM(om);
+      if (keys.length === 0) {
+        alert("Aucune mesure trouvée pour cet OM.");
+        return;
+      }
+      if (keys.length === 1) {
+        // Un seul résultat, on charge directement
+        localStorage.setItem('mesuresData_last', keys[0]); // <-- Ajout ici aussi
+        const data = JSON.parse(localStorage.getItem(keys[0]));
+        Object.entries(data).forEach(([k, v]) => {
+          const input = document.querySelector(`[name="${k}"]`);
+          if (input) input.value = v;
+        });
+        document.getElementById('confirmation').textContent = "Mesures chargées !";
+        document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
+        document.getElementById('confirmation').classList.add('text-green-600');
+        setTimeout(() => {
+          document.getElementById('confirmation').classList.add('hidden');
+        }, 2000);
+      } else {
+        // Plusieurs résultats, on propose de choisir la date
+        const dates = keys.map(k => k.split('_').pop());
+        const chosen = prompt("Plusieurs dossiers trouvés pour cet OM. Entrez la date souhaitée parmi :\n" + dates.join('\n'));
+        if (!chosen) return;
+        const chosenKey = `mesuresData_${om}_${chosen}`;
+        const saved = localStorage.getItem(chosenKey);
+        if (!saved) {
+          alert("Aucune mesure trouvée pour cette date.");
+          return;
+        }
+        localStorage.setItem('mesuresData_last', chosenKey); // <-- Ajout ici aussi
+        const data = JSON.parse(saved);
+        Object.entries(data).forEach(([k, v]) => {
+          const input = document.querySelector(`[name="${k}"]`);
+          if (input) input.value = v;
+        });
+        document.getElementById('confirmation').textContent = "Mesures chargées !";
+        document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
+        document.getElementById('confirmation').classList.add('text-green-600');
+        setTimeout(() => {
+          document.getElementById('confirmation').classList.add('hidden');
+        }, 2000);
+      }
+    }
+  });
   </script>
 </body>
 </html>
