@@ -13,8 +13,9 @@
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
       <a href="mesures.html" class="hover:underline">Mesures</a>
-      <a href="resultats.html" class="hover:underline">Résultats</a>
-      <a href="pdf.html" class="underline">PDF</a>
+      <a href="resultats.html" class="underline">Résultats</a>
+      <a href="pdf.html" class="hover:underline">PDF</a>
+      <!-- Correction : la page active est Résultats, pas PDF -->
     </div>
   </nav>
   <header class="bg-blue-600 text-white p-4">
@@ -64,15 +65,15 @@
       { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
       { title: "<b>Côté A</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "Côté" },
+      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "Côté" },
+      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "Côté" },
+      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "Côté" },
       { title: "<b>Côté B</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
+      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
       { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
       { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
@@ -86,21 +87,21 @@
       { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
     ];
 
-    // Récupérer les données du localStorage
-    const savedData = JSON.parse(localStorage.getItem('mesuresData'));
+    // Lecture correcte des données du localStorage
+    const savedData = JSON.parse(localStorage.getItem('mesuresData')) || {};
 
     // Afficher les informations générales
-    document.getElementById('display-date').textContent = savedData?.date || 'Non spécifié';
-    document.getElementById('display-om').textContent = savedData?.om || 'Non spécifié';
-    document.getElementById('display-bogieNo').textContent = savedData?.bogieNo || 'Non spécifié';
-    document.getElementById('display-typeNo').textContent = savedData?.typeNo || 'Non spécifié';
-    document.getElementById('display-Fabrick').textContent = savedData?.Fabrick || 'Non spécifié';
-    document.getElementById('display-Auftrags').textContent = savedData?.Auftrags || 'Non spécifié';
-    document.getElementById('display-Baujahr').textContent = savedData?.Baujahr || 'Non spécifié';
+    document.getElementById('display-date').textContent = savedData.date ? savedData.date : "";
+    document.getElementById('display-om').textContent = savedData.om ? savedData.om : "";
+    document.getElementById('display-bogieNo').textContent = savedData.bogieNo ? savedData.bogieNo : "";
+    document.getElementById('display-typeNo').textContent = savedData.typeNo ? savedData.typeNo : "";
+    document.getElementById('display-Fabrick').textContent = savedData.Fabrick ? savedData.Fabrick : "";
+    document.getElementById('display-Auftrags').textContent = savedData.Auftrags ? savedData.Auftrags : "";
+    document.getElementById('display-Baujahr').textContent = savedData.Baujahr ? savedData.Baujahr : "";
 
     // Afficher les résultats des mesures
     const resultsContainer = document.getElementById('results-container');
-    if (savedData) {
+    if (Object.keys(savedData).length > 0) {
       measurementGroups.forEach(group => {
         // N'affiche pas les groupes sans champs
         if (!group.fields.length) {
@@ -116,10 +117,10 @@
 
         group.fields.forEach(field => {
           const fieldId = field.split('-').pop();
-          const value = savedData[field] || 'Non spécifié';
+          const value = savedData[field];
           fieldsContainer.innerHTML += `
             <div>
-              <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+              <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value ? value : ""}</span></p>
             </div>
           `;
         });

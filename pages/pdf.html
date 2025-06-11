@@ -78,15 +78,15 @@
     { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
     { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
     { title: "<b>Côté A</b>", fields: [], label: "" },
-    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
+    { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
+    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
+    { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
     { title: "<b>Côté B</b>", fields: [], label: "" },
-    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
-    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
-    { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
+    { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
+    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
+    { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
     { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
     { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
     { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
@@ -207,13 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
   let html = `
     <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div><span class="font-medium">Date:</span> ${val('date')}</div>
-      <div><span class="font-medium">OM:</span> ${val('om')}</div>
-      <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo')}</div>
-      <div><span class="font-medium">Type N°:</span> ${val('typeNo')}</div>
-      <div><span class="font-medium">Fabrick:</span> ${val('Fabrick')}</div>
-      <div><span class="font-medium">Auftrags:</span> ${val('Auftrags')}</div>
-      <div><span class="font-medium">Baujahr:</span> ${val('Baujahr')}</div>
+      <div><span class="font-medium">Date:</span> ${val('date') ? val('date') : ""}</div>
+      <div><span class="font-medium">OM:</span> ${val('om') ? val('om') : ""}</div>
+      <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo') ? val('bogieNo') : ""}</div>
+      <div><span class="font-medium">Type N°:</span> ${val('typeNo') ? val('typeNo') : ""}</div>
+      <div><span class="font-medium">Fabrick:</span> ${val('Fabrick') ? val('Fabrick') : ""}</div>
+      <div><span class="font-medium">Auftrags:</span> ${val('Auftrags') ? val('Auftrags') : ""}</div>
+      <div><span class="font-medium">Baujahr:</span> ${val('Baujahr') ? val('Baujahr') : ""}</div>
     </div>
     <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
     <div class="space-y-4 mb-6">
@@ -231,10 +231,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
     group.fields.forEach(field => {
       const fieldId = field.split('-').pop();
-      const value = data[field] || 'Non spécifié';
+      const value = val(field);
       html += `
         <div>
-          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value ? value : ""}</span></p>
         </div>
       `;
     });
@@ -265,36 +265,36 @@ document.addEventListener('DOMContentLoaded', function() {
       <tr>
         <td class="border border-black px-2 py-1 align-middle" rowspan="4" style="text-align:center;">Grand Diamètre</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1-A') ? val('GD-Côte Verticale 1-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4-A') ? val('GD-Côte Horizontale 4-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1-B')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1-B') ? val('GD-Côte Verticale 1-B') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4-B')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4-B') ? val('GD-Côte Horizontale 4-B') : ""}</td>
         <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;">
           <span class="text-red-600 font-bold text-xs">117,450 < Ø < 117,475</span>
         </td>
       </tr>
       <tr>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2-A') ? val('GD-Côte Verticale 2-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5-A') ? val('GD-Côte Horizontale 5-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2-B')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2-B') ? val('GD-Côte Verticale 2-B') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5-B')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5-B') ? val('GD-Côte Horizontale 5-B') : ""}</td>
       </tr>
       <tr>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3-A') ? val('GD-Côte Verticale 3-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6-A') ? val('GD-Côte Horizontale 6-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3-B')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3-B') ? val('GD-Côte Verticale 3-B') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6-B')}</td>
+        <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6-B') ? val('GD-Côte Horizontale 6-B') : ""}</td>
       </tr>
       <tr>
         <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
@@ -308,36 +308,36 @@ document.addEventListener('DOMContentLoaded', function() {
       <tr>
         <td class="border border-black px-2 py-1 align-middle" rowspan="4" style="text-align:center;">Petit Diamètre</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1-A') ? val('PD-Côte Verticale 1-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4-A') ? val('PD-Côte Horizontale 4-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1-B')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1-B') ? val('PD-Côte Verticale 1-B') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4-B')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4-B') ? val('PD-Côte Horizontale 4-B') : ""}</td>
         <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;">
           <span class="text-red-600 font-bold text-xs">89,920 < Ø < 89,945</span>
         </td>
       </tr>
       <tr>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2-A') ? val('PD-Côte Verticale 2-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5-A') ? val('PD-Côte Horizontale 5-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2-B')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2-B') ? val('PD-Côte Verticale 2-B') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5-B')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5-B') ? val('PD-Côte Horizontale 5-B') : ""}</td>
       </tr>
       <tr>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3-A') ? val('PD-Côte Verticale 3-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6-A') ? val('PD-Côte Horizontale 6-A') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3-B')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3-B') ? val('PD-Côte Verticale 3-B') : ""}</td>
         <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6-B')}</td>
+        <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6-B') ? val('PD-Côte Horizontale 6-B') : ""}</td>
       </tr>
       <tr>
         <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="4">moyenne</td>
@@ -369,10 +369,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
     group.fields.forEach(field => {
       const fieldId = field.split('-').pop();
-      const value = data[field] || 'Non spécifié';
+      const value = val(field);
       html += `
         <div>
-          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value ? value : ""}</span></p>
         </div>
       `;
     });
