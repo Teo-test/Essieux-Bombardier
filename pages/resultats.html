@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col" id="page-resultats">
 
-    <!-- Navigation Bar -->
+  <!-- Navigation Bar -->
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
@@ -38,6 +38,15 @@
           <div>
             <p class="text-sm font-medium">Type N°: <span id="display-typeNo" class="font-normal"></span></p>
           </div>
+          <div>
+            <p class="text-sm font-medium">Fabrick: <span id="display-Fabrick" class="font-normal"></span></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium">Auftrags: <span id="display-Auftrags" class="font-normal"></span></p>
+          </div>
+          <div>
+            <p class="text-sm font-medium">Baujahr: <span id="display-Baujahr" class="font-normal"></span></p>
+          </div>
         </div>
       </section>
 
@@ -50,46 +59,54 @@
   </main>
 
   <script>
+    // Même configuration que dans mesures.html
+    const measurementGroups = [
+      { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
+      { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
+      { title: "<b>Côté A</b>", fields: [], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
+      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+      { title: "<b>Côté B</b>", fields: [], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
+      { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+      { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
+      { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
+      { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
+      { title: "<b>Valeurs 'u' mesurées</b> = hauteur petit et grand roulement montés sur la roue", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur du couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
+      { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
+      { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
+      { title: "<b>Jeu axial 'jm' mesuré Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
+      { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+    ];
+
     // Récupérer les données du localStorage
     const savedData = JSON.parse(localStorage.getItem('mesuresData'));
 
     // Afficher les informations générales
+    document.getElementById('display-date').textContent = savedData?.date || 'Non spécifié';
+    document.getElementById('display-om').textContent = savedData?.om || 'Non spécifié';
+    document.getElementById('display-bogieNo').textContent = savedData?.bogieNo || 'Non spécifié';
+    document.getElementById('display-typeNo').textContent = savedData?.typeNo || 'Non spécifié';
+    document.getElementById('display-Fabrick').textContent = savedData?.Fabrick || 'Non spécifié';
+    document.getElementById('display-Auftrags').textContent = savedData?.Auftrags || 'Non spécifié';
+    document.getElementById('display-Baujahr').textContent = savedData?.Baujahr || 'Non spécifié';
+
+    // Afficher les résultats des mesures
+    const resultsContainer = document.getElementById('results-container');
     if (savedData) {
-      document.getElementById('display-date').textContent = savedData.date || 'Non spécifié';
-      document.getElementById('display-om').textContent = savedData.om || 'Non spécifié';
-      document.getElementById('display-bogieNo').textContent = savedData.bogieNo || 'Non spécifié';
-      document.getElementById('display-typeNo').textContent = savedData.typeNo || 'Non spécifié';
-
-      // Afficher les résultats des mesures
-      const resultsContainer = document.getElementById('results-container');
-
-      // Configuration des groupes de mesures
-      const measurementGroups = [
-        { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"] },
-        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
-        { title: "Grand Rayon 1", fields: ["grandRayonVertical1A", "grandRayonHorizontal1A", "grandRayonVertical1B", "grandRayonHorizontal1B"] },
-        { title: "Grand Rayon 2", fields: ["grandRayonVertical2A", "grandRayonHorizontal2A", "grandRayonVertical2B", "grandRayonHorizontal2B"] },
-        { title: "Grand Rayon 3", fields: ["grandRayonVertical3A", "grandRayonHorizontal3A", "grandRayonVertical3B", "grandRayonHorizontal3B"] },
-        { title: "Petit Rayon 1", fields: ["petitRayonVertical1A", "petitRayonHorizontal1A", "petitRayonVertical1B", "petitRayonHorizontal1B"] },
-        { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "petitRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"] },
-        { title: "Petit Rayon 3", fields: ["petitRayonVertical3A", "petitRayonHorizontal3A", "petitRayonVertical3B", "petitRayonHorizontal3B"] },
-        { title: "Valeurs 'x' mesurées", fields: ["measured-value-x-A", "measured-value-x-B"] },
-        { title: "Valeurs 'y' mesurées", fields: ["measured-value-y-A", "measured-value-y-B"] },
-        { title: "Valeurs 'z' mesurées", fields: ["measured-value-z-A", "measured-value-z-B"] },
-        { title: "Valeurs 'u' mesurées", fields: ["measured-value-u-A", "measured-value-u-B"] },
-        { title: "Valeurs 'wm' mesurées", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
-        { title: "Valeurs 'bottom-nav' mesurées", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
-        { title: "Valeurs 'v' mesurées", fields: ["measured-value-v-A", "measured-value-v-B"] },
-        { title: "Valeurs 'bu' mesurées", fields: ["measured-value-bu-A", "measured-value-bu-B"] },
-        { title: "Valeurs 'd' mesurées", fields: ["measured-value-d-A", "measured-value-d-B"] },
-        { title: "Valeurs 'e' mesurées", fields: ["measured-value-e-A", "measured-value-e-B"] },
-        { title: "Valeurs 'eu' mesurées", fields: ["measured-value-eu-A", "measured-value-eu-B"] },
-        { title: "Jeu axial 'jm' mesuré Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
-        { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"] }
-      ];
-
-      // Générer dynamiquement les sections de résultats
       measurementGroups.forEach(group => {
+        // N'affiche pas les groupes sans champs
+        if (!group.fields.length) {
+          resultsContainer.innerHTML += `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
+          return;
+        }
         const section = document.createElement('div');
         section.className = 'bg-gray-50 p-4 rounded-lg';
         section.innerHTML = `<h3 class="font-medium mb-2">${group.title}</h3>`;
@@ -98,12 +115,13 @@
         fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4';
 
         group.fields.forEach(field => {
-          const fieldDiv = document.createElement('div');
           const fieldId = field.split('-').pop();
-          fieldDiv.innerHTML = `
-            <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${savedData[field] || 'Non spécifié'}</span></p>
+          const value = savedData[field] || 'Non spécifié';
+          fieldsContainer.innerHTML += `
+            <div>
+              <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+            </div>
           `;
-          fieldsContainer.appendChild(fieldDiv);
         });
 
         section.appendChild(fieldsContainer);

@@ -73,29 +73,31 @@
   </main>
 
   <script>
-  // Même configuration que dans resultats.html
+  // Même configuration que dans mesures.html et resultats.html
   const measurementGroups = [
-    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"] },
-    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
-    { title: "Grand Rayon 1", fields: ["grandRayonVertical1A", "grandRayonHorizontal1A", "grandRayonVertical1B", "grandRayonHorizontal1B"] },
-    { title: "Grand Rayon 2", fields: ["grandRayonVertical2A", "grandRayonHorizontal2A", "grandRayonVertical2B", "grandRayonHorizontal2B"] },
-    { title: "Grand Rayon 3", fields: ["grandRayonVertical3A", "grandRayonHorizontal3A", "grandRayonVertical3B", "grandRayonHorizontal3B"] },
-    { title: "Petit Rayon 1", fields: ["petitRayonVertical1A", "petitRayonHorizontal1A", "petitRayonVertical1B", "petitRayonHorizontal1B"] },
-    { title: "Petit Rayon 2", fields: ["petitRayonVertical2A", "petitRayonHorizontal2A", "petitRayonVertical2B", "petitRayonHorizontal2B"] },
-    { title: "Petit Rayon 3", fields: ["petitRayonVertical3A", "petitRayonHorizontal3A", "petitRayonVertical3B", "petitRayonHorizontal3B"] },
-    { title: "Valeurs 'x' mesurées", fields: ["measured-value-x-A", "measured-value-x-B"] },
-    { title: "Valeurs 'y' mesurées", fields: ["measured-value-y-A", "measured-value-y-B"] },
-    { title: "Valeurs 'z' mesurées", fields: ["measured-value-z-A", "measured-value-z-B"] },
-    { title: "Valeurs 'u' mesurées", fields: ["measured-value-u-A", "measured-value-u-B"] },
-    { title: "Valeurs 'wm' mesurées", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
-    { title: "Valeurs 'bottom-nav' mesurées", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
-    { title: "Valeurs 'v' mesurées", fields: ["measured-value-v-A", "measured-value-v-B"] },
-    { title: "Valeurs 'bu' mesurées", fields: ["measured-value-bu-A", "measured-value-bu-B"] },
-    { title: "Valeurs 'd' mesurées", fields: ["measured-value-d-A", "measured-value-d-B"] },
-    { title: "Valeurs 'e' mesurées", fields: ["measured-value-e-A", "measured-value-e-B"] },
-    { title: "Valeurs 'eu' mesurées", fields: ["measured-value-eu-A", "measured-value-eu-B"] },
-    { title: "Jeu axial 'jm' mesuré Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
-    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"] }
+    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
+    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
+    { title: "<b>Côté A</b>", fields: [], label: "" },
+    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
+    { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
+    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
+    { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+    { title: "<b>Côté B</b>", fields: [], label: "" },
+    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1", "GD-Côte Verticale 2", "GD-Côte Verticale 3"], label: "" },
+    { title: "", fields: ["GD-Côte Horizontale 4", "GD-Côte Horizontale 5", "GD-Côte Horizontale 6"], label: "" },
+    { title: "<i>Petit Diamètre<i>", fields: ["PD-Côte Verticale 1", "PD-Côte Verticale 2", "PD-Côte Verticale 3"], label: "" },
+    { title: "", fields: ["PD-Côte Horizontale 4", "PD-Côte Horizontale 5", "PD-Côte Horizontale 6"], label: "" },
+    { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
+    { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
+    { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
+    { title: "<b>Valeurs 'u' mesurées</b> = hauteur petit et grand roulement montés sur la roue", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+    { title: "<b>Valeurs 'wm' mesurées</b> = profondeur du couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+    { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+    { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
+    { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
+    { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
+    { title: "<b>Jeu axial 'jm' mesuré Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
+    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
   ];
 
   // Affichage HTML (tableau dynamique)
@@ -103,38 +105,41 @@
     const data = JSON.parse(localStorage.getItem('mesuresData'));
     const rapportContent = document.getElementById('rapportContent');
     if (data) {
+      // Informations générales
       let html = `
-        <h2 class="text-xl font-semibold mb-4">Résultats</h2>
-        <div class="overflow-x-auto">
-        <table class="min-w-full border">
-          <thead>
-            <tr>
-              <th class="border px-2 py-1">Catégorie</th>
-              ${(() => {
-                // Génère dynamiquement les entêtes selon le plus grand nombre de champs
-                let maxFields = Math.max(...measurementGroups.map(g => g.fields.length));
-                let headers = [];
-                for (let i = 0; i < maxFields; i++) {
-                  headers.push(`<th class="border px-2 py-1">Valeur ${i + 1}</th>`);
-                }
-                return headers.join('');
-              })()}
-            </tr>
-          </thead>
-          <tbody>
+        <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div><span class="font-medium">Date:</span> ${data.date || ''}</div>
+          <div><span class="font-medium">OM:</span> ${data.om || ''}</div>
+          <div><span class="font-medium">Bogie N°:</span> ${data.bogieNo || ''}</div>
+          <div><span class="font-medium">Type N°:</span> ${data.typeNo || ''}</div>
+          <div><span class="font-medium">Fabrick:</span> ${data.Fabrick || ''}</div>
+          <div><span class="font-medium">Auftrags:</span> ${data.Auftrags || ''}</div>
+          <div><span class="font-medium">Baujahr:</span> ${data.Baujahr || ''}</div>
+        </div>
+        <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
+        <div class="space-y-4">
       `;
       measurementGroups.forEach(group => {
-        html += `<tr>
-          <td class="border px-2 py-1 font-semibold">${group.title}</td>
-          ${group.fields.map(field => `<td class="border px-2 py-1">${data[field] ?? ''}</td>`).join('')}
-          ${(() => {
-            // Ajoute des cellules vides si moins de champs que le max
-            let empty = Math.max(...measurementGroups.map(g => g.fields.length)) - group.fields.length;
-            return '<td class="border px-2 py-1"></td>'.repeat(empty);
-          })()}
-        </tr>`;
+        if (!group.fields.length) {
+          html += `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
+          return;
+        }
+        html += `<div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-medium mb-2">${group.title}</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
+        group.fields.forEach(field => {
+          const fieldId = field.split('-').pop();
+          const value = data[field] || 'Non spécifié';
+          html += `
+            <div>
+              <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+            </div>
+          `;
+        });
+        html += `</div></div>`;
       });
-      html += '</tbody></table></div>';
+      html += '</div>';
       rapportContent.innerHTML = html;
     } else {
       rapportContent.innerHTML = '<p>Aucune donnée disponible.</p>';
@@ -150,51 +155,215 @@
 
     doc.setFontSize(16);
     doc.text("Résultats des mesures", 10, y);
-    const bogieNumber = data && data["bogie-number"] ? data["bogie-number"] : "inconnu";
-    doc.text(`Bogie n°: ${bogieNumber}`, 90, y);
     y += 10;
 
+    // Informations générales
     if (data) {
       doc.setFontSize(10);
-      // Génère dynamiquement les entêtes selon le plus grand nombre de champs
-      let maxFields = Math.max(...measurementGroups.map(g => g.fields.length));
-      let headers = ["Catégorie"];
-      for (let i = 0; i < maxFields; i++) {
-        headers.push("Valeur " + (i + 1));
-      }
-      let x = 10;
-      headers.forEach((h, i) => {
-        doc.text(h, x, y);
-        x += 45;
-      });
+      doc.text(`Date: ${data.date || ''}`, 10, y);
+      doc.text(`OM: ${data.om || ''}`, 60, y);
+      doc.text(`Bogie N°: ${data.bogieNo || ''}`, 110, y);
+      doc.text(`Type N°: ${data.typeNo || ''}`, 160, y);
       y += 7;
-      doc.line(10, y, 10 + 45 * headers.length, y);
+      doc.text(`Fabrick: ${data.Fabrick || ''}`, 10, y);
+      doc.text(`Auftrags: ${data.Auftrags || ''}`, 60, y);
+      doc.text(`Baujahr: ${data.Baujahr || ''}`, 110, y);
+      y += 10;
 
-      // Lignes du tableau
+      // Affichage des groupes
       measurementGroups.forEach(group => {
-        y += 7;
-        let x = 10;
-        doc.text(group.title, x, y);
-        x += 45;
-        group.fields.forEach(field => {
-          doc.text(String(data[field] ?? ''), x, y);
-          x += 45;
-        });
-        // Cellules vides si moins de champs
-        let empty = maxFields - group.fields.length;
-        for (let i = 0; i < empty; i++) {
-          x += 45;
+        if (!group.fields.length) {
+          y += 10;
+          doc.setFont(undefined, "bold");
+          doc.text(group.title.replace(/<[^>]+>/g, ''), 10, y);
+          doc.setFont(undefined, "normal");
+          return;
         }
+        y += 7;
+        doc.setFont(undefined, "bold");
+        doc.text(group.title.replace(/<[^>]+>/g, ''), 10, y);
+        doc.setFont(undefined, "normal");
+        group.fields.forEach(field => {
+          y += 7;
+          const fieldId = field.split('-').pop();
+          const value = data[field] || 'Non spécifié';
+          doc.text(`${fieldId}: ${value}`, 20, y);
+        });
         if (y > 180) { doc.addPage(); y = 15; }
       });
-      // Récupère le numéro de bogie depuis les données (champ "bogie-number" attendu)
-      const bogieNumber = data && data["bogie-number"] ? data["bogie-number"] : "inconnu";
-      doc.save(`resultats_mesures_bogie_${bogieNumber}.pdf`);
-        } else {
+      doc.save("resultats_mesures.pdf");
+    } else {
       doc.text("Aucune donnée disponible.", 10, y);
       doc.save("resultats_mesures.pdf");
     }
   });
+</script>
+<script>
+const data = JSON.parse(localStorage.getItem('mesuresData')) || {};
+function val(key) { return data[key] ?? ""; }
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Informations générales
+  let html = `
+    <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div><span class="font-medium">Date:</span> ${val('date')}</div>
+      <div><span class="font-medium">OM:</span> ${val('om')}</div>
+      <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo')}</div>
+      <div><span class="font-medium">Type N°:</span> ${val('typeNo')}</div>
+      <div><span class="font-medium">Fabrick:</span> ${val('Fabrick')}</div>
+      <div><span class="font-medium">Auftrags:</span> ${val('Auftrags')}</div>
+      <div><span class="font-medium">Baujahr:</span> ${val('Baujahr')}</div>
+    </div>
+    <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
+    <div class="space-y-4 mb-6">
+  `;
+
+  // Groupes AVANT le tableau
+  const measurementGroups = [
+    { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
+    { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" }
+  ];
+  measurementGroups.forEach(group => {
+    if (!group.fields.length) return;
+    html += `<div class="bg-gray-50 p-4 rounded-lg">
+      <h3 class="font-medium mb-2">${group.title}</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
+    group.fields.forEach(field => {
+      const fieldId = field.split('-').pop();
+      const value = data[field] || 'Non spécifié';
+      html += `
+        <div>
+          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+  });
+
+  // === TABLEAU entre les deux groupes ===
+  html += `
+    <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
+    <div class="overflow-x-auto">
+    <table class="min-w-full text-xs border border-black">
+      <thead>
+        <tr>
+          <th rowspan="2" class="border border-black px-2 py-1 align-middle"> </th>
+          <th colspan="2" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
+          <th colspan="2" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
+          <th rowspan="2" class="border border-black px-2 py-1 align-middle"> </th>
+        </tr>
+        <tr>
+          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Vertical</th>
+          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Horizontal</th>
+          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Vertical</th>
+          <th class="border border-black px-2 py-1 bg-gray-100 text-center">Horizontal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border border-black px-2 py-1">Grand modèle 1</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 1')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 4')}</td>
+          <td class="border border-black px-2 py-1" rowspan="3" style="vertical-align:middle;text-align:center;" colspan="1">
+            <div class="text-red-600 font-bold text-xs">117,450 &lt; Ø &lt; 117,475</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1">Grand modèle 2</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 2')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 5')}</td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1">Grand modèle 3</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Verticale 3')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Côte Horizontale 6')}</td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1 font-bold bg-gray-100">Moyenne</td>
+          <td class="border border-black px-2 py-1">${val('GD-Moyenne Verticale')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Moyenne Horizontale')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Moyenne Verticale')}</td>
+          <td class="border border-black px-2 py-1">${val('GD-Moyenne Horizontale')}</td>
+          <td class="border border-black px-2 py-1"></td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1">Petit modèle 1</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 1')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 4')}</td>
+          <td class="border border-black px-2 py-1" rowspan="3" style="vertical-align:middle;text-align:center;" colspan="1">
+            <div class="text-red-600 font-bold text-xs">89,920 &lt; Ø &lt; 89,945</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1">Petit modèle 2</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 2')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 5')}</td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1">Petit modèle 3</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Verticale 3')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Côte Horizontale 6')}</td>
+        </tr>
+        <tr>
+          <td class="border border-black px-2 py-1 font-bold bg-gray-100">Moyenne</td>
+          <td class="border border-black px-2 py-1">${val('PD-Moyenne Verticale')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Moyenne Horizontale')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Moyenne Verticale')}</td>
+          <td class="border border-black px-2 py-1">${val('PD-Moyenne Horizontale')}</td>
+          <td class="border border-black px-2 py-1"></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  `;
+
+  // Groupes APRES le tableau
+  const afterTableGroups = [
+    { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
+    { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
+    { title: "<b>Valeurs 'z' mesurées</b> = hauteur petie roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
+    { title: "<b>Valeurs 'u' mesurées</b> = hauteur petit et grand roulement montés sur la roue", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+    { title: "<b>Valeurs 'wm' mesurées</b> = profondeur du couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+    { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+    { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
+    { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
+    { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
+    { title: "<b>Jeu axial 'jm' mesuré Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
+    { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" }
+  ];
+  afterTableGroups.forEach(group => {
+    if (!group.fields.length) return;
+    html += `<div class="bg-gray-50 p-4 rounded-lg">
+      <h3 class="font-medium mb-2">${group.title}</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">`;
+    group.fields.forEach(field => {
+      const fieldId = field.split('-').pop();
+      const value = data[field] || 'Non spécifié';
+      html += `
+        <div>
+          <p class="text-sm font-medium">${fieldId}: <span class="font-normal">${value}</span></p>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('rapportContent').innerHTML = html;
+});
 </script>
 </body>
 </html>
