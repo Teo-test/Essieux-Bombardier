@@ -82,11 +82,97 @@
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
       { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
       { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+      { 
+        title: "<b>Valeurs 'c' calculée</b> = u - y - z", 
+        fields: ["measured-value-c-A", "measured-value-c-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          // field is either "measured-value-c-A" or "measured-value-c-B"
+          const suffix = field.endsWith('-A') ? '-A' : '-B';
+          const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+          const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
+          const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
+          const c = u - y - z;
+          // Enregistre la valeur calculée dans savedData
+          savedData['measured-value-c' + suffix] = isNaN(c) ? "" : c.toFixed(3);
+          // Affiche vide si toutes les valeurs sont nulles
+          if (!savedData['measured-value-u' + suffix] && !savedData['measured-value-y' + suffix] && !savedData['measured-value-z' + suffix]) {
+        return "";
+          }
+          // Affiche avec 3 décimales si c'est un nombre
+          return isNaN(c) ? "" : c.toFixed(3);
+        }
+      },
       { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+      { 
+        title: "<b>Valeurs 'w' calculée</b> = x - u - 0,02mm", 
+        fields: ["measured-value-w-A", "measured-value-w-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          // field is either "measured-value-w-A" or "measured-value-w-B"
+          const suffix = field.endsWith('-A') ? '-A' : '-B';
+          const x = parseFloat(savedData['measured-value-x' + suffix]) || 0;
+          const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+          const w = x - u - 0.02;
+          // Enregistre la valeur calculée dans savedData
+          savedData['measured-value-w' + suffix] = isNaN(w) ? "" : w.toFixed(3);
+          // Affiche vide si toutes les valeurs sont nulles
+          if (!savedData['measured-value-x' + suffix] && !savedData['measured-value-u' + suffix]) {
+        return "";
+          }
+          // Affiche avec 3 décimales si c'est un nombre
+          return isNaN(w) ? "" : w.toFixed(3);
+        }
+      },
       { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+      { 
+        title: "<b>Valeurs 'b' calculées</b> = c + 0,2mm", 
+        fields: ["measured-value-b-A", "measured-value-b-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          // field is either "measured-value-b-A" or "measured-value-b-B"
+          const suffix = field.endsWith('-A') ? '-A' : '-B';
+          const c = parseFloat(savedData['measured-value-c' + suffix]) || 0;
+          const b = c + 0.2;
+          // Enregistre la valeur calculée dans savedData
+          savedData['measured-value-b' + suffix] = isNaN(b) ? "" : b.toFixed(3);
+          // Affiche vide si la valeur source est absente
+          if (!savedData['measured-value-c' + suffix]) {
+        return "";
+          }
+          // Affiche avec 3 décimales si c'est un nombre
+          return isNaN(b) ? "" : b.toFixed(3);
+        }
+      },
       { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
       { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
-      { title: "<b>Valeurs 'eu' usinées</b>", fields: ["measured-value-eu-A", "measured-value-eu-B"], label: "Côté" },
+      { 
+        title: "<b>Valeurs 'eu' usinées</b>", 
+        fields: ["measured-value-eu-A", "measured-value-eu-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          // field is either "measured-value-eu-A" or "measured-value-eu-B"
+          const suffix = field.endsWith('-A') ? '-A' : '-B';
+          const d = parseFloat(savedData['measured-value-d' + suffix]);
+          const e = parseFloat(savedData['measured-value-e' + suffix]);
+          let result = "";
+          if (!isNaN(d) && !isNaN(e)) {
+        if (d > e) {
+          result = '<span style="color:green;font-weight:bold">OK</span>';
+          savedData['measured-value-eu' + suffix] = "OK";
+        } else if (e > d) {
+          result = '<span style="color:red;font-weight:bold">A usiner</span>';
+          savedData['measured-value-eu' + suffix] = "A usiner";
+        } else {
+          result = "";
+          savedData['measured-value-eu' + suffix] = "";
+        }
+          } else {
+        savedData['measured-value-eu' + suffix] = "";
+          }
+          return result;
+        }
+      },
       { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
       { title: "<b>Ecartement des roues</b>", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
     ];
@@ -138,12 +224,16 @@
         fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2';
 
         group.fields.forEach(field => {
+          let value;
+          // Si le groupe a une fonction compute, on l'utilise pour obtenir la valeur
+          if (typeof group.compute === "function") {
+            value = group.compute(savedData, field);
+          } else {
+            value = (savedData[field] !== undefined && savedData[field] !== null && savedData[field] !== "") ? savedData[field] : "";
+          }
           const labelText = group.label 
             ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
             : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-          // Affiche la valeur uniquement si elle existe
-          const value = (savedData[field] !== undefined && savedData[field] !== null && savedData[field] !== "") ? savedData[field] : "";
-          // Pour les groupes "Jeu axial" et "Contrôle visuel des soudures", même logique :
           if (value !== "") {
             fieldsContainer.innerHTML += `
               <div>

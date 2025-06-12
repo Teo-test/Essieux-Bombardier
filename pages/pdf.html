@@ -8,49 +8,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f8f9fa;
-      color: #212529;
-    }
-    header {
-      background-color: #0d6efd;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
-      background-color: #343a40;
-      color: white;
-      padding: 1rem;
-    }
-    nav a {
-      color: white;
-      margin: 0 1rem;
-      text-decoration: none;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .button {
-      background-color: #0d6efd;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: #0b5ed7;
-    }
-    .page-break {
-      page-break-before: always;
-      break-before: always;
-    }
-    .no-break {
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
+    body { font-family: 'Arial', sans-serif; background-color: #f8f9fa; color: #212529; }
+    header { background-color: #0d6efd; color: white; padding: 1rem; text-align: center; }
+    nav { background-color: #343a40; color: white; padding: 1rem; }
+    nav a { color: white; margin: 0 1rem; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    .button { background-color: #0d6efd; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.25rem; cursor: pointer; }
+    .button:hover { background-color: #0b5ed7; }
+    .page-break { page-break-before: always; break-before: always; }
+    .no-break { page-break-inside: avoid; break-inside: avoid; }
     .bg-white { background: #fff !important; }
     .shadow { box-shadow: none !important; }
   </style>
@@ -64,11 +30,9 @@
       <a href="pdf.html" class="underline">PDF</a>
     </div>
   </nav>
-  
   <header class="bg-blue-600 text-white p-4">
     <h1 class="text-2xl font-bold">Export PDF des Mesures</h1>
   </header>
-
   <main class="flex-grow container mx-auto p-4">
     <div class="bg-white p-6 rounded-lg shadow space-y-6">
       <section>
@@ -79,13 +43,11 @@
       </section>
     </div>
   </main>
-
   <script>
     // Fonction pour obtenir la dernière clé utilisée (valider ou ouvrir)
     function getLastMesuresKey() {
       return localStorage.getItem('mesuresData_last') || null;
     }
-
     function getLastMesuresData() {
       const key = getLastMesuresKey();
       if (!key) return null;
@@ -95,23 +57,70 @@
         return null;
       }
     }
-
     // Utilise toujours la dernière saisie ou ouverture
-    const data = getLastMesuresData() || {};
-    function val(key) { return data[key] ?? ""; }
-
-    // Calculate average of an array of values, ignoring empty strings
+    const savedData = getLastMesuresData() || {};
+    function val(key) { return savedData[key] ?? ""; }
+    // Fonctions de calculs pour les champs calculés
+    function calcC(suffix) {
+      const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+      const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
+      const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
+      const c = u - y - z;
+      return (!savedData['measured-value-u' + suffix] && !savedData['measured-value-y' + suffix] && !savedData['measured-value-z' + suffix]) ? "" : (isNaN(c) ? "" : c.toFixed(3));
+    }
+    function calcW(suffix) {
+      const x = parseFloat(savedData['measured-value-x' + suffix]) || 0;
+      const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+      const w = x - u - 0.02;
+      return (!savedData['measured-value-x' + suffix] && !savedData['measured-value-u' + suffix]) ? "" : (isNaN(w) ? "" : w.toFixed(3));
+    }
+    function calcB(suffix) {
+      const c = parseFloat(calcC(suffix)) || 0;
+      const b = c + 0.2;
+      return (!savedData['measured-value-c' + suffix]) ? "" : (isNaN(b) ? "" : b.toFixed(3));
+    }
+    function calcEU(suffix) {
+      const d = parseFloat(savedData['measured-value-d' + suffix]);
+      const e = parseFloat(savedData['measured-value-e' + suffix]);
+      if (!isNaN(d) && !isNaN(e)) {
+        if (d > e) {
+          return '<span style="color:green;font-weight:bold">OK</span>';
+        } else if (e > d) {
+          return '<span style="color:red;font-weight:bold">A usiner</span>';
+        }
+      }
+      return "";
+    }
+    // Moyenne d'un tableau de valeurs
     function calcAverage(values) {
       const validNums = values.filter(v => v !== "").map(Number).filter(v => !isNaN(v));
       return validNums.length ? (validNums.reduce((sum, v) => sum + v, 0) / validNums.length).toFixed(3) : "";
     }
+    // Fonction utilitaire pour colorer les valeurs du Grand Diamètre
+    function colorGD(val) {
+      const num = parseFloat(val);
+      if (isNaN(num) || val === "") return "";
+      if (num > 117.475 || num < 117.450) return "bg-red-100";
+      if (num > 117.460 && num <= 117.475) return "bg-green-100";
+      if (num >= 117.450 && num <= 117.460) return "bg-orange-100";
+      return "";
+    }
 
+    // Fonction utilitaire pour colorer les valeurs du Petit Diamètre
+    function colorPD(val) {
+      const num = parseFloat(val);
+      if (isNaN(num) || val === "") return "";
+      if (num > 89.945 || num < 89.920) return "bg-red-100";
+      if (num > 89.930 && num <= 89.945) return "bg-green-100";
+      if (num >= 89.920 && num <= 89.930) return "bg-orange-100";
+      return "";
+    }
     document.addEventListener('DOMContentLoaded', function() {
-      if (Object.keys(data).length === 0) {
+      if (Object.keys(savedData).length === 0) {
         document.getElementById('rapportContent').innerHTML = '';
         return;
       }
-      // First page content: Informations Générales, Localisation, and Table
+      // Première page : infos générales et tableau diamètres
       let html = `
         <div id="firstPageContent" class="no-break">
           <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
@@ -150,26 +159,26 @@
                 <tr>
                   <td class="border border-black px-2 py-1 align-middle" rowspan="3" style="text-align:center;width:100px;">Grand Diamètre</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 1-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 4-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 1-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 4-B')}</td> <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 1-A'))}" style="width:76px;">${val('GD-Côte Verticale 1-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 4-A'))}" style="width:76px;">${val('GD-Côte Horizontale 4-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 1-B'))}" style="width:76px;">${val('GD-Côte Verticale 1-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 4-B'))}" style="width:76px;">${val('GD-Côte Horizontale 4-B')}</td> <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
                     <span class="text-red-600 font-bold text-xs">117,450<br> < Ø < <br>117,475</span>
                   </td>
                 </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 2-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 5-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 2-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 5-B')}</td> </tr>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 2-A'))}" style="width:76px;">${val('GD-Côte Verticale 2-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 5-A'))}" style="width:76px;">${val('GD-Côte Horizontale 5-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 2-B'))}" style="width:76px;">${val('GD-Côte Verticale 2-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 5-B'))}" style="width:76px;">${val('GD-Côte Horizontale 5-B')}</td> </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 3-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 6-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Verticale 3-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('GD-Côte Horizontale 6-B')}</td> </tr>
-
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 3-A'))}" style="width:76px;">${val('GD-Côte Verticale 3-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 6-A'))}" style="width:76px;">${val('GD-Côte Horizontale 6-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 3-B'))}" style="width:76px;">${val('GD-Côte Verticale 3-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 6-B'))}" style="width:76px;">${val('GD-Côte Horizontale 6-B')}</td> </tr>
+                <tr>
                 <tr>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
@@ -182,7 +191,6 @@
                       val('GD-Côte Horizontale 4-A'), val('GD-Côte Horizontale 5-A'), val('GD-Côte Horizontale 6-A')
                       ])}
                   </td>
-
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
                     ${calcAverage([
                       val('GD-Côte Verticale 1-B'), val('GD-Côte Verticale 2-B'), val('GD-Côte Verticale 3-B'),
@@ -192,35 +200,44 @@
                     ${calcAverage([
                       val('GD-Côte Horizontale 4-B'), val('GD-Côte Horizontale 5-B'), val('GD-Côte Horizontale 6-B')
                       ])}
-                    </td>
-
+                  </td>
                 </tr>
-                <tr>
                   <td colspan="10" class="border border-black px-2 py-1"></td>
                 </tr>
                 <tr>
                   <td class="border border-black px-2 py-1 align-middle" rowspan="3" style="text-align:center;width:100px;">Petit Diamètre</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 1-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 4-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 1-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 4-B')}</td> <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 1-A'))}" style="width:76px;">${val('PD-Côte Verticale 1-A')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 4-A'))}" style="width:76px;">${val('PD-Côte Horizontale 4-A')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 1-B'))}" style="width:76px;">${val('PD-Côte Verticale 1-B')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 4-B'))}" style="width:76px;">${val('PD-Côte Horizontale 4-B')}</td>
+                  <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
                     <span class="text-red-600 font-bold text-xs">89,920<br> < Ø < <br>89,945</span>
                   </td>
                 </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 2-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 5-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 2-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 5-B')}</td> </tr>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 2-A'))}" style="width:76px;">${val('PD-Côte Verticale 2-A')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 5-A'))}" style="width:76px;">${val('PD-Côte Horizontale 5-A')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 2-B'))}" style="width:76px;">${val('PD-Côte Verticale 2-B')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 5-B'))}" style="width:76px;">${val('PD-Côte Horizontale 5-B')}</td>
+                </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 3-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 6-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Verticale 3-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1" style="width:76px;">${val('PD-Côte Horizontale 6-B')}</td> </tr>
-
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 3-A'))}" style="width:76px;">${val('PD-Côte Verticale 3-A')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 6-A'))}" style="width:76px;">${val('PD-Côte Horizontale 6-A')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 3-B'))}" style="width:76px;">${val('PD-Côte Verticale 3-B')}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 6-B'))}" style="width:76px;">${val('PD-Côte Horizontale 6-B')}</td>
+                </tr>
                 <tr>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
@@ -248,6 +265,34 @@
             </table>
           </div>
         </div>
+        <!-- Tableau Usinage des pièces -->
+        <div class="page-break"></div>
+        <div id="usinagePiecesContent">
+          <h2 class="text-xl font-semibold mb-4">Usinage des pièces</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-base border border-black mb-8" style="border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:400px;">Mesure</th>
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="border border-black px-2 py-1">Couvercle : Valeur <b>w</b></td>
+                  <td class="border border-black px-2 py-1 text-center">${calcW('-A')}</td>
+                  <td class="border border-black px-2 py-1 text-center">${calcW('-B')}</td>
+                </tr>
+                <tr>
+                  <td class="border border-black px-2 py-1">Douille d'écatrement : Valeur <b>b</b></td>
+                  <td class="border border-black px-2 py-1 text-center">${calcB('-A')}</td>
+                  <td class="border border-black px-2 py-1 text-center">${calcB('-B')}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         <div class="page-break"></div>
         <div id="subsequentPagesContent">
           <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
@@ -262,8 +307,7 @@
               </thead>
               <tbody>
       `;
-
-      // Measurement groups for subsequent pages
+      // Groupes de mesures avec calculs
       const measurementGroups = [
         { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"]},
         { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], type: "text" },
@@ -271,18 +315,26 @@
         { title: "Valeurs 'y' mesurées = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"]},
         { title: "Valeurs 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"]},
         { title: "Valeurs 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"]},
+        { title: "Valeurs 'c' calculée = u - y - z", fields: ["measured-value-c-A", "measured-value-c-B"], compute: (suffix) => calcC(suffix) },
         { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"]},
+        { title: "Valeurs 'w' calculée = x - u - 0,02mm", fields: ["measured-value-w-A", "measured-value-w-B"], compute: (suffix) => calcW(suffix) },
         { title: "Valeurs 'bm' mesurées = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
+        { title: "Valeurs 'b' calculées = c + 0,2mm", fields: ["measured-value-b-A", "measured-value-b-B"], compute: (suffix) => calcB(suffix) },
         { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"]},
         { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"]},
-        { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"]},
+        { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"], compute: (suffix) => calcEU(suffix) },
         { title: "Jeu axial 'jm' Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"]},
         { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"]}
       ];
-
       measurementGroups.forEach(group => {
-        const valueA = data[group.fields[0]] !== undefined && data[group.fields[0]] !== null && data[group.fields[0]] !== "" ? data[group.fields[0]] : "";
-        const valueB = data[group.fields[1]] !== undefined && data[group.fields[1]] !== null && data[group.fields[1]] !== "" ? data[group.fields[1]] : "";
+        let valueA, valueB;
+        if (group.compute) {
+          valueA = group.compute('-A');
+          valueB = group.compute('-B');
+        } else {
+          valueA = savedData[group.fields[0]] !== undefined && savedData[group.fields[0]] !== null && savedData[group.fields[0]] !== "" ? savedData[group.fields[0]] : "";
+          valueB = savedData[group.fields[1]] !== undefined && savedData[group.fields[1]] !== null && savedData[group.fields[1]] !== "" ? savedData[group.fields[1]] : "";
+        }
         html += `
           <tr>
             <td class="border border-black px-2 py-1">${group.title}</td>
@@ -291,7 +343,6 @@
           </tr>
         `;
       });
-
       html += `
               </tbody>
             </table>
@@ -299,12 +350,11 @@
         </div>
       `;
       document.getElementById('rapportContent').innerHTML = html;
-
       // PDF generation
       document.getElementById('exportPDF').addEventListener('click', function() {
         const element = document.getElementById('rapportContent');
         const opt = {
-          margin: [0.5, 0.2, 0.5, 0.2], // top, right, bottom, left
+          margin: [0.5, 0.2, 0.5, 0.2],
           filename: 'resultats_mesures.pdf',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true },
