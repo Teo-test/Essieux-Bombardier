@@ -385,8 +385,25 @@
           return value;
         }
       },
-      { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-      { title: "<b>Ecartement des bandages</b> (valeur ?)", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
+      { 
+        title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm)", 
+        fields: ["wheel-ecart-A", "wheel-ecart-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num >= 1395 && num <= 1397) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { title: "<b>Ecartement des bandages</b> ( 1380 mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
     ];
 
     // Recherche la dernière clé utilisée lors du clic sur "Valider"

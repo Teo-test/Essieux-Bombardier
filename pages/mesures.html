@@ -108,8 +108,8 @@
     { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
     { title: "<b>Jeu axial du bandage Après remise en état</b> < 0.7mm" , fields: ["axial-bandage-after-A", "axial-bandage-after-B"], label: "Côté" },
     { title: "<b>Jeu radial du bandage près remise en état</b> < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"], label: "Côté" },
-    { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-    { title: "<b>Ecartement des bandages</b> (valeur ?)", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
+    { title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+    { title: "<b>Ecartement des bandages</b> ( 1380mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
   ];
 
   const measurementsContainer = document.getElementById('measurements');
@@ -204,7 +204,11 @@
       confirmation.classList.add('hidden');
       validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
       validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      // Redirection vers la page résultats
+      window.location.href = "resultats.html";
     }, 3000);
+    // Si tu veux une redirection immédiate, mets simplement :
+    // window.location.href = "resultats.html";
     // e.target.reset(); // <-- Supprimez ou commentez cette ligne pour ne pas vider le formulaire
   });
 

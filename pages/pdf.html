@@ -132,6 +132,12 @@
       if (num >= 89.920 && num <= 89.930) return "bg-orange-100";
       return "";
     }
+    function colorWheelEcart(val) {
+      const num = parseFloat(val);
+      if (val === "" || isNaN(num)) return "";
+      if (num >= 1395 && num <= 1397) return "color:green;font-weight:bold";
+      return "color:red;font-weight:bold";
+    }
     document.addEventListener('DOMContentLoaded', function() {
       if (Object.keys(savedData).length === 0) {
         document.getElementById('rapportContent').innerHTML = '';
@@ -375,8 +381,8 @@
         { title: "Jeu axial 'jm' après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
         { title: "Jeu axial du bandage après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
         { title: "Jeu radial du bandage après remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
-        { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-        { title: "Ecartement des bandages (valeur ?)", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
+        { title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+        { title: "Ecartement des bandages ( 1380mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
       ];
       measurementGroups.forEach(group => {
         let valueA, valueB;
@@ -405,13 +411,23 @@
           if (field.startsWith("axial-play-after-") && num <= 0.07) return "text-green-600 font-bold";
           return "";
         }
-        html += `
-          <tr>
-            <td class="border border-black px-2 py-1">${group.title}</td>
-            <td class="border border-black px-2 py-1 text-center ${getResultColor(group.fields[0], valueA)}">${trimZeros(valueA)}</td>
-            <td class="border border-black px-2 py-1 text-center ${getResultColor(group.fields[1], valueB)}">${trimZeros(valueB)}</td>
-          </tr>
-        `;
+        if (group.title.includes("Ecartement des roues")) {
+          html += `
+            <tr>
+              <td class="border border-black px-2 py-1">${group.title}</td>
+              <td class="border border-black px-2 py-1 text-center"><span style="${colorWheelEcart(valueA)}">${trimZeros(valueA)}</span></td>
+              <td class="border border-black px-2 py-1 text-center"><span style="${colorWheelEcart(valueB)}">${trimZeros(valueB)}</span></td>
+            </tr>
+          `;
+        } else {
+          html += `
+            <tr>
+              <td class="border border-black px-2 py-1">${group.title}</td>
+              <td class="border border-black px-2 py-1 text-center">${trimZeros(valueA)}</td>
+              <td class="border border-black px-2 py-1 text-center">${trimZeros(valueB)}</td>
+            </tr>
+          `;
+        }
       });
       html += `
               </tbody>
