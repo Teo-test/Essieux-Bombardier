@@ -364,6 +364,23 @@
         html2pdf().set(opt).from(element).save();
       });
     });
+    // Efface les données à l'ouverture de la page
+    window.addEventListener('DOMContentLoaded', () => {
+      // Supprime la clé principale des mesures
+      localStorage.removeItem('mesuresData_last');
+      // Supprime toutes les mesures sauvegardées (clé commençant par mesuresData_)
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_'))
+        .forEach(k => localStorage.removeItem(k));
+    });
+
+    // Efface les données à la fermeture de la page
+    window.addEventListener('beforeunload', () => {
+      localStorage.removeItem('mesuresData_last');
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_'))
+        .forEach(k => localStorage.removeItem(k));
+    });
   </script>
 </body>
 </html>

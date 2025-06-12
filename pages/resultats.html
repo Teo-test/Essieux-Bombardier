@@ -195,6 +195,24 @@
     // Remplace la récupération des données par :
     const savedData = getLastMesuresData() || {};
 
+    // Efface les données à l'ouverture de la page
+    window.addEventListener('DOMContentLoaded', () => {
+      // Supprime la clé principale des mesures
+      localStorage.removeItem('mesuresData_last');
+      // Supprime toutes les mesures sauvegardées (clé commençant par mesuresData_)
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_'))
+        .forEach(k => localStorage.removeItem(k));
+    });
+
+    // Efface les données à la fermeture de la page
+    window.addEventListener('beforeunload', () => {
+      localStorage.removeItem('mesuresData_last');
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_'))
+        .forEach(k => localStorage.removeItem(k));
+    });
+
     // Affichage des informations générales
     document.getElementById('display-date').textContent = savedData.date ? savedData.date : "";
     document.getElementById('display-om').textContent = savedData.om ? savedData.om : "";
