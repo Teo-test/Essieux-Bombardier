@@ -19,6 +19,10 @@
     .no-break { page-break-inside: avoid; break-inside: avoid; }
     .bg-white { background: #fff !important; }
     .shadow { box-shadow: none !important; }
+    @media print {
+      .page-break { display: block; page-break-before: always; }
+      .no-break { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -66,7 +70,7 @@
       const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
       const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
       const c = u - y - z;
-      savedData['measured-value-c' + suffix] = isNaN(c) ? "" : c.toFixed(3); // <-- important
+      savedData['measured-value-c' + suffix] = isNaN(c) ? "" : c.toFixed(3);
       return (!savedData['measured-value-u' + suffix] && !savedData['measured-value-y' + suffix] && !savedData['measured-value-z' + suffix]) ? "" : (isNaN(c) ? "" : c.toFixed(3));
     }
     function calcW(suffix) {
@@ -106,7 +110,6 @@
       if (num >= 117.450 && num <= 117.460) return "bg-orange-100";
       return "";
     }
-
     // Fonction utilitaire pour colorer les valeurs du Petit Diamètre
     function colorPD(val) {
       const num = parseFloat(val);
@@ -121,8 +124,9 @@
         document.getElementById('rapportContent').innerHTML = '';
         return;
       }
-      // Première page : infos générales et tableau diamètres
+      // Contenu pour le PDF
       let html = `
+        <!-- Première page -->
         <div id="firstPageContent" class="no-break">
           <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -133,11 +137,6 @@
             <div><span class="font-medium">Fabrick:</span> ${val('Fabrick')}</div>
             <div><span class="font-medium">Auftrags:</span> ${val('Auftrags')}</div>
             <div><span class="font-medium">Baujahr:</span> ${val('Baujahr')}</div>
-          </div>
-          <h2 class="text-xl font-semibold mb-4">Localisation</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div><span class="font-medium">N° de série roue droite (Côté A):</span> ${val('series-wheel-A')}</div>
-            <div><span class="font-medium">N° de série roue gauche (Côté B):</span> ${val('series-wheel-B')}</div>
           </div>
           <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
           <div class="overflow-x-auto">
@@ -168,7 +167,7 @@
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
                   <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 4-B'))}" style="width:76px;">${val('GD-Côte Horizontale 4-B') !== "" ? Number(val('GD-Côte Horizontale 4-B')).toFixed(3) : ""}</td>
                   <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
-                  <span class="text-red-600 font-bold text-xs">117,450<br> < Ø < <br>117,475</span>
+                    <span class="text-red-600 font-bold text-xs">117,450<br> < Ø < <br>117,475</span>
                   </td>
                 </tr>
                 <tr>
@@ -193,27 +192,32 @@
                 </tr>
                 <tr>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="1">
                     ${calcAverage([
                       val('GD-Côte Verticale 1-A'), val('GD-Côte Verticale 2-A'), val('GD-Côte Verticale 3-A')
-                      ])}
+                    ])}
                   </td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="1">
                     ${calcAverage([
                       val('GD-Côte Horizontale 4-A'), val('GD-Côte Horizontale 5-A'), val('GD-Côte Horizontale 6-A')
-                      ])}
+                    ])}
                   </td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="1">
                     ${calcAverage([
-                      val('GD-Côte Verticale 1-B'), val('GD-Côte Verticale 2-B'), val('GD-Côte Verticale 3-B'),
-                      ])}
+                      val('GD-Côte Verticale 1-B'), val('GD-Côte Verticale 2-B'), val('GD-Côte Verticale 3-B')
+                    ])}
                   </td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="1">
                     ${calcAverage([
                       val('GD-Côte Horizontale 4-B'), val('GD-Côte Horizontale 5-B'), val('GD-Côte Horizontale 6-B')
-                      ])}
+                    ])}
                   </td>
                 </tr>
+                <tr>
                   <td colspan="10" class="border border-black px-2 py-1"></td>
                 </tr>
                 <tr>
@@ -227,7 +231,7 @@
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
                   <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 4-B'))}" style="width:76px;">${val('PD-Côte Horizontale 4-B') !== "" ? Number(val('PD-Côte Horizontale 4-B')).toFixed(3) : ""}</td>
                   <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
-                  <span class="text-red-600 font-bold text-xs">89,920<br> < Ø < <br>89,945</span>
+                    <span class="text-red-600 font-bold text-xs">89,920<br> < Ø < <br>89,945</span>
                   </td>
                 </tr>
                 <tr>
@@ -252,34 +256,48 @@
                 </tr>
                 <tr>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right "colspan="">
                     ${calcAverage([
                       val('PD-Côte Verticale 1-A'), val('PD-Côte Verticale 2-A'), val('PD-Côte Verticale 3-A')
-                      ])}
+                    ])}
                   </td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="">
                     ${calcAverage([
                       val('PD-Côte Horizontale 4-A'), val('PD-Côte Horizontale 5-A'), val('PD-Côte Horizontale 6-A')
-                      ])}
+                    ])}
                   </td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="1">
                     ${calcAverage([
-                      val('PD-Côte Verticale 1-B'), val('PD-Côte Verticale 2-B'), val('PD-Côte Verticale 3-B'),
-                      ])}
+                      val('PD-Côte Verticale 1-B'), val('PD-Côte Verticale 2-B'), val('PD-Côte Verticale 3-B')
+                    ])}
                   </td>
-                  <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
+                  <td colspan="1" class="border border-black px-2 py-1"></td>
+                  <td class="border border-black px-2 py-1 font-bold bg-gray-30 text-right" colspan="1">
                     ${calcAverage([
                       val('PD-Côte Horizontale 4-B'), val('PD-Côte Horizontale 5-B'), val('PD-Côte Horizontale 6-B')
-                      ])}
+                    ])}
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-        <!-- Tableau Usinage des pièces -->
+        <!-- Deuxième page -->
         <div class="page-break"></div>
-        <div id="usinagePiecesContent">
+        <div id="secondPageContent" class="no-break">
+          <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div><span class="font-medium">Date:</span> ${val('date')}</div>
+            <div><span class="font-medium">OM:</span> ${val('om')}</div>
+            <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo')}</div>
+            <div><span class="font-medium">Type N°:</span> ${val('typeNo')}</div>
+            <div><span class="font-medium">Fabrick:</span> ${val('Fabrick')}</div>
+            <div><span class="font-medium">Auftrags:</span> ${val('Auftrags')}</div>
+            <div><span class="font-medium">Baujahr:</span> ${val('Baujahr')}</div>
+          </div>
           <h2 class="text-xl font-semibold mb-4">Usinage des pièces</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full text-base border border-black mb-8" style="border-collapse:collapse;">
@@ -305,14 +323,20 @@
             </table>
           </div>
         </div>
+        <!-- Troisième page -->
         <div class="page-break"></div>
-        <div id="subsequentPagesContent">
+        <div id="thirdPageContent" class="no-break">
+          <h2 class="text-xl font-semibold mb-4">Localisation</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div><span class="font-medium">N° de série roue droite (Côté A):</span> ${val('series-wheel-A')}</div>
+            <div><span class="font-medium">N° de série roue gauche à</span> ${val('series-wheel-B')}</div>
+          </div>
           <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-base border border-black mb-8" style="border-collapse:collapse;">
+          <div class="min-w-full overflow-x-auto">
+            <table class="min-w-full text-xs border border-black mb-8" style="border-collapse:collapse;">
               <thead>
                 <tr>
-                  <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:600px;">Mesure</th> 
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:500px;">Mesure</th>
                   <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
                   <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
                 </tr>
@@ -321,24 +345,24 @@
       `;
       // Groupes de mesures avec calculs
       const measurementGroups = [
-        { title: "Jeu axial 'Jm' mesuré Avant Démontage", fields: ["axial-play-A", "axial-play-B"]},
-        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], type: "text" },
-        { title: "Valeurs 'x' mesurées = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"]},
-        { title: "Valeurs 'y' mesurées = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"]},
-        { title: "Valeurs 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"]},
-        { title: "Valeurs 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"]},
-        { title: "Valeurs 'c' calculée = u - y - z", fields: ["measured-value-c-A", "measured-value-c-B"], compute: (suffix) => calcC(suffix) },
-        { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"]},
+        { title: "Jeu axial 'jm' mesuré avant démontage", fields: ["axial-play-A", "axial-play-B"] },
+        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"], type: "text-center" },
+        { title: "Valeurs 'x' mesurées = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"] },
+        { title: "Valeurs 'y' mesurées = hauteur mesurées = valeur du grand roulement-re", fields: ["measured-value-y-A", "measured-value-y-B"] },
+        { title: "Valeurs de 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"] },
+        { title: "Valeurs de 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"] },
+        { title: "Valeurs de 'c' calculée = u - y - z", fields: ["measured-value-c-A", "measured-value-c-B"], compute: (suffix) => calcC(suffix) },
+        { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
         { title: "Valeurs 'w' calculée = x - u - 0,02mm", fields: ["measured-value-w-A", "measured-value-w-B"], compute: (suffix) => calcW(suffix) },
-        { title: "Valeurs 'bm' mesurées = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
+        { title: "Valeurs 'bm' mesurées = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
         { title: "Valeurs 'b' calculées = c + 0,2mm", fields: ["measured-value-b-A", "measured-value-b-B"], compute: (suffix) => calcB(suffix) },
-        { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"]},
-        { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"]},
+        { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"] },
+        { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"] },
         { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"], compute: (suffix) => calcEU(suffix) },
-        { title: "Jeu axial 'jm' Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"]},
-        { title: "Jeu axial du bandage Après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
-        { title: "Jeu radial du bandage près remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
-         { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+        { title: "Jeu axial 'jm' après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
+        { title: "Jeu axial du bandage après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
+        { title: "Jeu radial du bandage après remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
+        { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
         { title: "Ecartement des bandages (valeur ?)", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
       ];
       measurementGroups.forEach(group => {
@@ -353,26 +377,21 @@
         function trimZeros(val) {
           if (typeof val === "number") return val.toString();
           if (typeof val === "string" && val.match(/^\d+\.\d+$/)) {
-            return val.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'');
+            return val.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.0+$/, '');
           }
           return val;
         }
-
         function getResultColor(field, value) {
           const num = parseFloat(value);
           if (value === "" || isNaN(num)) return "";
-          // Jeu axial du bandage Après remise en état < 0.7mm
           if (field.startsWith("axial-bandage-after-") && num > 0.7) return "text-red-600 font-bold";
           if (field.startsWith("axial-bandage-after-") && num <= 0.7) return "text-green-600 font-bold";
-          // Jeu radial du bandage près remise en état < 0.5mm
           if (field.startsWith("radial-bandage-after-") && num > 0.5) return "text-red-600 font-bold";
           if (field.startsWith("radial-bandage-after-") && num <= 0.5) return "text-green-600 font-bold";
-          // Jeu axial 'jm' Après remise en état 0 < jm < 0,05
           if (field.startsWith("axial-play-after-") && num > 0.07) return "text-red-600 font-bold";
           if (field.startsWith("axial-play-after-") && num <= 0.07) return "text-green-600 font-bold";
           return "";
         }
-
         html += `
           <tr>
             <td class="border border-black px-2 py-1">${group.title}</td>
@@ -404,19 +423,14 @@
     });
     // Nettoyage uniquement à la première ouverture et à la fermeture complète du navigateur
     (function() {
-      // Utilise sessionStorage pour savoir si une session est déjà active
       if (!sessionStorage.getItem('sessionActive')) {
-        // Première ouverture d'un onglet dans le navigateur
         localStorage.removeItem('mesuresData_last');
         Object.keys(localStorage)
           .filter(k => k.startsWith('mesuresData_'))
           .forEach(k => localStorage.removeItem(k));
         sessionStorage.setItem('sessionActive', '1');
       }
-
-      // Quand le dernier onglet est fermé, efface les données
       window.addEventListener('unload', function() {
-        // Si c'est le dernier onglet (sessionStorage va être vidé)
         if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
           localStorage.removeItem('mesuresData_last');
           Object.keys(localStorage)
