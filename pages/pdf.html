@@ -66,6 +66,7 @@
       const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
       const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
       const c = u - y - z;
+      savedData['measured-value-c' + suffix] = isNaN(c) ? "" : c.toFixed(3); // <-- important
       return (!savedData['measured-value-u' + suffix] && !savedData['measured-value-y' + suffix] && !savedData['measured-value-z' + suffix]) ? "" : (isNaN(c) ? "" : c.toFixed(3));
     }
     function calcW(suffix) {
@@ -159,26 +160,37 @@
                 <tr>
                   <td class="border border-black px-2 py-1 align-middle" rowspan="3" style="text-align:center;width:100px;">Grand Diamètre</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 1-A'))}" style="width:76px;">${val('GD-Côte Verticale 1-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 4-A'))}" style="width:76px;">${val('GD-Côte Horizontale 4-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 1-B'))}" style="width:76px;">${val('GD-Côte Verticale 1-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 4-B'))}" style="width:76px;">${val('GD-Côte Horizontale 4-B')}</td> <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
-                    <span class="text-red-600 font-bold text-xs">117,450<br> < Ø < <br>117,475</span>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Verticale 1-A'))}" style="width:76px;">${val('GD-Côte Verticale 1-A') !== "" ? Number(val('GD-Côte Verticale 1-A')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 4-A'))}" style="width:76px;">${val('GD-Côte Horizontale 4-A') !== "" ? Number(val('GD-Côte Horizontale 4-A')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Verticale 1-B'))}" style="width:76px;">${val('GD-Côte Verticale 1-B') !== "" ? Number(val('GD-Côte Verticale 1-B')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 4-B'))}" style="width:76px;">${val('GD-Côte Horizontale 4-B') !== "" ? Number(val('GD-Côte Horizontale 4-B')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
+                  <span class="text-red-600 font-bold text-xs">117,450<br> < Ø < <br>117,475</span>
                   </td>
                 </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 2-A'))}" style="width:76px;">${val('GD-Côte Verticale 2-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 5-A'))}" style="width:76px;">${val('GD-Côte Horizontale 5-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 2-B'))}" style="width:76px;">${val('GD-Côte Verticale 2-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 5-B'))}" style="width:76px;">${val('GD-Côte Horizontale 5-B')}</td> </tr>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Verticale 2-A'))}" style="width:76px;">${val('GD-Côte Verticale 2-A') !== "" ? Number(val('GD-Côte Verticale 2-A')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 5-A'))}" style="width:76px;">${val('GD-Côte Horizontale 5-A') !== "" ? Number(val('GD-Côte Horizontale 5-A')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Verticale 2-B'))}" style="width:76px;">${val('GD-Côte Verticale 2-B') !== "" ? Number(val('GD-Côte Verticale 2-B')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 5-B'))}" style="width:76px;">${val('GD-Côte Horizontale 5-B') !== "" ? Number(val('GD-Côte Horizontale 5-B')).toFixed(3) : ""}</td>
+                </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 3-A'))}" style="width:76px;">${val('GD-Côte Verticale 3-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 6-A'))}" style="width:76px;">${val('GD-Côte Horizontale 6-A')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Verticale 3-B'))}" style="width:76px;">${val('GD-Côte Verticale 3-B')}</td> <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1 ${colorGD(val('GD-Côte Horizontale 6-B'))}" style="width:76px;">${val('GD-Côte Horizontale 6-B')}</td> </tr>
-                <tr>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Verticale 3-A'))}" style="width:76px;">${val('GD-Côte Verticale 3-A') !== "" ? Number(val('GD-Côte Verticale 3-A')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 6-A'))}" style="width:76px;">${val('GD-Côte Horizontale 6-A') !== "" ? Number(val('GD-Côte Horizontale 6-A')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Verticale 3-B'))}" style="width:76px;">${val('GD-Côte Verticale 3-B') !== "" ? Number(val('GD-Côte Verticale 3-B')).toFixed(3) : ""}</td>
+                  <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorGD(val('GD-Côte Horizontale 6-B'))}" style="width:76px;">${val('GD-Côte Horizontale 6-B') !== "" ? Number(val('GD-Côte Horizontale 6-B')).toFixed(3) : ""}</td>
+                </tr>
                 <tr>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="2">
@@ -207,36 +219,36 @@
                 <tr>
                   <td class="border border-black px-2 py-1 align-middle" rowspan="3" style="text-align:center;width:100px;">Petit Diamètre</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 1-A'))}" style="width:76px;">${val('PD-Côte Verticale 1-A')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Verticale 1-A'))}" style="width:76px;">${val('PD-Côte Verticale 1-A') !== "" ? Number(val('PD-Côte Verticale 1-A')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 4-A'))}" style="width:76px;">${val('PD-Côte Horizontale 4-A')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 4-A'))}" style="width:76px;">${val('PD-Côte Horizontale 4-A') !== "" ? Number(val('PD-Côte Horizontale 4-A')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">1</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 1-B'))}" style="width:76px;">${val('PD-Côte Verticale 1-B')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Verticale 1-B'))}" style="width:76px;">${val('PD-Côte Verticale 1-B') !== "" ? Number(val('PD-Côte Verticale 1-B')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">4</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 4-B'))}" style="width:76px;">${val('PD-Côte Horizontale 4-B')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 4-B'))}" style="width:76px;">${val('PD-Côte Horizontale 4-B') !== "" ? Number(val('PD-Côte Horizontale 4-B')).toFixed(3) : ""}</td>
                   <td class="border border-black px-2 py-1" rowspan="4" style="vertical-align:middle;text-align:center;width:50px;">
-                    <span class="text-red-600 font-bold text-xs">89,920<br> < Ø < <br>89,945</span>
+                  <span class="text-red-600 font-bold text-xs">89,920<br> < Ø < <br>89,945</span>
                   </td>
                 </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 2-A'))}" style="width:76px;">${val('PD-Côte Verticale 2-A')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Verticale 2-A'))}" style="width:76px;">${val('PD-Côte Verticale 2-A') !== "" ? Number(val('PD-Côte Verticale 2-A')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 5-A'))}" style="width:76px;">${val('PD-Côte Horizontale 5-A')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 5-A'))}" style="width:76px;">${val('PD-Côte Horizontale 5-A') !== "" ? Number(val('PD-Côte Horizontale 5-A')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">2</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 2-B'))}" style="width:76px;">${val('PD-Côte Verticale 2-B')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Verticale 2-B'))}" style="width:76px;">${val('PD-Côte Verticale 2-B') !== "" ? Number(val('PD-Côte Verticale 2-B')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">5</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 5-B'))}" style="width:76px;">${val('PD-Côte Horizontale 5-B')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 5-B'))}" style="width:76px;">${val('PD-Côte Horizontale 5-B') !== "" ? Number(val('PD-Côte Horizontale 5-B')).toFixed(3) : ""}</td>
                 </tr>
                 <tr>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 3-A'))}" style="width:76px;">${val('PD-Côte Verticale 3-A')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Verticale 3-A'))}" style="width:76px;">${val('PD-Côte Verticale 3-A') !== "" ? Number(val('PD-Côte Verticale 3-A')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 6-A'))}" style="width:76px;">${val('PD-Côte Horizontale 6-A')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 6-A'))}" style="width:76px;">${val('PD-Côte Horizontale 6-A') !== "" ? Number(val('PD-Côte Horizontale 6-A')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">3</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Verticale 3-B'))}" style="width:76px;">${val('PD-Côte Verticale 3-B')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Verticale 3-B'))}" style="width:76px;">${val('PD-Côte Verticale 3-B') !== "" ? Number(val('PD-Côte Verticale 3-B')).toFixed(3) : ""}</td>
                   <td class="border border-black px-1 py-1 text-center" style="width:24px;">6</td>
-                  <td class="border border-black px-2 py-1 ${colorPD(val('PD-Côte Horizontale 6-B'))}" style="width:76px;">${val('PD-Côte Horizontale 6-B')}</td>
+                  <td class="border border-black px-2 py-1 text-right ${colorPD(val('PD-Côte Horizontale 6-B'))}" style="width:76px;">${val('PD-Côte Horizontale 6-B') !== "" ? Number(val('PD-Côte Horizontale 6-B')).toFixed(3) : ""}</td>
                 </tr>
                 <tr>
                   <td class="border border-black px-2 py-1 font-bold bg-gray-100 text-center" colspan="1">moyenne:</td>
@@ -300,7 +312,7 @@
             <table class="min-w-full text-base border border-black mb-8" style="border-collapse:collapse;">
               <thead>
                 <tr>
-                  <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:400px;">Mesure</th> 
+                  <th class="border border-black px-2 py-1 bg-gray-200 text-left" style="width:600px;">Mesure</th> 
                   <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
                   <th class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
                 </tr>
@@ -318,13 +330,16 @@
         { title: "Valeurs 'c' calculée = u - y - z", fields: ["measured-value-c-A", "measured-value-c-B"], compute: (suffix) => calcC(suffix) },
         { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"]},
         { title: "Valeurs 'w' calculée = x - u - 0,02mm", fields: ["measured-value-w-A", "measured-value-w-B"], compute: (suffix) => calcW(suffix) },
-        { title: "Valeurs 'bm' mesurées = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
+        { title: "Valeurs 'bm' mesurées = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"]},
         { title: "Valeurs 'b' calculées = c + 0,2mm", fields: ["measured-value-b-A", "measured-value-b-B"], compute: (suffix) => calcB(suffix) },
         { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"]},
         { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"]},
         { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"], compute: (suffix) => calcEU(suffix) },
         { title: "Jeu axial 'jm' Après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"]},
-        { title: "Ecartement des roues", fields: ["wheel-ecart-A", "wheel-ecart-B"]}
+        { title: "Jeu axial du bandage Après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
+        { title: "Jeu radial du bandage près remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
+         { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+        { title: "Ecartement des bandages (valeur ?)", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
       ];
       measurementGroups.forEach(group => {
         let valueA, valueB;
@@ -335,11 +350,34 @@
           valueA = savedData[group.fields[0]] !== undefined && savedData[group.fields[0]] !== null && savedData[group.fields[0]] !== "" ? savedData[group.fields[0]] : "";
           valueB = savedData[group.fields[1]] !== undefined && savedData[group.fields[1]] !== null && savedData[group.fields[1]] !== "" ? savedData[group.fields[1]] : "";
         }
+        function trimZeros(val) {
+          if (typeof val === "number") return val.toString();
+          if (typeof val === "string" && val.match(/^\d+\.\d+$/)) {
+            return val.replace(/(\.\d*?[1-9])0+$/,'$1').replace(/\.0+$/,'');
+          }
+          return val;
+        }
+
+        function getResultColor(field, value) {
+          const num = parseFloat(value);
+          if (value === "" || isNaN(num)) return "";
+          // Jeu axial du bandage Après remise en état < 0.7mm
+          if (field.startsWith("axial-bandage-after-") && num > 0.7) return "text-red-600 font-bold";
+          if (field.startsWith("axial-bandage-after-") && num <= 0.7) return "text-green-600 font-bold";
+          // Jeu radial du bandage près remise en état < 0.5mm
+          if (field.startsWith("radial-bandage-after-") && num > 0.5) return "text-red-600 font-bold";
+          if (field.startsWith("radial-bandage-after-") && num <= 0.5) return "text-green-600 font-bold";
+          // Jeu axial 'jm' Après remise en état 0 < jm < 0,05
+          if (field.startsWith("axial-play-after-") && num > 0.07) return "text-red-600 font-bold";
+          if (field.startsWith("axial-play-after-") && num <= 0.07) return "text-green-600 font-bold";
+          return "";
+        }
+
         html += `
           <tr>
             <td class="border border-black px-2 py-1">${group.title}</td>
-            <td class="border border-black px-2 py-1 text-center">${valueA}</td>
-            <td class="border border-black px-2 py-1 text-center">${valueB}</td>
+            <td class="border border-black px-2 py-1 text-center ${getResultColor(group.fields[0], valueA)}">${trimZeros(valueA)}</td>
+            <td class="border border-black px-2 py-1 text-center ${getResultColor(group.fields[1], valueB)}">${trimZeros(valueB)}</td>
           </tr>
         `;
       });

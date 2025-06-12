@@ -69,15 +69,167 @@
       { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
       { title: "<b>Côté A</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
-      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
+      { 
+        title: "<i>Grand Diamètre</i>", 
+        fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 117.460 && num <= 117.475) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 117.450 && num <= 117.460) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "", 
+        fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 117.460 && num <= 117.475) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 117.450 && num <= 117.460) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "<i>Petit Diamètre</i>", 
+        fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 89.930 && num <= 89.945) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 89.920 && num <= 89.930) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "", 
+        fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 89.930 && num <= 89.945) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 89.920 && num <= 89.930) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
       { title: "<b>Côté B</b>", fields: [], label: "" },
-      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
-      { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
-      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
-      { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
+      { 
+        title: "<i>Grand Diamètre</i>", 
+        fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 117.460 && num <= 117.475) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 117.450 && num <= 117.460) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "", 
+        fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 117.460 && num <= 117.475) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 117.450 && num <= 117.460) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "<i>Petit Diamètre</i>", 
+        fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 89.930 && num <= 89.945) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 89.920 && num <= 89.930) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "", 
+        fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], 
+        label: "",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 89.930 && num <= 89.945) {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        } else if (num >= 89.920 && num <= 89.930) {
+          return `<span style="color:orange;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
       { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
       { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
@@ -105,7 +257,7 @@
       },
       { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
       { 
-        title: "<b>Valeurs 'w' calculée</b> = x - u - 0,02mm", 
+        title: "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>", 
         fields: ["measured-value-w-A", "measured-value-w-B"], 
         label: "Côté",
         compute: function(savedData, field) {
@@ -124,9 +276,9 @@
           return isNaN(w) ? "" : w.toFixed(3);
         }
       },
-      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
       { 
-        title: "<b>Valeurs 'b' calculées</b> = c + 0,2mm", 
+        title: "<b><u>Valeurs 'b' calculées</b> = hauteur douille d'écartement à uniser = c + 0,2mm</u>", 
         fields: ["measured-value-b-A", "measured-value-b-B"], 
         label: "Côté",
         compute: function(savedData, field) {
@@ -173,8 +325,62 @@
           return result;
         }
       },
-      { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
-      { title: "<b>Ecartement des roues</b>", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+      { 
+        title: "<b>Jeu axial 'jm' Après remise en état</b> 0 < jm < 0,05", 
+        fields: ["axial-play-after-A", "axial-play-after-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 0.07) {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "<b>Jeu axial du bandage Après remise en état</b> < 0.7mm", 
+        fields: ["axial-bandage-after-A", "axial-bandage-after-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 0.7) {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { 
+        title: "<b>Jeu radial du bandage près remise en état</b> < 0.5mm", 
+        fields: ["radial-bandage-after-A", "radial-bandage-after-B"], 
+        label: "Côté",
+        compute: function(savedData, field) {
+          const value = savedData[field];
+          if (value === undefined || value === null || value === "") return "";
+          const num = parseFloat(value);
+          if (!isNaN(num)) {
+        if (num > 0.5) {
+          return `<span style="color:red;font-weight:bold">${value}</span>`;
+        } else {
+          return `<span style="color:green;font-weight:bold">${value}</span>`;
+        }
+          }
+          return value;
+        }
+      },
+      { title: "<b>Ecartement des roues</b> = distance entre suport bandage (valeur ?)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+      { title: "<b>Ecartement des bandages</b> (valeur ?)", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
     ];
 
     // Recherche la dernière clé utilisée lors du clic sur "Valider"
@@ -216,16 +422,30 @@
           resultsContainer.innerHTML += `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
           return;
         }
+
+        // Vérifie s'il y a au moins une valeur non vide dans ce groupe
+        const hasValue = group.fields.some(field => {
+          let value;
+          if (typeof group.compute === "function") {
+            value = group.compute(savedData, field);
+            // Si la valeur calculée contient du texte visible (hors balise vide)
+            return value && value.replace(/<[^>]+>/g, '').trim() !== "";
+          } else {
+            value = savedData[field];
+            return value !== undefined && value !== null && value !== "";
+          }
+        });
+
         const section = document.createElement('div');
         section.className = 'bg-gray-50 p-4 rounded-lg';
-        section.innerHTML = `<h3 class="font-medium mb-2">${group.title}</h3>`;
+        // Ajoute la classe orange si aucune valeur
+        section.innerHTML = `<h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3>`;
 
         const fieldsContainer = document.createElement('div');
         fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2';
 
         group.fields.forEach(field => {
           let value;
-          // Si le groupe a une fonction compute, on l'utilise pour obtenir la valeur
           if (typeof group.compute === "function") {
             value = group.compute(savedData, field);
           } else {
