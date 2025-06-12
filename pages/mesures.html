@@ -163,7 +163,7 @@
       validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
       validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     }, 3000);
-    e.target.reset();
+    // e.target.reset(); // <-- Supprimez ou commentez cette ligne pour ne pas vider le formulaire
   });
 
   // Fonction utilitaire pour trouver toutes les clés par OM
@@ -255,6 +255,41 @@
         }, 2000);
       }
     }
+  });
+
+  // Fonction pour sauvegarder le formulaire en temps réel
+  function saveFormInputsRealtime() {
+    const form = document.getElementById('mesuresForm');
+    if (!form) return;
+    const inputs = form.querySelectorAll('input');
+    const formData = {};
+    inputs.forEach(input => {
+      formData[input.name] = input.value;
+    });
+    localStorage.setItem('mesuresFormRealtime', JSON.stringify(formData));
+  }
+
+  // Fonction pour charger les valeurs sauvegardées
+  function loadFormInputsRealtime() {
+    const form = document.getElementById('mesuresForm');
+    if (!form) return;
+    const saved = localStorage.getItem('mesuresFormRealtime');
+    if (saved) {
+      const data = JSON.parse(saved);
+      Object.entries(data).forEach(([k, v]) => {
+        const input = form.querySelector(`[name="${k}"]`);
+        if (input) input.value = v;
+      });
+    }
+  }
+
+  // Charger les valeurs au chargement de la page
+  document.addEventListener('DOMContentLoaded', () => {
+    loadFormInputsRealtime();
+    // Ajout de l'écouteur sur tous les inputs pour sauvegarder en temps réel
+    document.querySelectorAll('#mesuresForm input').forEach(input => {
+      input.addEventListener('input', saveFormInputsRealtime);
+    });
   });
   </script>
 </body>
