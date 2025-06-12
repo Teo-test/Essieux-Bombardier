@@ -290,6 +290,30 @@
       input.addEventListener('input', saveFormInputsRealtime);
     });
   });
+
+  // Nettoyage uniquement à la première ouverture et à la fermeture complète du navigateur
+  (function() {
+    // Utilise sessionStorage pour savoir si une session est déjà active
+    if (!sessionStorage.getItem('sessionActive')) {
+      // Première ouverture d'un onglet dans le navigateur
+      localStorage.removeItem('mesuresData_last');
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_'))
+        .forEach(k => localStorage.removeItem(k));
+      sessionStorage.setItem('sessionActive', '1');
+    }
+
+    // Quand le dernier onglet est fermé, efface les données
+    window.addEventListener('unload', function() {
+      // Si c'est le dernier onglet (sessionStorage va être vidé)
+      if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
+        localStorage.removeItem('mesuresData_last');
+        Object.keys(localStorage)
+          .filter(k => k.startsWith('mesuresData_'))
+          .forEach(k => localStorage.removeItem(k));
+      }
+    });
+  })();
   </script>
 </body>
 </html>

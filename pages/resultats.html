@@ -195,24 +195,6 @@
     // Remplace la récupération des données par :
     const savedData = getLastMesuresData() || {};
 
-    // Efface les données à l'ouverture de la page
-    window.addEventListener('DOMContentLoaded', () => {
-      // Supprime la clé principale des mesures
-      localStorage.removeItem('mesuresData_last');
-      // Supprime toutes les mesures sauvegardées (clé commençant par mesuresData_)
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('mesuresData_'))
-        .forEach(k => localStorage.removeItem(k));
-    });
-
-    // Efface les données à la fermeture de la page
-    window.addEventListener('beforeunload', () => {
-      localStorage.removeItem('mesuresData_last');
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('mesuresData_'))
-        .forEach(k => localStorage.removeItem(k));
-    });
-
     // Affichage des informations générales
     document.getElementById('display-date').textContent = savedData.date ? savedData.date : "";
     document.getElementById('display-om').textContent = savedData.om ? savedData.om : "";
@@ -281,6 +263,30 @@
       document.getElementById('display-series-wheel-A').textContent = "";
       document.getElementById('display-series-wheel-B').textContent = "";
     }
+
+    // Nettoyage uniquement à la première ouverture et à la fermeture complète du navigateur
+    (function() {
+  // Utilise sessionStorage pour savoir si une session est déjà active
+  if (!sessionStorage.getItem('sessionActive')) {
+    // Première ouverture d'un onglet dans le navigateur
+    localStorage.removeItem('mesuresData_last');
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('mesuresData_'))
+      .forEach(k => localStorage.removeItem(k));
+    sessionStorage.setItem('sessionActive', '1');
+  }
+
+  // Quand le dernier onglet est fermé, efface les données
+  window.addEventListener('unload', function() {
+    // Si c'est le dernier onglet (sessionStorage va être vidé)
+    if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
+      localStorage.removeItem('mesuresData_last');
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_'))
+        .forEach(k => localStorage.removeItem(k));
+    }
+  });
+})();
   </script>
 </body>
 </html>
