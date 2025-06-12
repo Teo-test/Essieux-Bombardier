@@ -141,6 +141,47 @@
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
 
+    // Calculs pour chaque suffixe -A et -B
+    ['-A', '-B'].forEach(suffix => {
+      // c = u - y - z
+      const u = parseFloat(data['measured-value-u' + suffix]) || 0;
+      const y = parseFloat(data['measured-value-y' + suffix]) || 0;
+      const z = parseFloat(data['measured-value-z' + suffix]) || 0;
+      if (
+        data['measured-value-u' + suffix] !== undefined &&
+        data['measured-value-y' + suffix] !== undefined &&
+        data['measured-value-z' + suffix] !== undefined &&
+        data['measured-value-u' + suffix] !== "" &&
+        data['measured-value-y' + suffix] !== "" &&
+        data['measured-value-z' + suffix] !== ""
+      ) {
+        data['measured-value-c' + suffix] = (u - y - z).toFixed(3);
+      } else {
+        data['measured-value-c' + suffix] = "";
+      }
+
+      // w = x - u - 0.02
+      const x = parseFloat(data['measured-value-x' + suffix]) || 0;
+      if (
+        data['measured-value-x' + suffix] !== undefined &&
+        data['measured-value-u' + suffix] !== undefined &&
+        data['measured-value-x' + suffix] !== "" &&
+        data['measured-value-u' + suffix] !== ""
+      ) {
+        data['measured-value-w' + suffix] = (x - u - 0.02).toFixed(3);
+      } else {
+        data['measured-value-w' + suffix] = "";
+      }
+
+      // b = c + 0.2
+      const c = parseFloat(data['measured-value-c' + suffix]) || 0;
+      if (data['measured-value-c' + suffix] !== "") {
+        data['measured-value-b' + suffix] = (c + 0.2).toFixed(3);
+      } else {
+        data['measured-value-b' + suffix] = "";
+      }
+    });
+
     // Clé unique : OM + date (date peut être vide)
     const om = data.om ? data.om.trim() : '';
     const date = data.date ? data.date.trim() : '';
@@ -148,10 +189,9 @@
       alert("Merci de renseigner l'OM.");
       return;
     }
-    // Si pas de date, on utilise 'nodate'
-    const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}_nodate`;
+    const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
     localStorage.setItem(key, JSON.stringify(data));
-    localStorage.setItem('mesuresData_last', key); // <-- Cette ligne permet à pdf.html de toujours charger la dernière saisie
+    localStorage.setItem('mesuresData_last', key);
 
     const confirmation = document.getElementById('confirmation');
     const validerBtn = document.getElementById('validerBtn');
@@ -212,50 +252,24 @@
         document.getElementById('confirmation').classList.add('hidden');
       }, 2000);
     } else {
-      // Recherche toutes les clés correspondant à l'OM
-      const keys = findKeysByOM(om);
-      if (keys.length === 0) {
+      key = `mesuresData_${om}`;
+      const saved = localStorage.getItem(key);
+      if (!saved) {
         alert("Aucune mesure trouvée pour cet OM.");
         return;
       }
-      if (keys.length === 1) {
-        // Un seul résultat, on charge directement
-        localStorage.setItem('mesuresData_last', keys[0]); // <-- Ajout ici aussi
-        const data = JSON.parse(localStorage.getItem(keys[0]));
-        Object.entries(data).forEach(([k, v]) => {
-          const input = document.querySelector(`[name="${k}"]`);
-          if (input) input.value = v;
-        });
-        document.getElementById('confirmation').textContent = "Mesures chargées !";
-        document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
-        document.getElementById('confirmation').classList.add('text-green-600');
-        setTimeout(() => {
-          document.getElementById('confirmation').classList.add('hidden');
-        }, 2000);
-      } else {
-        // Plusieurs résultats, on propose de choisir la date
-        const dates = keys.map(k => k.split('_').pop());
-        const chosen = prompt("Plusieurs dossiers trouvés pour cet OM. Entrez la date souhaitée parmi :\n" + dates.join('\n'));
-        if (!chosen) return;
-        const chosenKey = `mesuresData_${om}_${chosen}`;
-        const saved = localStorage.getItem(chosenKey);
-        if (!saved) {
-          alert("Aucune mesure trouvée pour cette date.");
-          return;
-        }
-        localStorage.setItem('mesuresData_last', chosenKey); // <-- Ajout ici aussi
-        const data = JSON.parse(saved);
-        Object.entries(data).forEach(([k, v]) => {
-          const input = document.querySelector(`[name="${k}"]`);
-          if (input) input.value = v;
-        });
-        document.getElementById('confirmation').textContent = "Mesures chargées !";
-        document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
-        document.getElementById('confirmation').classList.add('text-green-600');
-        setTimeout(() => {
-          document.getElementById('confirmation').classList.add('hidden');
-        }, 2000);
-      }
+      localStorage.setItem('mesuresData_last', key);
+      const data = JSON.parse(saved);
+      Object.entries(data).forEach(([k, v]) => {
+        const input = document.querySelector(`[name="${k}"]`);
+        if (input) input.value = v;
+      });
+      document.getElementById('confirmation').textContent = "Mesures chargées !";
+      document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
+      document.getElementById('confirmation').classList.add('text-green-600');
+      setTimeout(() => {
+        document.getElementById('confirmation').classList.add('hidden');
+      }, 2000);
     }
   });
 

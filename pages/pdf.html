@@ -80,9 +80,22 @@
       return (!savedData['measured-value-x' + suffix] && !savedData['measured-value-u' + suffix]) ? "" : (isNaN(w) ? "" : w.toFixed(3));
     }
     function calcB(suffix) {
-      const c = parseFloat(calcC(suffix)) || 0;
+      // Vérifie si toutes les valeurs sources sont vides
+      if (
+        (!savedData['measured-value-u' + suffix] || savedData['measured-value-u' + suffix] === "") &&
+        (!savedData['measured-value-y' + suffix] || savedData['measured-value-y' + suffix] === "") &&
+        (!savedData['measured-value-z' + suffix] || savedData['measured-value-z' + suffix] === "")
+      ) {
+        savedData['measured-value-b' + suffix] = "";
+        return "";
+      }
+      const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+      const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
+      const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
+      const c = u - y - z;
       const b = c + 0.2;
-      return (!savedData['measured-value-c' + suffix]) ? "" : (isNaN(b) ? "" : b.toFixed(3));
+      savedData['measured-value-b' + suffix] = isNaN(b) ? "" : b.toFixed(3);
+      return isNaN(b) ? "" : b.toFixed(3);
     }
     function calcEU(suffix) {
       const d = parseFloat(savedData['measured-value-d' + suffix]);

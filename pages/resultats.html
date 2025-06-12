@@ -278,21 +278,27 @@
       },
       { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
       { 
-        title: "<b><u>Valeurs 'b' calculées</b> = hauteur douille d'écartement à uniser = c + 0,2mm</u>", 
+        title: "<b><u>'Valeurs 'b' calculées'</b> = hauteur douille d'écartement à uniser = c + 0,2mm</u>", 
         fields: ["measured-value-b-A", "measured-value-b-B"], 
         label: "Côté",
         compute: function(savedData, field) {
           // field is either "measured-value-b-A" or "measured-value-b-B"
           const suffix = field.endsWith('-A') ? '-A' : '-B';
-          const c = parseFloat(savedData['measured-value-c' + suffix]) || 0;
-          const b = c + 0.2;
-          // Enregistre la valeur calculée dans savedData
-          savedData['measured-value-b' + suffix] = isNaN(b) ? "" : b.toFixed(3);
-          // Affiche vide si la valeur source est absente
-          if (!savedData['measured-value-c' + suffix]) {
-        return "";
+          // Vérifie si toutes les valeurs sources sont vides
+          if (
+            (!savedData['measured-value-u' + suffix] || savedData['measured-value-u' + suffix] === "") &&
+            (!savedData['measured-value-y' + suffix] || savedData['measured-value-y' + suffix] === "") &&
+            (!savedData['measured-value-z' + suffix] || savedData['measured-value-z' + suffix] === "")
+          ) {
+            savedData['measured-value-b' + suffix] = "";
+            return "";
           }
-          // Affiche avec 3 décimales si c'est un nombre
+          const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+          const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
+          const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
+          const c = u - y - z;
+          const b = c + 0.2;
+          savedData['measured-value-b' + suffix] = isNaN(b) ? "" : b.toFixed(3);
           return isNaN(b) ? "" : b.toFixed(3);
         }
       },
