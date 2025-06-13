@@ -24,31 +24,37 @@
         <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label for="date" class="block text-sm font-medium">Date:</label>
+            <label for="date" class="block text-sm font-medium">Date :</label>
             <input type="date" id="date" name="date" class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
-            <label for="om" class="block text-sm font-medium">OM:</label>
+            <label for="om" class="block text-sm font-medium">N° de l'intervention GHH :</label>
             <input type="text" id="om" name="om" required class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
-            <label for="bogieNo" class="block text-sm font-medium">Bogie N°:</label>
+            <label for="bogieNo" class="block text-sm font-medium">Bogie N° :</label>
             <input type="text" id="bogieNo" name="bogieNo"  class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
-            <label for="typeNo" class="block text-sm font-medium">Type N°:</label>
-            <input type="text" id="typeNo" name="typeNo" class="mt-1 p-2 w-full border rounded">
+            <label for="typeNo" class="block text-sm font-medium">Type :</label>
+            <input type="text" id="typeNo" name="typeNo" class="mt-1 p-2 w-full border rounded" style="text-transform:uppercase" oninput="this.value = this.value.toUpperCase()">
           </div>
+          <script>
+            // Force la valeur à être enregistrée en majuscule dans le localStorage
+            document.getElementById('typeNo').addEventListener('input', function() {
+              this.value = this.value.toUpperCase();
+            });
+          </script>
           <div>
-            <label for="Fabrick" class="block text-sm font-medium">Fabrick (N° de Fab.):</label>
+            <label for="Fabrick" class="block text-sm font-medium">N° de Fabrication :</label>
             <input type="text" id="Fabrick" name="Fabrick" class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
-            <label for="Auftrags" class="block text-sm font-medium">Auftrags (N° de Cde):</label>
+            <label for="Auftrags" class="block text-sm font-medium">N° de Cde :</label>
             <input type="text" id="Auftrags" name="Auftrags" class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
-            <label for="Baujahr" class="block text-sm font-medium">Baujahr (Année de Fab.):</label>
+            <label for="Baujahr" class="block text-sm font-medium">Année de Fabrication :</label>
             <input type="text" id="Baujahr" name="Baujahr" class="mt-1 p-2 w-full border rounded">
           </div>
           <div class="flex items-end justify-end">

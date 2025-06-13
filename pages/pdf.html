@@ -152,10 +152,10 @@
             <div><span class="font-medium">Date:</span> ${val('date')}</div>
             <div><span class="font-medium">OM:</span> ${val('om')}</div>
             <div><span class="font-medium">Bogie N°:</span> ${val('bogieNo')}</div>
-            <div><span class="font-medium">Type N°:</span> ${val('typeNo')}</div>
-            <div><span class="font-medium">Fabrick:</span> ${val('Fabrick')}</div>
-            <div><span class="font-medium">Auftrags:</span> ${val('Auftrags')}</div>
-            <div><span class="font-medium">Baujahr:</span> ${val('Baujahr')}</div>
+            <div><span class="font-medium">Type :</span> ${val('typeNo').toUpperCase()}</div>
+            <div><span class="font-medium">N° de Fabrication :</span> ${val('Fabrick')}</div>
+            <div><span class="font-medium">N° de Cde :</span> ${val('Auftrags')}</div>
+            <div><span class="font-medium">Année de Fabrication :</span> ${val('Baujahr')}</div>
           </div>
           <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
           <div class="overflow-x-auto">
@@ -165,7 +165,9 @@
                   <th rowspan="2" class="border border-black px-2 py-1" style="width:100px;"></th>
                   <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté A</th>
                   <th colspan="4" class="border border-black px-2 py-1 bg-gray-200 text-center">Côté B</th>
-                  <th rowspan="2" class="border border-black px-2 py-1" style="width:100px;"></th>
+                  <th rowspan="2" class="border border-black px-2 py-1" style="width:100px;">
+                    <img src="../image/plan-point-mesure.jpg" alt="Plan point de mesure" style="max-width:200px;max-height:90px;display:block;margin:auto;">
+                  </th>
                 </tr>
                 <tr>
                   <th colspan="2" class="border border-black px-2 py-1 bg-gray-100 text-center">vertical</th>
