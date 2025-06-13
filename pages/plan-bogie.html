@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Plan du bogie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Ajout de styles personnalisés pour l'image plein écran */
+    .full-screen-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Maintient le ratio de l'image sans déformation */
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+  <header class="bg-blue-600 text-white p-4">
+    <h1 class="text-2xl font-bold">Plan du bogie</h1>
+  </header>
+  <main class="flex-grow flex justify-center items-center p-4">
+    <img src="../image/plan-du-bogie.jpg" alt="Plan du bogie" class="full-screen-image rounded shadow">
+  </main>
+</body>
+</html>

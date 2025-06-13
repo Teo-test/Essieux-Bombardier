@@ -11,6 +11,7 @@
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
       <a href="mesures.html" class="hover:underline">Mesures</a>
+      <a href="pages/plan-bogie.html" class="hover:underline">Plan du bogie</a>
       <a href="resultats.html" class="hover:underline">Résultats</a>
       <a href="pdf.html" class="underline">PDF</a>
     </div>
@@ -33,18 +34,12 @@
           </div>
           <div>
             <label for="bogieNo" class="block text-sm font-medium">Bogie N° :</label>
-            <input type="text" id="bogieNo" name="bogieNo"  class="mt-1 p-2 w-full border rounded">
+            <input type="text" id="bogieNo" name="bogieNo" class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
             <label for="typeNo" class="block text-sm font-medium">Type :</label>
-            <input type="text" id="typeNo" name="typeNo" class="mt-1 p-2 w-full border rounded" style="text-transform:uppercase" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="typeNo" name="typeNo" class="mt-1 p-2 w-full border rounded uppercase" oninput="this.value = this.value.toUpperCase()">
           </div>
-          <script>
-            // Force la valeur à être enregistrée en majuscule dans le localStorage
-            document.getElementById('typeNo').addEventListener('input', function() {
-              this.value = this.value.toUpperCase();
-            });
-          </script>
           <div>
             <label for="Fabrick" class="block text-sm font-medium">N° de Fabrication :</label>
             <input type="text" id="Fabrick" name="Fabrick" class="mt-1 p-2 w-full border rounded">
@@ -58,7 +53,7 @@
             <input type="text" id="Baujahr" name="Baujahr" class="mt-1 p-2 w-full border rounded">
           </div>
           <div class="flex items-end justify-end">
-            <button type="submit" id="OuvrirBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Ouvrir</button>
+            <button type="button" id="OuvrirBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Ouvrir</button>
           </div>
         </div>
       </section>
@@ -86,261 +81,224 @@
         <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Valider</button>
       </div>
     </form>
-    <div id="confirmation" class="hidden text-green-600 mt-4">Mesures enregistrées !</div>
+    <div id="confirmation" class="hidden text-green-600 mt-4" role="alert"></div>
   </main>
 
   <script>
-  const measurementGroups = [
-    { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
-    { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
-    { title: "<b>Côté A</b>", fields: [], label: "" },
-    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
-    { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
-    { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
-    { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
-    { title: "<b>Côté B</b>", fields: [], label: "" },
-    { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
-    { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
-    { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
-    { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
-    { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
-    { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
-    { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
-    { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-    { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-    { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
-    { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
-    { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
-    { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
-    { title: "<b>Jeu axial du bandage Après remise en état</b> < 0.7mm" , fields: ["axial-bandage-after-A", "axial-bandage-after-B"], label: "Côté" },
-    { title: "<b>Jeu radial du bandage près remise en état</b> < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"], label: "Côté" },
-    { title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-    { title: "<b>Ecartement des bandages</b> ( 1380mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
-  ];
+    // Configuration des groupes de mesures
+    const measurementGroups = [
+      { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
+      { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
+      { title: "<b>Côté A</b>", fields: [], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], label: "" },
+      { title: "<b>Côté B</b>", fields: [], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], label: "" },
+      { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
+      { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
+      { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
+      { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
+      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
+      { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
+      { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
+      { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
+      { title: "<b>Jeu axial du bandage Après remission en état</b> < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"], label: "Côté" },
+      { title: "<b>Jeu radial du bandage après remise en état</b> < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"], label: "Côté" },
+      { title: "<b>Ecartement des roues</b> = distance entre suport bandage (1396 +/- 1mm)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+      { title: "<b>Ecartement des bandages</b> (1380mm)", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
+    ];
 
-  const measurementsContainer = document.getElementById('measurements');
-  measurementGroups.forEach((group) => {
-    const section = document.createElement('div');
-    section.className = 'mb-6';
-    section.innerHTML = `
-      <h3 class="text-lg font-medium mb-2">${group.title}</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        ${group.fields.map(field => {
-          const labelText = group.label 
-            ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
-            : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-          return `
-            <div>
-              <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
-              <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded">
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-    measurementsContainer.appendChild(section);
-  });
-
-  // Sauvegarde par OM+date
-  document.getElementById('mesuresForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
-
-    // Calculs pour chaque suffixe -A et -B
-    ['-A', '-B'].forEach(suffix => {
-      // c = u - y - z
-      const u = parseFloat(data['measured-value-u' + suffix]) || 0;
-      const y = parseFloat(data['measured-value-y' + suffix]) || 0;
-      const z = parseFloat(data['measured-value-z' + suffix]) || 0;
-      if (
-        data['measured-value-u' + suffix] !== undefined &&
-        data['measured-value-y' + suffix] !== undefined &&
-        data['measured-value-z' + suffix] !== undefined &&
-        data['measured-value-u' + suffix] !== "" &&
-        data['measured-value-y' + suffix] !== "" &&
-        data['measured-value-z' + suffix] !== ""
-      ) {
-        data['measured-value-c' + suffix] = (u - y - z).toFixed(3);
-      } else {
-        data['measured-value-c' + suffix] = "";
-      }
-
-      // w = x - u - 0.02
-      const x = parseFloat(data['measured-value-x' + suffix]) || 0;
-      if (
-        data['measured-value-x' + suffix] !== undefined &&
-        data['measured-value-u' + suffix] !== undefined &&
-        data['measured-value-x' + suffix] !== "" &&
-        data['measured-value-u' + suffix] !== ""
-      ) {
-        data['measured-value-w' + suffix] = (x - u - 0.02).toFixed(3);
-      } else {
-        data['measured-value-w' + suffix] = "";
-      }
-
-      // b = c + 0.2
-      const c = parseFloat(data['measured-value-c' + suffix]) || 0;
-      if (data['measured-value-c' + suffix] !== "") {
-        data['measured-value-b' + suffix] = (c + 0.2).toFixed(3);
-      } else {
-        data['measured-value-b' + suffix] = "";
-      }
-    });
-
-    // Clé unique : OM + date (date peut être vide)
-    const om = data.om ? data.om.trim() : '';
-    const date = data.date ? data.date.trim() : '';
-    if (!om) {
-      alert("Merci de renseigner l'OM.");
-      return;
-    }
-    const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
-    localStorage.setItem(key, JSON.stringify(data));
-    localStorage.setItem('mesuresData_last', key);
-
-    const confirmation = document.getElementById('confirmation');
-    const validerBtn = document.getElementById('validerBtn');
-    confirmation.textContent = "Mesures enregistrées avec succès !";
-    confirmation.classList.remove('hidden', 'text-red-600');
-    confirmation.classList.add('text-green-600');
-    validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-red-600', 'hover:bg-red-700');
-    validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-    setTimeout(() => {
-      confirmation.classList.add('hidden');
-      validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
-      validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      // Redirection vers la page résultats
-      window.location.href = "resultats.html";
-    }, 3000);
-    // Si tu veux une redirection immédiate, mets simplement :
-    // window.location.href = "resultats.html";
-    // e.target.reset(); // <-- Supprimez ou commentez cette ligne pour ne pas vider le formulaire
-  });
-
-  // Fonction utilitaire pour trouver toutes les clés par OM
-  function findKeysByOM(om) {
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key.startsWith(`mesuresData_${om}_`)) {
-        keys.push(key);
-      }
-    }
-    return keys;
-  }
-
-  // Fonction "Ouvrir" : charge les données si OM (et éventuellement date) sont renseignés
-  document.getElementById('OuvrirBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    const om = document.getElementById('om').value.trim();
-    const date = document.getElementById('date').value.trim();
-
-    if (!om) {
-      alert("Merci de renseigner l'OM pour ouvrir un dossier.");
-      return;
-    }
-
-    let key;
-    if (date) {
-      key = `mesuresData_${om}_${date}`;
-      const saved = localStorage.getItem(key);
-      if (!saved) {
-        alert("Aucune mesure trouvée pour cette combinaison OM/date.");
-        return;
-      }
-      localStorage.setItem('mesuresData_last', key); // <-- Ajout ici aussi pour que PDF soit à jour après ouverture
-      const data = JSON.parse(saved);
-      Object.entries(data).forEach(([k, v]) => {
-        const input = document.querySelector(`[name="${k}"]`);
-        if (input) input.value = v;
+    // Utilitaire pour générer les champs de mesure
+    function generateMeasurementFields(container, groups) {
+      groups.forEach(group => {
+        const section = document.createElement('div');
+        section.className = 'mb-6';
+        section.innerHTML = `
+          <h3 class="text-lg font-medium mb-2">${group.title}</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            ${group.fields.map(field => {
+              const labelText = group.label 
+                ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
+                : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+              return `
+                <div>
+                  <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
+                  <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded" aria-label="${labelText}">
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+        container.appendChild(section);
       });
-      document.getElementById('confirmation').textContent = "Mesures chargées !";
-      document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
-      document.getElementById('confirmation').classList.add('text-green-600');
-      setTimeout(() => {
-        document.getElementById('confirmation').classList.add('hidden');
-      }, 2000);
-    } else {
-      key = `mesuresData_${om}`;
-      const saved = localStorage.getItem(key);
-      if (!saved) {
-        alert("Aucune mesure trouvée pour cet OM.");
-        return;
+    }
+
+    // Calcul des valeurs dérivées (c, w, b)
+    function calculateDerivedValues(data) {
+      ['-A', '-B'].forEach(suffix => {
+        const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
+        const y = parseFloat(data[`measured-value-y${suffix}`]) || 0;
+        const z = parseFloat(data[`measured-value-z${suffix}`]) || 0;
+        const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
+
+        if (u && y && z) {
+          data[`measured-value-c${suffix}`] = (u - y - z).toFixed(3);
+        } else {
+          data[`measured-value-c${suffix}`] = '';
+        }
+
+        if (x && u) {
+          data[`measured-value-w${suffix}`] = (x - u - 0.02).toFixed(3);
+        } else {
+          data[`measured-value-w${suffix}`] = '';
+        }
+
+        const c = parseFloat(data[`measured-value-c${suffix}`]) || 0;
+        if (c) {
+          data[`measured-value-b${suffix}`] = (c + 0.2).toFixed(3);
+        } else {
+          data[`measured-value-b${suffix}`] = '';
+        }
+      });
+      return data;
+    }
+
+    // Afficher les messages de confirmation ou d'erreur
+    function showMessage(message, isError = false) {
+      const confirmation = document.getElementById('confirmation');
+      confirmation.textContent = message;
+      confirmation.classList.remove('hidden', isError ? 'text-green-600' : 'text-red-600');
+      confirmation.classList.add(isError ? 'text-red-600' : 'text-green-600');
+      setTimeout(() => confirmation.classList.add('hidden'), 3000);
+    }
+
+    // Sauvegarde des données dans localStorage
+    function saveData(data, om, date) {
+      if (!om) {
+        showMessage("Merci de renseigner l'OM.", true);
+        return false;
       }
+      const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
+      localStorage.setItem(key, JSON.stringify(data));
       localStorage.setItem('mesuresData_last', key);
+      return true;
+    }
+
+    // Chargement des données depuis localStorage
+    function loadData(om, date) {
+      const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
+      const saved = localStorage.getItem(key);
+      if (!saved) {
+        showMessage(`Aucune mesure trouvée pour ${date ? 'cette combinaison OM/date' : 'cet OM'}.`, true);
+        return false;
+      }
       const data = JSON.parse(saved);
       Object.entries(data).forEach(([k, v]) => {
         const input = document.querySelector(`[name="${k}"]`);
         if (input) input.value = v;
       });
-      document.getElementById('confirmation').textContent = "Mesures chargées !";
-      document.getElementById('confirmation').classList.remove('hidden', 'text-red-600');
-      document.getElementById('confirmation').classList.add('text-green-600');
-      setTimeout(() => {
-        document.getElementById('confirmation').classList.add('hidden');
-      }, 2000);
+      localStorage.setItem('mesuresData_last', key);
+      showMessage("Mesures chargées !");
+      return true;
     }
-  });
 
-  // Fonction pour sauvegarder le formulaire en temps réel
-  function saveFormInputsRealtime() {
-    const form = document.getElementById('mesuresForm');
-    if (!form) return;
-    const inputs = form.querySelectorAll('input');
-    const formData = {};
-    inputs.forEach(input => {
-      formData[input.name] = input.value;
-    });
-    localStorage.setItem('mesuresFormRealtime', JSON.stringify(formData));
-  }
+    // Sauvegarde en temps réel
+    function saveFormInputsRealtime() {
+      const form = document.getElementById('mesuresForm');
+      const inputs = form.querySelectorAll('input');
+      const formData = {};
+      inputs.forEach(input => formData[input.name] = input.value);
+      localStorage.setItem('mesuresFormRealtime', JSON.stringify(formData));
+    }
 
-  // Fonction pour charger les valeurs sauvegardées
-  function loadFormInputsRealtime() {
-    const form = document.getElementById('mesuresForm');
-    if (!form) return;
-    const saved = localStorage.getItem('mesuresFormRealtime');
-    if (saved) {
-      const data = JSON.parse(saved);
-      Object.entries(data).forEach(([k, v]) => {
-        const input = form.querySelector(`[name="${k}"]`);
-        if (input) input.value = v;
+    // Chargement des données en temps réel
+    function loadFormInputsRealtime() {
+      const saved = localStorage.getItem('mesuresFormRealtime');
+      if (saved) {
+        const data = JSON.parse(saved);
+        Object.entries(data).forEach(([k, v]) => {
+          const input = document.querySelector(`[name="${k}"]`);
+          if (input) input.value = v;
+        });
+      }
+    }
+
+    // Gestion des événements du formulaire
+    function setupFormEvents() {
+      const form = document.getElementById('mesuresForm');
+      const ouvrirBtn = document.getElementById('OuvrirBtn');
+      const validerBtn = document.getElementById('validerBtn');
+
+      // Sauvegarde en temps réel
+      form.addEventListener('input', saveFormInputsRealtime);
+
+      // Bouton Ouvrir
+      ouvrirBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const om = document.getElementById('om').value.trim();
+        const date = document.getElementById('date').value.trim();
+        if (!om) {
+          showMessage("Merci de renseigner l'OM pour ouvrir un dossier.", true);
+          return;
+        }
+        loadData(om, date);
+      });
+
+      // Bouton Valider
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        let data = Object.fromEntries(formData);
+        data = calculateDerivedValues(data);
+        const om = data.om?.trim();
+        const date = data.date?.trim();
+
+        if (saveData(data, om, date)) {
+          validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+          validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+          showMessage("Mesures enregistrées avec succès !");
+          setTimeout(() => {
+            validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            window.location.href = "resultats.html";
+          }, 1500);
+        }
       });
     }
-  }
 
-  // Charger les valeurs au chargement de la page
-  document.addEventListener('DOMContentLoaded', () => {
-    loadFormInputsRealtime();
-    // Ajout de l'écouteur sur tous les inputs pour sauvegarder en temps réel
-    document.querySelectorAll('#mesuresForm input').forEach(input => {
-      input.addEventListener('input', saveFormInputsRealtime);
-    });
-  });
-
-  // Nettoyage uniquement à la première ouverture et à la fermeture complète du navigateur
-  (function() {
-    // Utilise sessionStorage pour savoir si une session est déjà active
-    if (!sessionStorage.getItem('sessionActive')) {
-      // Première ouverture d'un onglet dans le navigateur
-      localStorage.removeItem('mesuresData_last');
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('mesuresData_'))
-        .forEach(k => localStorage.removeItem(k));
-      sessionStorage.setItem('sessionActive', '1');
-    }
-
-    // Quand le dernier onglet est fermé, efface les données
-    window.addEventListener('unload', function() {
-      // Si c'est le dernier onglet (sessionStorage va être vidé)
-      if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
+    // Gestion du nettoyage de localStorage
+    function setupStorageCleanup() {
+      if (!sessionStorage.getItem('sessionActive')) {
         localStorage.removeItem('mesuresData_last');
         Object.keys(localStorage)
           .filter(k => k.startsWith('mesuresData_'))
           .forEach(k => localStorage.removeItem(k));
+        sessionStorage.setItem('sessionActive', '1');
       }
+
+      window.addEventListener('unload', () => {
+        if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
+          localStorage.removeItem('mesuresData_last');
+          Object.keys(localStorage)
+            .filter(k => k.startsWith('mesuresData_'))
+            .forEach(k => localStorage.removeItem(k));
+        }
+      });
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      generateMeasurementFields(document.getElementById('measurements'), measurementGroups);
+      loadFormInputsRealtime();
+      setupFormEvents();
+      setupStorageCleanup();
     });
-  })();
   </script>
 </body>
 </html>

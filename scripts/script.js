@@ -1,81 +1,121 @@
+// Configuration
+const CONFIG = {
+  formId: 'mesuresForm',
+  confirmationId: 'confirmation',
+  resultatsPageId: 'page-resultats',
+  storageKeys: {
+    formInputs: 'formInputs',
+    mesuresData: 'mesuresData'
+  }
+};
+
+// Service Worker Registration
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js')
     .then(() => console.log('Service Worker enregistré'))
-    .catch(err => console.log('Erreur Service Worker', err));
+    .catch(err => console.error('Erreur Service Worker:', err));
 }
 
-// Function to save form inputs to localStorage in real-time
-function saveFormInputs() {
-  const form = document.getElementById('mesuresForm');
+// Utility Functions
+const getElement = id => document.getElementById(id);
+const getFormData = form => Object.fromEntries(new FormData(form).entries());
+const saveToStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+const loadFromStorage = key => JSON.parse(localStorage.getItem(key) || '{}');
+const clearStorage = () => Object.values(CONFIG.storageKeys).forEach(key => localStorage.removeItem(key));
+
+// Form Handling
+const handleFormInput = input => {
+  input.style.borderLeft = input.checkValidity() 
+    ? '3px solid rgb(71, 139, 71)' 
+    : '3px solid #ff0000';
+  saveFormInputs();
+};
+
+const saveFormInputs = () => {
+  const form = getElement(CONFIG.formId);
+  if (form) saveToStorage(CONFIG.storageKeys.formInputs, getFormData(form));
+};
+
+const loadFormInputs = () => {
+  const form = getElement(CONFIG.formId);
   if (!form) return;
 
-  const inputs = form.querySelectorAll('input');
-  const formData = {};
-  inputs.forEach(input => {
-    formData[input.name] = input.value;
+  const savedData = loadFromStorage(CONFIG.storageKeys.formInputs);
+  Object.entries(savedData).forEach(([key, value]) => {
+    const input = form.querySelector(`[name="${key}"]`);
+    if (input) input.value = value || '';
   });
-  localStorage.setItem('formInputs', JSON.stringify(formData));
-}
+};
 
-// Function to load form inputs from localStorage
-function loadFormInputs() {
-  const form = document.getElementById('mesuresForm');
-  if (!form) return;
+const calculateValues = data => ({
+  ...data,
+  moyenneVerticale: ([
+    data.grandModeleVertical1,
+    data.grandModeleVertical2,
+    data.grandModeleVertical3
+  ].reduce((sum, val) => sum + parseFloat(val || 0), 0) / 3).toFixed(3),
+  moyenneHorizontale: ([
+    data.grandModeleHorizontal1,
+    data.grandModeleHorizontal2,
+    data.grandModeleHorizontal3
+  ].reduce((sum, val) => sum + parseFloat(val || 0), 0) / 3).toFixed(3)
+});
 
-  const savedData = JSON.parse(localStorage.getItem('formInputs'));
-  if (savedData) {
-    Object.keys(savedData).forEach(key => {
-      const input = form.querySelector(`[name="${key}"]`);
-      if (input) input.value = savedData[key];
-    });
+// Resultats Page
+const loadResultats = () => {
+  const rapportContent = getElement('rapportContent');
+  const data = loadFromStorage(CONFIG.storageKeys.mesuresData);
+  
+  if (!rapportContent || !Object.keys(data).length) {
+    rapportContent.innerHTML = `<tr><td colspan="2">Aucune donnée disponible.</td></tr>`;
+    return;
   }
-}
 
+  const fields = [
+    ['Date', 'date'],
+    ['OM', 'om'],
+    ['Bogie N°', 'bogieNo'],
+    ['Type N°', 'typeNo'],
+    ['Fabrick', 'fabrick'],
+    ['Année de Fabrication', 'anneeFab'],
+    ['Autre', 'autre'],
+    ['Localisation', 'localisation'],
+    ['N° de série de la roue', 'serieRoue'],
+    ['Jeu Axial "Jm" mesuré', 'jeuAxialJm'],
+    ['Grand Modèle Vertical 1', 'grandModeleVertical1'],
+    ['Grand Modèle Vertical 2', 'grandModeleVertical2'],
+    ['Grand Modèle Vertical 3', 'grandModeleVertical3'],
+    ['Grand Modèle Horizontal 1', 'grandModeleHorizontal1'],
+    ['Grand Modèle Horizontal 2', 'grandModeleHorizontal2'],
+    ['Grand Modèle Horizontal 3', 'grandModeleHorizontal3'],
+    ['Moyenne Verticale', 'moyenneVerticale'],
+    ['Moyenne Horizontale', 'moyenneHorizontale']
+  ];
+
+  rapportContent.innerHTML = fields.map(([label, key]) => 
+    `<tr><td>${label}</td><td>${data[key] || 'N/A'}</td></tr>`
+  ).join('');
+};
+
+// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('mesuresForm');
-  const confirmation = document.getElementById('confirmation');
+  const form = getElement(CONFIG.formId);
+  const confirmation = getElement(CONFIG.confirmationId);
 
-  // Handle mesures form
   if (form) {
-    // Load saved form inputs
     loadFormInputs();
+    
+    form.querySelectorAll('input[required]').forEach(input => 
+      input.addEventListener('input', () => handleFormInput(input))
+    );
 
-    // Real-time validation and saving
-    document.querySelectorAll('input[required]').forEach(input => {
-      input.addEventListener('input', function() {
-        if (this.checkValidity()) {
-          this.style.borderLeft = '3px solid rgb(71, 139, 71)';
-        } else {
-          this.style.borderLeft = '3px solid #ff0000';
-        }
-        saveFormInputs(); // Save inputs on change
-      });
-    });
-
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      const formData = {
-        date: form.date.value,
-        om: form.om.value,
-        bogieNo: form.bogieNo.value,
-        typeNo: form.typeNo.value,
-        fabrick: form.fabrick.value,
-        anneeFab: form.anneeFab.value,
-        autre: form.autre.value,
-        localisation: form.localisation.value,
-        serieRoue: form.serieRoue.value,
-        jeuAxialJm: form.jeuAxialJm.value,
-        grandModeleVertical1: form.grandModeleVertical1.value,
-        grandModeleVertical2: form.grandModeleVertical2.value,
-        grandModeleVertical3: form.grandModeleVertical3.value,
-        grandModeleHorizontal1: form.grandModeleHorizontal1.value,
-        grandModeleHorizontal2: form.grandModeleHorizontal2.value,
-        grandModeleHorizontal3: form.grandModeleHorizontal3.value,
-      };
-
+      const formData = getFormData(form);
       const calculatedData = calculateValues(formData);
-      localStorage.setItem('mesuresData', JSON.stringify(calculatedData));
-
+      
+      saveToStorage(CONFIG.storageKeys.mesuresData, calculatedData);
+      
       confirmation.style.display = 'block';
       setTimeout(() => {
         confirmation.style.display = 'none';
@@ -84,60 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle resultats page
-  if (document.body.id === 'page-resultats') {
+  if (document.body.id === CONFIG.resultatsPageId) {
     loadResultats();
   }
 });
 
-// Clear localStorage when the window/tab is closed
-window.addEventListener('beforeunload', () => {
-  localStorage.removeItem('formInputs');
-  localStorage.removeItem('mesuresData');
-});
-
-function calculateValues(data) {
-  // Calcul des moyennes
-  const moyenneVerticale = (parseFloat(data.grandModeleVertical1) + parseFloat(data.grandModeleVertical2) + parseFloat(data.grandModeleVertical3)) / 3;
-  const moyenneHorizontale = (parseFloat(data.grandModeleHorizontal1) + parseFloat(data.grandModeleHorizontal2) + parseFloat(data.grandModeleHorizontal3)) / 3;
-
-  return {
-    ...data,
-    moyenneVerticale: moyenneVerticale,
-    moyenneHorizontale: moyenneHorizontale
-  };
-}
-
-function loadResultats() {
-  const data = JSON.parse(localStorage.getItem('mesuresData'));
-  const rapportContent = document.getElementById('rapportContent');
-
-  if (data) {
-    const lignes = [
-      ["Date", data.date || 'N/A'],
-      ["OM", data.om || 'N/A'],
-      ["Bogie N°", data.bogieNo || 'N/A'],
-      ["Type N°", data.typeNo || 'N/A'],
-      ["Fabrick", data.fabrick || 'N/A'],
-      ["Année de Fabrication", data.anneeFab || 'N/A'],
-      ["Autre", data.autre || 'N/A'],
-      ["Localisation", data.localisation || 'N/A'],
-      ["N° de série de la roue", data.serieRoue || 'N/A'],
-      ["Jeu Axial 'Jm' mesuré", data.jeuAxialJm || 'N/A'],
-      ["Grand Modèle Vertical 1", data.grandModeleVertical1 || 'N/A'],
-      ["Grand Modèle Vertical 2", data.grandModeleVertical2 || 'N/A'],
-      ["Grand Modèle Vertical 3", data.grandModeleVertical3 || 'N/A'],
-      ["Grand Modèle Horizontal 1", data.grandModeleHorizontal1 || 'N/A'],
-      ["Grand Modèle Horizontal 2", data.grandModeleHorizontal2 || 'N/A'],
-      ["Grand Modèle Horizontal 3", data.grandModeleHorizontal3 || 'N/A'],
-      ["Moyenne Verticale", data.moyenneVerticale ? data.moyenneVerticale.toFixed(3) : 'N/A'],
-      ["Moyenne Horizontale", data.moyenneHorizontale ? data.moyenneHorizontale.toFixed(3) : 'N/A'],
-    ];
-
-    rapportContent.innerHTML = lignes.map(
-      ([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`
-    ).join('');
-  } else {
-    rapportContent.innerHTML = `<tr><td colspan="2">Aucune donnée disponible.</td></tr>`;
-  }
-}
+window.addEventListener('beforeunload', clearStorage);

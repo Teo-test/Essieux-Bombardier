@@ -6,11 +6,12 @@
   <title>Résultats</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col" id="page-resultats">
+<body class="bg-gray-100 min-h-screen flex flex-col">
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
       <a href="mesures.html" class="hover:underline">Mesures</a>
+      <a href="pages/plan-bogie.html" class="hover:underline">Plan du bogie</a>
       <a href="resultats.html" class="underline">Résultats</a>
       <a href="pdf.html" class="hover:underline">PDF</a>
     </div>
@@ -22,40 +23,11 @@
     <div class="bg-white p-6 rounded-lg shadow space-y-6">
       <section>
         <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <p class="text-sm font-medium">Date :<span class="font-normal ml-4" id="display-date"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">N° de l'intervention GHH :<span class="font-normal ml-4" id="display-om"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">Bogie N° :<span class="font-normal ml-4" id="display-bogieNo"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">Type :<span class="font-normal ml-4 uppercase" id="display-typeNo"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">N° de Fabrication :<span class="font-normal ml-4" id="display-Fabrick"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">N° de Cde :<span class="font-normal ml-4" id="display-Auftrags"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">Année de Fabrication :<span class="font-normal ml-4" id="display-Baujahr"></span></p>
-          </div>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="general-info"></div>
       </section>
       <section>
         <h2 class="text-xl font-semibold mb-4">Localisation</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p class="text-sm font-medium">N° de série roue droite (Côté A):<span class="font-normal ml-4" id="display-series-wheel-A"></span></p>
-          </div>
-          <div>
-            <p class="text-sm font-medium">N° de série roue gauche (Côté B):<span class="font-normal ml-4" id="display-series-wheel-B"></span></p>
-          </div>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="location-info"></div>
       </section>
       <section>
         <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
@@ -65,471 +37,262 @@
   </main>
 
   <script>
+    // Configuration des groupes de mesures
     const measurementGroups = [
       { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
-      { title: "<b>Côté A</b>", fields: [], label: "" },
-      { 
-        title: "<i>Grand Diamètre</i>", 
-        fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 117.460 && num <= 117.475) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 117.450 && num <= 117.460) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
+      {
+        title: "<b>Côté A</b>", fields: [], label: "",
+        subGroups: [
+          {
+            title: "<i>Grand Diamètre</i>",
+            fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A", "GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"],
+            ranges: { green: [117.460, 117.475], orange: [117.450, 117.460] }
+          },
+          {
+            title: "<i>Petit Diamètre</i>",
+            fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A", "PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"],
+            ranges: { green: [89.930, 89.945], orange: [89.920, 89.930] }
           }
-          return value;
-        }
+        ]
       },
-      { 
-        title: "", 
-        fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 117.460 && num <= 117.475) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 117.450 && num <= 117.460) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
+      {
+        title: "<b>Côté B</b>", fields: [], label: "",
+        subGroups: [
+          {
+            title: "<i>Grand Diamètre</i>",
+            fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B", "GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"],
+            ranges: { green: [117.460, 117.475], orange: [117.450, 117.460] }
+          },
+          {
+            title: "<i>Petit Diamètre</i>",
+            fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B", "PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"],
+            ranges: { green: [89.930, 89.945], orange: [89.920, 89.930] }
           }
-          return value;
-        }
-      },
-      { 
-        title: "<i>Petit Diamètre</i>", 
-        fields: ["PD-Côte Verticale 1-A", "PD-Côte Verticale 2-A", "PD-Côte Verticale 3-A"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 89.930 && num <= 89.945) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 89.920 && num <= 89.930) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
-      },
-      { 
-        title: "", 
-        fields: ["PD-Côte Horizontale 4-A", "PD-Côte Horizontale 5-A", "PD-Côte Horizontale 6-A"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 89.930 && num <= 89.945) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 89.920 && num <= 89.930) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
-      },
-      { title: "<b>Côté B</b>", fields: [], label: "" },
-      { 
-        title: "<i>Grand Diamètre</i>", 
-        fields: ["GD-Côte Verticale 1-B", "GD-Côte Verticale 2-B", "GD-Côte Verticale 3-B"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 117.460 && num <= 117.475) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 117.450 && num <= 117.460) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
-      },
-      { 
-        title: "", 
-        fields: ["GD-Côte Horizontale 4-B", "GD-Côte Horizontale 5-B", "GD-Côte Horizontale 6-B"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 117.460 && num <= 117.475) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 117.450 && num <= 117.460) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
-      },
-      { 
-        title: "<i>Petit Diamètre</i>", 
-        fields: ["PD-Côte Verticale 1-B", "PD-Côte Verticale 2-B", "PD-Côte Verticale 3-B"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 89.930 && num <= 89.945) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 89.920 && num <= 89.930) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
-      },
-      { 
-        title: "", 
-        fields: ["PD-Côte Horizontale 4-B", "PD-Côte Horizontale 5-B", "PD-Côte Horizontale 6-B"], 
-        label: "",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 89.930 && num <= 89.945) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else if (num >= 89.920 && num <= 89.930) {
-          return `<span style="color:orange;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
+        ]
       },
       { title: "<b>Valeurs 'x' mesurées</b> = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"], label: "Côté" },
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
       { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
       { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-      { 
-        title: "<b>Valeurs 'c' calculée</b> = u - y - z", 
-        fields: ["measured-value-c-A", "measured-value-c-B"], 
+      {
+        title: "<b>Valeurs 'c' calculée</b> = u - y - z",
+        fields: ["measured-value-c-A", "measured-value-c-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          // field is either "measured-value-c-A" or "measured-value-c-B"
+        compute: (data, field) => {
           const suffix = field.endsWith('-A') ? '-A' : '-B';
-          const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
-          const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
-          const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
+          const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
+          const y = parseFloat(data[`measured-value-y${suffix}`]) || 0;
+          const z = parseFloat(data[`measured-value-z${suffix}`]) || 0;
           const c = u - y - z;
-          // Enregistre la valeur calculée dans savedData
-          savedData['measured-value-c' + suffix] = isNaN(c) ? "" : c.toFixed(3);
-          // Affiche vide si toutes les valeurs sont nulles
-          if (!savedData['measured-value-u' + suffix] && !savedData['measured-value-y' + suffix] && !savedData['measured-value-z' + suffix]) {
-        return "";
-          }
-          // Affiche avec 3 décimales si c'est un nombre
-          return isNaN(c) ? "" : c.toFixed(3);
+          data[field] = isNaN(c) ? "" : c.toFixed(3);
+          return !u && !y && !z ? "" : data[field];
         }
       },
       { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-      { 
-        title: "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>", 
-        fields: ["measured-value-w-A", "measured-value-w-B"], 
+      {
+        title: "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>",
+        fields: ["measured-value-w-A", "measured-value-w-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          // field is either "measured-value-w-A" or "measured-value-w-B"
+        compute: (data, field) => {
           const suffix = field.endsWith('-A') ? '-A' : '-B';
-          const x = parseFloat(savedData['measured-value-x' + suffix]) || 0;
-          const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
+          const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
+          const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
           const w = x - u - 0.02;
-          // Enregistre la valeur calculée dans savedData
-          savedData['measured-value-w' + suffix] = isNaN(w) ? "" : w.toFixed(3);
-          // Affiche vide si toutes les valeurs sont nulles
-          if (!savedData['measured-value-x' + suffix] && !savedData['measured-value-u' + suffix]) {
-        return "";
-          }
-          // Affiche avec 3 décimales si c'est un nombre
-          return isNaN(w) ? "" : w.toFixed(3);
+          data[field] = isNaN(w) ? "" : w.toFixed(3);
+          return !x && !u ? "" : data[field];
         }
       },
       { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
-      { 
-        title: "<b><u>'Valeurs 'b' calculées'</b> = hauteur douille d'écartement à uniser = c + 0,2mm</u>", 
-        fields: ["measured-value-b-A", "measured-value-b-B"], 
+      {
+        title: "<b><u>'Valeurs 'b' calculées'</b> = hauteur douille d'écartement à usiner = c + 0,2mm</u>",
+        fields: ["measured-value-b-A", "measured-value-b-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          // field is either "measured-value-b-A" or "measured-value-b-B"
+        compute: (data, field) => {
           const suffix = field.endsWith('-A') ? '-A' : '-B';
-          // Vérifie si toutes les valeurs sources sont vides
-          if (
-            (!savedData['measured-value-u' + suffix] || savedData['measured-value-u' + suffix] === "") &&
-            (!savedData['measured-value-y' + suffix] || savedData['measured-value-y' + suffix] === "") &&
-            (!savedData['measured-value-z' + suffix] || savedData['measured-value-z' + suffix] === "")
-          ) {
-            savedData['measured-value-b' + suffix] = "";
+          if (!data[`measured-value-u${suffix}`] && !data[`measured-value-y${suffix}`] && !data[`measured-value-z${suffix}`]) {
+            data[field] = "";
             return "";
           }
-          const u = parseFloat(savedData['measured-value-u' + suffix]) || 0;
-          const y = parseFloat(savedData['measured-value-y' + suffix]) || 0;
-          const z = parseFloat(savedData['measured-value-z' + suffix]) || 0;
-          const c = u - y - z;
+          const c = parseFloat(data[`measured-value-c${suffix}`]) || 0;
           const b = c + 0.2;
-          savedData['measured-value-b' + suffix] = isNaN(b) ? "" : b.toFixed(3);
-          return isNaN(b) ? "" : b.toFixed(3);
+          data[field] = isNaN(b) ? "" : b.toFixed(3);
+          return data[field];
         }
       },
       { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
       { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
-      { 
-        title: "<b>Valeurs 'eu' usinées</b>", 
-        fields: ["measured-value-eu-A", "measured-value-eu-B"], 
+      {
+        title: "<b>Valeurs 'eu' usinées</b>",
+        fields: ["measured-value-eu-A", "measured-value-eu-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          // field is either "measured-value-eu-A" or "measured-value-eu-B"
+        compute: (data, field) => {
           const suffix = field.endsWith('-A') ? '-A' : '-B';
-          const d = parseFloat(savedData['measured-value-d' + suffix]);
-          const e = parseFloat(savedData['measured-value-e' + suffix]);
-          let result = "";
+          const d = parseFloat(data[`measured-value-d${suffix}`]);
+          const e = parseFloat(data[`measured-value-e${suffix}`]);
           if (!isNaN(d) && !isNaN(e)) {
-        if (d > e) {
-          result = '<span style="color:green;font-weight:bold">OK</span>';
-          savedData['measured-value-eu' + suffix] = "OK";
-        } else if (e > d) {
-          result = '<span style="color:red;font-weight:bold">A usiner</span>';
-          savedData['measured-value-eu' + suffix] = "A usiner";
-        } else {
-          result = "";
-          savedData['measured-value-eu' + suffix] = "";
-        }
-          } else {
-        savedData['measured-value-eu' + suffix] = "";
+            data[field] = d > e ? "OK" : "A usiner";
+            return `<span style="color:${d > e ? 'green' : 'red'};font-weight:bold">${data[field]}</span>`;
           }
-          return result;
+          data[field] = "";
+          return "";
         }
       },
-      { 
-        title: "<b>Jeu axial 'jm' Après remise en état</b> 0 < jm < 0,05", 
-        fields: ["axial-play-after-A", "axial-play-after-B"], 
+      {
+        title: "<b>Jeu axial 'jm' Après remise en état</b> 0 < jm < 0,05",
+        fields: ["axial-play-after-A", "axial-play-after-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 0.07) {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
+        compute: (data, field) => formatRange(data[field], 0, 0.07, 0.05)
       },
-      { 
-        title: "<b>Jeu axial du bandage Après remise en état</b> < 0.7mm", 
-        fields: ["axial-bandage-after-A", "axial-bandage-after-B"], 
+      {
+        title: "<b>Jeu axial du bandage Après remise en état</b> < 0.7mm",
+        fields: ["axial-bandage-after-A", "axial-bandage-after-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 0.7) {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
+        compute: (data, field) => formatRange(data[field], 0, 0.7, 0.7)
       },
-      { 
-        title: "<b>Jeu radial du bandage près remise en état</b> < 0.5mm", 
-        fields: ["radial-bandage-after-A", "radial-bandage-after-B"], 
+      {
+        title: "<b>Jeu radial du bandage près remise en état</b> < 0.5mm",
+        fields: ["radial-bandage-after-A", "radial-bandage-after-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num > 0.5) {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
+        compute: (data, field) => formatRange(data[field], 0, 0.5, 0.5)
       },
-      { 
-        title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm)", 
-        fields: ["wheel-ecart-A", "wheel-ecart-B"], 
+      {
+        title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm)",
+        fields: ["wheel-ecart-A", "wheel-ecart-B"],
         label: "Côté",
-        compute: function(savedData, field) {
-          const value = savedData[field];
-          if (value === undefined || value === null || value === "") return "";
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-        if (num >= 1395 && num <= 1397) {
-          return `<span style="color:green;font-weight:bold">${value}</span>`;
-        } else {
-          return `<span style="color:red;font-weight:bold">${value}</span>`;
-        }
-          }
-          return value;
-        }
+        compute: (data, field) => formatRange(data[field], 1395, 1397, 1396)
       },
-      { title: "<b>Ecartement des bandages</b> ( 1380 mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
+      { title: "<b>Ecartement des bandages</b> ( 1380 mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" }
     ];
 
-    // Recherche la dernière clé utilisée lors du clic sur "Valider"
-    function getLastMesuresKey() {
-      return localStorage.getItem('mesuresData_last') || null;
+    // Fonction utilitaire pour formater les valeurs selon les plages
+    function formatRange(value, min, max, target) {
+      if (!value && value !== 0) return "";
+      const num = parseFloat(value);
+      if (isNaN(num)) return value;
+      const isInRange = num >= min && num <= max;
+      return `<span style="color:${isInRange ? 'green' : 'red'};font-weight:bold">${value}</span>`;
     }
 
-    function getLastMesuresData() {
-      const key = getLastMesuresKey();
-      if (!key) return null;
-      try {
-        return JSON.parse(localStorage.getItem(key));
-      } catch {
-        return null;
+    // Fonction utilitaire pour formater les diamètres
+    function formatDiameter(data, field, ranges) {
+      const value = data[field];
+      if (!value && value !== 0) return "";
+      const num = parseFloat(value);
+      if (isNaN(num)) return value;
+      if (num > ranges.green[0] && num <= ranges.green[1]) {
+        return `<span style="color:green;font-weight:bold">${value}</span>`;
+      } else if (num >= ranges.orange[0] && num <= ranges.orange[1]) {
+        return `<span style="color:orange;font-weight:bold">${value}</span>`;
       }
+      return `<span style="color:red;font-weight:bold">${value}</span>`;
     }
 
-    // Remplace la récupération des données par :
-    const savedData = getLastMesuresData() || {};
+    // Récupération des données
+    function getLastMesuresData() {
+      const key = localStorage.getItem('mesuresData_last');
+      return key ? JSON.parse(localStorage.getItem(key) || '{}') : {};
+    }
 
     // Affichage des informations générales
-    document.getElementById('display-date').textContent = savedData.date ? savedData.date : "";
-    document.getElementById('display-om').textContent = savedData.om ? savedData.om : "";
-    document.getElementById('display-bogieNo').textContent = savedData.bogieNo ? savedData.bogieNo : "";
-    document.getElementById('display-typeNo').textContent = savedData.typeNo ? savedData.typeNo : "";
-    document.getElementById('display-Fabrick').textContent = savedData.Fabrick ? savedData.Fabrick : "";
-    document.getElementById('display-Auftrags').textContent = savedData.Auftrags ? savedData.Auftrags : "";
-    document.getElementById('display-Baujahr').textContent = savedData.Baujahr ? savedData.Baujahr : "";
+    function displayGeneralInfo(data) {
+      const fields = [
+        { id: 'display-date', key: 'date', label: 'Date' },
+        { id: 'display-om', key: 'om', label: 'N° de l\'intervention GHH' },
+        { id: 'display-bogieNo', key: 'bogieNo', label: 'Bogie N°' },
+        { id: 'display-typeNo', key: 'typeNo', label: 'Type', transform: v => v.toUpperCase() },
+        { id: 'display-Fabrick', key: 'Fabrick', label: 'N° de Fabrication' },
+        { id: 'display-Auftrags', key: 'Auftrags', label: 'N° de Cde' },
+        { id: 'display-Baujahr', key: 'Baujahr', label: 'Année de Fabrication' }
+      ];
+      const container = document.getElementById('general-info');
+      container.innerHTML = fields.map(field => `
+        <div>
+          <p class="text-sm font-medium">${field.label}:<span class="font-normal ml-4">${field.transform ? field.transform(data[field.key] || '') : (data[field.key] || '')}</span></p>
+        </div>
+      `).join('');
+    }
 
-    // Affichage des numéros de série roues (localisation)
-    document.getElementById('display-series-wheel-A').textContent = savedData['series-wheel-A'] ? savedData['series-wheel-A'] : "";
-    document.getElementById('display-series-wheel-B').textContent = savedData['series-wheel-B'] ? savedData['series-wheel-B'] : "";
+    // Affichage des numéros de série
+    function displayLocationInfo(data) {
+      const container = document.getElementById('location-info');
+      container.innerHTML = `
+        <div>
+          <p class="text-sm font-medium">N° de série roue droite (Côté A):<span class="font-normal ml-4">${data['series-wheel-A'] || ''}</span></p>
+        </div>
+        <div>
+          <p class="text-sm font-medium">N° de série roue gauche (Côté B):<span class="font-normal ml-4">${data['series-wheel-B'] || ''}</span></p>
+        </div>
+      `;
+    }
 
-    // Display measurement results
-    const resultsContainer = document.getElementById('results-container');
-    if (Object.keys(savedData).length > 0) {
-      measurementGroups.forEach(group => {
-        if (!group.fields.length) {
-          resultsContainer.innerHTML += `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
-          return;
+    // Affichage des résultats
+    function displayResults(data) {
+      const resultsContainer = document.getElementById('results-container');
+      if (!Object.keys(data).length) {
+        resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
+        return;
+      }
+
+      resultsContainer.innerHTML = measurementGroups.map(group => {
+        if (!group.fields.length && !group.subGroups) {
+          return `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
         }
 
-        // Vérifie s'il y a au moins une valeur non vide dans ce groupe
-        const hasValue = group.fields.some(field => {
-          let value;
-          if (typeof group.compute === "function") {
-            value = group.compute(savedData, field);
-            // Si la valeur calculée contient du texte visible (hors balise vide)
-            return value && value.replace(/<[^>]+>/g, '').trim() !== "";
-          } else {
-            value = savedData[field];
-            return value !== undefined && value !== null && value !== "";
-          }
-        });
+        const hasValue = group.fields?.some(field => group.compute ? group.compute(data, field) : data[field]) || group.subGroups?.some(sub => sub.fields.some(field => data[field]));
+        const section = `<div class="bg-gray-50 p-4 rounded-lg"><h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">`;
 
-        const section = document.createElement('div');
-        section.className = 'bg-gray-50 p-4 rounded-lg';
-        // Ajoute la classe orange si aucune valeur
-        section.innerHTML = `<h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3>`;
+        let fieldsHTML = '';
+        if (group.fields?.length) {
+          fieldsHTML = group.fields.map(field => {
+            const value = group.compute ? group.compute(data, field) : (data[field] || '');
+            if (!value) return '';
+            const labelText = group.label ? (field.endsWith('-A') ? 'Côté A' : 'Côté B') : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+            return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+          }).filter(Boolean).join('');
+        }
 
-        const fieldsContainer = document.createElement('div');
-        fieldsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2';
+        let subGroupsHTML = '';
+        if (group.subGroups) {
+          subGroupsHTML = group.subGroups.map(sub => {
+            const subHasValue = sub.fields.some(field => data[field]);
+            if (!subHasValue) return '';
+            return `<div class="col-span-full"><h4 class="font-medium mb-2">${sub.title}</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">${
+              sub.fields.map(field => {
+                const value = formatDiameter(data, field, sub.ranges);
+                if (!value) return '';
+                const labelText = field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+                return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+              }).filter(Boolean).join('')
+            }</div></div>`;
+          }).filter(Boolean).join('');
+        }
 
-        group.fields.forEach(field => {
-          let value;
-          if (typeof group.compute === "function") {
-            value = group.compute(savedData, field);
-          } else {
-            value = (savedData[field] !== undefined && savedData[field] !== null && savedData[field] !== "") ? savedData[field] : "";
-          }
-          const labelText = group.label 
-            ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
-            : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-          if (value !== "") {
-            fieldsContainer.innerHTML += `
-              <div>
-                <p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p>
-              </div>
-            `;
-          }
-        });
+        return section + fieldsHTML + subGroupsHTML + '</div></div>';
+      }).join('');
+    }
 
-        section.appendChild(fieldsContainer);
-        resultsContainer.appendChild(section);
+    // Gestion du stockage
+    function manageStorage() {
+      if (!sessionStorage.getItem('sessionActive')) {
+        localStorage.removeItem('mesuresData_last');
+        Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
+        sessionStorage.setItem('sessionActive', '1');
+      }
+      window.addEventListener('unload', () => {
+        if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
+          localStorage.removeItem('mesuresData_last');
+          Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
+        }
       });
-    } else {
-      resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
     }
 
-    // Si aucune donnée, la page reste vierge (pas de résultats affichés)
-    if (Object.keys(savedData).length === 0) {
-      document.getElementById('results-container').innerHTML = '';
-      document.getElementById('display-date').textContent = "";
-      document.getElementById('display-om').textContent = "";
-      document.getElementById('display-bogieNo').textContent = "";
-      document.getElementById('display-typeNo').textContent = "";
-      document.getElementById('display-Fabrick').textContent = "";
-      document.getElementById('display-Auftrags').textContent = "";
-      document.getElementById('display-Baujahr').textContent = "";
-      document.getElementById('display-series-wheel-A').textContent = "";
-      document.getElementById('display-series-wheel-B').textContent = "";
-    }
-
-    // Nettoyage uniquement à la première ouverture et à la fermeture complète du navigateur
-    (function() {
-  // Utilise sessionStorage pour savoir si une session est déjà active
-  if (!sessionStorage.getItem('sessionActive')) {
-    // Première ouverture d'un onglet dans le navigateur
-    localStorage.removeItem('mesuresData_last');
-    Object.keys(localStorage)
-      .filter(k => k.startsWith('mesuresData_'))
-      .forEach(k => localStorage.removeItem(k));
-    sessionStorage.setItem('sessionActive', '1');
-  }
-
-  // Quand le dernier onglet est fermé, efface les données
-  window.addEventListener('unload', function() {
-    // Si c'est le dernier onglet (sessionStorage va être vidé)
-    if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
-      localStorage.removeItem('mesuresData_last');
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('mesuresData_'))
-        .forEach(k => localStorage.removeItem(k));
-    }
-  });
-})();
+    // Initialisation
+    const savedData = getLastMesuresData();
+    displayGeneralInfo(savedData);
+    displayLocationInfo(savedData);
+    displayResults(savedData);
+    manageStorage();
   </script>
 </body>
 </html>
