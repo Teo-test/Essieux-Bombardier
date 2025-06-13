@@ -157,12 +157,12 @@
         compute: (data, field) => formatRange(data[field], 0, 0.5, 0.5)
       },
       {
-        title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm)",
+        title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm)",
         fields: ["wheel-ecart-A", "wheel-ecart-B"],
         label: "Côté",
         compute: (data, field) => formatRange(data[field], 1395, 1397, 1396)
       },
-      { title: "<b>Ecartement des bandages</b> ( 1380 mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" }
+      { title: "<b>Ecartement des bandages</b> distance entre bandage ( 1380 mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" }
     ];
 
     // Fonction utilitaire pour formater les valeurs selon les plages

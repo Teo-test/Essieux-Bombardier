@@ -7,6 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col" id="page-mesures">
+  <button id="clearScreenBtn" class="bg-red-600 text-white px-4 py-2 rounded m-4 hover:bg-red-700">
+    Effacer les valeurs à l'écran
+  </button>
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
@@ -110,8 +113,8 @@
       { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
       { title: "<b>Jeu axial du bandage Après remission en état</b> < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"], label: "Côté" },
       { title: "<b>Jeu radial du bandage après remise en état</b> < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"], label: "Côté" },
-      { title: "<b>Ecartement des roues</b> = distance entre suport bandage (1396 +/- 1mm)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
-      { title: "<b>Ecartement des bandages</b> (1380mm)", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
+      { title: "<b>Ecartement des roues</b> = distance entre support bandage (1396 +/- 1mm)", fields: ["wheel-ecart-A", "wheel-ecart-B"], label: "Côté" },
+      { title: "<b>Ecartement des bandages</b> = distance entre bandage (1380mm)", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" },
     ];
 
     // Utilitaire pour générer les champs de mesure
@@ -170,13 +173,17 @@
     }
 
     // Afficher les messages de confirmation ou d'erreur
-    function showMessage(message, isError = false) {
-      const confirmation = document.getElementById('confirmation');
-      confirmation.textContent = message;
-      confirmation.classList.remove('hidden', isError ? 'text-green-600' : 'text-red-600');
-      confirmation.classList.add(isError ? 'text-red-600' : 'text-green-600');
-      setTimeout(() => confirmation.classList.add('hidden'), 3000);
-    }
+function showMessage(message, isError = false) {
+  const confirmation = document.getElementById('confirmation');
+  if (!confirmation) {
+    console.error("L'élément #confirmation n'existe pas dans le DOM.");
+    return;
+  }
+  confirmation.textContent = message;
+  confirmation.classList.remove('hidden', 'text-green-600', 'text-red-600'); // Supprime toutes les classes pertinentes
+  confirmation.classList.add(isError ? 'text-red-600' : 'text-green-600'); // Ajoute la classe appropriée
+  setTimeout(() => confirmation.classList.add('hidden'), 3000);
+}
 
     // Sauvegarde des données dans localStorage
     function saveData(data, om, date) {
@@ -191,22 +198,23 @@
     }
 
     // Chargement des données depuis localStorage
-    function loadData(om, date) {
-      const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
-      const saved = localStorage.getItem(key);
-      if (!saved) {
-        showMessage(`Aucune mesure trouvée pour ${date ? 'cette combinaison OM/date' : 'cet OM'}.`, true);
-        return false;
-      }
-      const data = JSON.parse(saved);
-      Object.entries(data).forEach(([k, v]) => {
-        const input = document.querySelector(`[name="${k}"]`);
-        if (input) input.value = v;
-      });
-      localStorage.setItem('mesuresData_last', key);
-      showMessage("Mesures chargées !");
-      return true;
-    }
+function loadData(om, date) {
+  const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
+  const saved = localStorage.getItem(key);
+  if (!saved) {
+    alert(`Aucune mesure trouvée pour ${date ? 'cette combinaison OM/date' : 'cet OM'}.`);
+    showMessage(`Aucune mesure trouvée pour ${date ? 'cette combinaison OM/date' : 'cet OM'}.`, true);
+    return false;
+  }
+  const data = JSON.parse(saved);
+  Object.entries(data).forEach(([k, v]) => {
+    const input = document.querySelector(`[name="${k}"]`);
+    if (input) input.value = v;
+  });
+  localStorage.setItem('mesuresData_last', key);
+  showMessage("Mesures chargées !");
+  return true;
+}
 
     // Sauvegarde en temps réel
     function saveFormInputsRealtime() {
@@ -244,7 +252,7 @@
         const om = document.getElementById('om').value.trim();
         const date = document.getElementById('date').value.trim();
         if (!om) {
-          showMessage("Merci de renseigner l'OM pour ouvrir un dossier.", true);
+          showMessage("Merci de renseigner le n° Intervention pour ouvrir un dossier.", true);
           return;
         }
         loadData(om, date);
@@ -299,6 +307,21 @@
       setupFormEvents();
       setupStorageCleanup();
     });
+
+    document.getElementById('clearScreenBtn').onclick = function() {
+      if (confirm("Voulez-vous vraiment effacer toutes les valeurs affichées à l'écran ?")) {
+        // Efface tous les champs du formulaire à l'écran
+        const form = document.getElementById('mesuresForm');
+        if (form) form.reset();
+
+        // Efface les données du localStorage liées aux mesures
+        localStorage.removeItem('mesuresData_last');
+        Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
+
+        alert("Toutes les valeurs ont été effacées.");
+      }
+      // Sinon, rien ne se passe (action annulée)
+    };
   </script>
 </body>
 </html>

@@ -224,8 +224,8 @@
         { title: "Jeu axial 'jm' après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
         { title: "Jeu axial du bandage après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
         { title: "Jeu radial du bandage après remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
-        { title: "<b>Ecartement des roues</b> = distance entre suport bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A", "wheel-ecart-B"] },
-        { title: "Ecartement des bandages ( 1380mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
+        { title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A", "wheel-ecart-B"] },
+        { title: "Ecartement des bandages distance entre bandage ( 1380mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
       ];
 
       const measurementsTable = `
@@ -282,6 +282,11 @@
           ${diameterTable}
         </div>
         <div class="page-break"></div>
+        <div class="no-break flex flex-col items-center justify-center p-8">
+          <h2 class="text-xl font-semibold mb-4">Plan du bogie</h2>
+          <img src="../image/plan-du-bogie.jpg" alt="Plan du bogie" style="max-width:100%;height:auto;">
+        </div>
+        <div class="page-break"></div>
         <div id="secondPageContent" class="no-break">
           <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
           ${generalInfo}
@@ -298,6 +303,7 @@
           <h2 class="text-xl font-semibold mb-4">Résultats des Mesures</h2>
           ${measurementsTable}
         </div>
+        <div class="page-break"></div>
       `;
     };
 
