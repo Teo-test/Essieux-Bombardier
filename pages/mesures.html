@@ -366,7 +366,7 @@ function loadData(om, date) {
             })
             .then(res => res.json())
             .then(res => {
-              showMessage("Mesures enregistrées localement et envoyées à Google Sheets !");
+              showMessage("Mesures enregistrées localement et envoyées au réseau !");
               validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
               validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
               setTimeout(() => {
@@ -376,7 +376,7 @@ function loadData(om, date) {
               }, 1500);
             })
             .catch(() => {
-              showMessage("Erreur lors de l'envoi à Google Sheets, mais les données sont enregistrées localement.", true);
+              showMessage("Erreur lors de l'envoi au réseau, mais les données sont enregistrées localement.", true);
               setTimeout(() => {
                 window.location.href = "resultats.html";
               }, 1500);
