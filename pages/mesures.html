@@ -7,6 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col" id="page-mesures">
+  <div id="confirmation" class="hidden text-center my-2"></div>
   <button id="clearScreenBtn" class="bg-red-600 text-white px-4 py-2 rounded m-4 hover:bg-red-700">
     Effacer les valeurs à l'écran
   </button>
@@ -84,8 +85,16 @@
         <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Valider</button>
       </div>
     </form>
-    <div id="confirmation" class="hidden text-green-600 mt-4" role="alert"></div>
+    <div id="confirmation" class="hidden text-center my-2"></div>
   </main>
+
+  <!-- Fenêtre modale d'avertissement -->
+<div id="modal-alert" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded shadow-lg p-6 max-w-sm w-full text-center">
+    <div id="modal-alert-message" class="mb-4 text-lg"></div>
+    <button id="modal-alert-ok" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+  </div>
+</div>
 
   <script>
     // Configuration des groupes de mesures
@@ -168,21 +177,60 @@
         } else {
           data[`measured-value-b${suffix}`] = '';
         }
+
+        // AJOUT : Calcul de measured-value-eu
+        const d = parseFloat(data[`measured-value-d${suffix}`]);
+        const e = parseFloat(data[`measured-value-e${suffix}`]);
+        if (!isNaN(d) && !isNaN(e)) {
+          data[`measured-value-eu${suffix}`] = d > e ? "OK" : "A usiner";
+        } else {
+          data[`measured-value-eu${suffix}`] = "";
+        }
       });
       return data;
     }
 
     // Afficher les messages de confirmation ou d'erreur
 function showMessage(message, isError = false) {
-  const confirmation = document.getElementById('confirmation');
-  if (!confirmation) {
-    console.error("L'élément #confirmation n'existe pas dans le DOM.");
-    return;
+  const modal = document.getElementById('modal-alert');
+  const msg = document.getElementById('modal-alert-message');
+  msg.textContent = message;
+  msg.className = "mb-4 text-lg " + (isError ? "text-red-600" : "text-green-600");
+  // Supprime le bouton Annuler s'il existe
+  const cancelBtn = document.getElementById('modal-alert-cancel');
+  if (cancelBtn) cancelBtn.remove();
+  modal.classList.remove('hidden');
+  document.getElementById('modal-alert-ok').onclick = () => {
+    modal.classList.add('hidden');
+  };
+}
+
+    // Fonction de confirmation avec modal
+function showConfirm(message, onOk, onCancel) {
+  const modal = document.getElementById('modal-alert');
+  const msg = document.getElementById('modal-alert-message');
+  msg.textContent = message;
+  msg.className = "mb-4 text-lg text-yellow-600";
+  // Ajoute le bouton Annuler si pas déjà présent
+  let cancelBtn = document.getElementById('modal-alert-cancel');
+  if (!cancelBtn) {
+    cancelBtn = document.createElement('button');
+    cancelBtn.id = 'modal-alert-cancel';
+    cancelBtn.className = "bg-gray-400 text-white px-4 py-2 rounded ml-2 hover:bg-gray-500";
+    cancelBtn.textContent = "Annuler";
+    document.getElementById('modal-alert-ok').after(cancelBtn);
   }
-  confirmation.textContent = message;
-  confirmation.classList.remove('hidden', 'text-green-600', 'text-red-600'); // Supprime toutes les classes pertinentes
-  confirmation.classList.add(isError ? 'text-red-600' : 'text-green-600'); // Ajoute la classe appropriée
-  setTimeout(() => confirmation.classList.add('hidden'), 3000);
+  modal.classList.remove('hidden');
+  // OK
+  document.getElementById('modal-alert-ok').onclick = () => {
+    modal.classList.add('hidden');
+    if (onOk) onOk();
+  };
+  // Annuler
+  cancelBtn.onclick = () => {
+    modal.classList.add('hidden');
+    if (onCancel) onCancel();
+  };
 }
 
     // Sauvegarde des données dans localStorage
@@ -202,8 +250,8 @@ function loadData(om, date) {
   const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
   const saved = localStorage.getItem(key);
   if (!saved) {
-    alert(`Aucune mesure trouvée pour ${date ? 'cette combinaison OM/date' : 'cet OM'}.`);
-    showMessage(`Aucune mesure trouvée pour ${date ? 'cette combinaison OM/date' : 'cet OM'}.`, true);
+    alert(`Aucune mesure trouvée pour ${date ? 'cet OM' : 'cet OM'}.`);
+    showMessage(`Aucune mesure trouvée pour ${date ? 'cet OM' : 'cet OM'}.`, true);
     return false;
   }
   const data = JSON.parse(saved);
@@ -247,7 +295,7 @@ function loadData(om, date) {
       form.addEventListener('input', saveFormInputsRealtime);
 
       // Bouton Ouvrir
-      ouvrirBtn.addEventListener('click', (e) => {
+      ouvrirBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         const om = document.getElementById('om').value.trim();
         const date = document.getElementById('date').value.trim();
@@ -255,7 +303,41 @@ function loadData(om, date) {
           showMessage("Merci de renseigner le n° Intervention pour ouvrir un dossier.", true);
           return;
         }
-        loadData(om, date);
+
+        // 1. Essaye de charger depuis Google Sheet via SheetDB
+        try {
+          const res = await fetch(`https://sheetdb.io/api/v1/gjfhltg3oglot/search?om=${encodeURIComponent(om)}`);
+          const rows = await res.json();
+          if (rows.length > 0) {
+            // Si plusieurs lignes, tu peux filtrer par date si besoin
+            const data = date
+              ? rows.find(row => row.date === date) || rows[0]
+              : rows[0];
+            // Remplit le formulaire
+            Object.entries(data).forEach(([k, v]) => {
+              const input = document.querySelector(`[name="${k}"]`);
+              if (input) input.value = v;
+            });
+            showMessage("Mesures chargées !");
+            // Enregistre aussi localement pour la suite
+            const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
+            localStorage.setItem(key, JSON.stringify(data));
+            localStorage.setItem('mesuresData_last', key);
+            return;
+          } else {
+            // Aucun résultat trouvé dans Google Sheet
+            showMessage("Aucune donnée trouvée pour cet OM.", true);
+            return;
+          }
+        } catch (err) {
+          showMessage("Erreur lors de la récupération.", true);
+          return;
+        }
+
+        // 2. Sinon, essaye de charger depuis le localStorage
+        if (!loadData(om, date)) {
+          showMessage("Aucune donnée trouvée pour cet OM.", true);
+        }
       });
 
       // Bouton Valider
@@ -268,14 +350,37 @@ function loadData(om, date) {
         const date = data.date?.trim();
 
         if (saveData(data, om, date)) {
-          validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-          validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-          showMessage("Mesures enregistrées avec succès !");
-          setTimeout(() => {
-            validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-            validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            window.location.href = "resultats.html";
-          }, 1500);
+          // Vérifie si un OM existe déjà et met à jour, sinon ajoute
+          fetch(`https://sheetdb.io/api/v1/gjfhltg3oglot/search?om=${encodeURIComponent(om)}`)
+            .then(res => res.json())
+            .then(rows => {
+              const method = rows.length > 0 ? 'PUT' : 'POST';
+              const url = rows.length > 0
+                ? `https://sheetdb.io/api/v1/gjfhltg3oglot/om/${encodeURIComponent(om)}`
+                : `https://sheetdb.io/api/v1/gjfhltg3oglot`;
+              return fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({data: [data]})
+              });
+            })
+            .then(res => res.json())
+            .then(res => {
+              showMessage("Mesures enregistrées localement et envoyées à Google Sheets !");
+              validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+              validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+              setTimeout(() => {
+                validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                window.location.href = "resultats.html";
+              }, 1500);
+            })
+            .catch(() => {
+              showMessage("Erreur lors de l'envoi à Google Sheets, mais les données sont enregistrées localement.", true);
+              setTimeout(() => {
+                window.location.href = "resultats.html";
+              }, 1500);
+            });
         }
       });
     }
@@ -309,19 +414,27 @@ function loadData(om, date) {
     });
 
     document.getElementById('clearScreenBtn').onclick = function() {
-      if (confirm("Voulez-vous vraiment effacer toutes les valeurs affichées à l'écran ?")) {
-        // Efface tous les champs du formulaire à l'écran
-        const form = document.getElementById('mesuresForm');
-        if (form) form.reset();
+  showConfirm(
+    "Voulez-vous vraiment effacer toutes les valeurs et toutes les données enregistrées ?",
+    () => {
+      // Efface tous les champs du formulaire à l'écran
+      const form = document.getElementById('mesuresForm');
+      if (form) form.reset();
 
-        // Efface les données du localStorage liées aux mesures
-        localStorage.removeItem('mesuresData_last');
-        Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
+      // Efface toutes les données du localStorage liées aux mesures
+      localStorage.removeItem('mesuresData_last');
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('mesuresData_') || k === 'mesuresFormRealtime')
+        .forEach(k => localStorage.removeItem(k));
 
-        alert("Toutes les valeurs ont été effacées.");
-      }
-      // Sinon, rien ne se passe (action annulée)
-    };
+      // Affiche un message de confirmation
+      showMessage("Toutes les valeurs et données enregistrées ont été effacées.", false);
+
+      // Optionnel : recharge la page pour vider aussi les affichages dynamiques
+      setTimeout(() => window.location.reload(), 1200);
+    }
+  );
+};
   </script>
 </body>
 </html>
