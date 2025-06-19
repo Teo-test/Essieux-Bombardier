@@ -224,8 +224,8 @@
         { title: "Jeu axial 'jm' après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
         { title: "Jeu axial du bandage après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
         { title: "Jeu radial du bandage après remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
-        { title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A", "wheel-ecart-B"] },
-        { title: "Ecartement des bandages distance entre bandage ( 1380mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"] }
+        { title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A"] },
+        { title: "Ecartement des bandages distance entre bandage ( 1380mm )", fields: ["bandage-ecart-A"] }
       ];
 
       const measurementsTable = `
@@ -239,7 +239,26 @@
               </tr>
             </thead>
             <tbody>
-              ${measurementGroups.map(group => {
+${measurementGroups.map(group => {
+                // Cas particulier pour les groupes avec un seul champ (Ecartement des roues et bandages)
+                if (group.fields.length === 1) {
+                  const value = val(group.fields[0]);
+                  const trimZeros = val => {
+                    if (!val || typeof val !== "string" || !val.match(/^\d+\.\d+$/)) return val;
+                    return val.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.0+$/, '');
+                  };
+                  const formattedValue = group.title.includes("Ecartement des roues") && value
+                    ? `<span style="${colorWheelEcart(value)}">${trimZeros(value)}</span>`
+                    : trimZeros(value);
+                  return `
+                    <tr>
+                      <td>${group.title}</td>
+                      <td colspan="2" class="text-center">${formattedValue}</td>
+                    </tr>
+                  `;
+                }
+
+                // Logique existante pour les autres groupes
                 const [valueA, valueB] = group.compute
                   ? [group.compute('-A'), group.compute('-B')]
                   : [val(group.fields[0]), val(group.fields[1])];
@@ -261,12 +280,8 @@
                 return `
                   <tr>
                     <td>${group.title}</td>
-                    <td class="text-center ${getResultColor(group.fields[0], valueA)}">
-                      ${group.title.includes("Ecartement des roues") ? `<span style="${colorWheelEcart(valueA)}">${trimZeros(valueA)}</span>` : trimZeros(valueA)}
-                    </td>
-                    <td class="text-center ${getResultColor(group.fields[1], valueB)}">
-                      ${group.title.includes("Ecartement des roues") ? `<span style="${colorWheelEcart(valueB)}">${trimZeros(valueB)}</span>` : trimZeros(valueB)}
-                    </td>
+                    <td class="text-center ${getResultColor(group.fields[0], valueA)}">${trimZeros(valueA)}</td>
+                    <td class="text-center ${getResultColor(group.fields[1], valueB)}">${trimZeros(valueB)}</td>
                   </tr>
                 `;
               }).join('')}

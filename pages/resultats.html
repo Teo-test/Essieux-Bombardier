@@ -158,11 +158,11 @@
       },
       {
         title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm)",
-        fields: ["wheel-ecart-A", "wheel-ecart-B"],
-        label: "Côté",
+        fields: ["wheel-ecart-A"],
+        label: "",
         compute: (data, field) => formatRange(data[field], 1395, 1397, 1396)
       },
-      { title: "<b>Ecartement des bandages</b> distance entre bandage ( 1380 mm )", fields: ["bandage-ecart-A", "bandage-ecart-B"], label: "Côté" }
+      { title: "<b>Ecartement des bandages</b> distance entre bandage ( 1380 mm )", fields: ["bandage-ecart-A"], label: "" }
     ];
 
     // Fonction utilitaire pour formater les valeurs selon les plages
@@ -226,51 +226,67 @@
       `;
     }
 
-    // Affichage des résultats
-    function displayResults(data) {
-      const resultsContainer = document.getElementById('results-container');
-      if (!Object.keys(data).length) {
-        resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
-        return;
-      }
 
-      resultsContainer.innerHTML = measurementGroups.map(group => {
-        if (!group.fields.length && !group.subGroups) {
-          return `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
-        }
+// Affichage des résultats
+function displayResults(data) {
+  const resultsContainer = document.getElementById('results-container');
+  if (!Object.keys(data).length) {
+    resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
+    return;
+  }
 
-        const hasValue = group.fields?.some(field => group.compute ? group.compute(data, field) : data[field]) || group.subGroups?.some(sub => sub.fields.some(field => data[field]));
-        const section = `<div class="bg-gray-50 p-4 rounded-lg"><h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">`;
-
-        let fieldsHTML = '';
-        if (group.fields?.length) {
-          fieldsHTML = group.fields.map(field => {
-            const value = group.compute ? group.compute(data, field) : (data[field] || '');
-            if (!value) return '';
-            const labelText = group.label ? (field.endsWith('-A') ? 'Côté A' : 'Côté B') : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-            return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
-          }).filter(Boolean).join('');
-        }
-
-        let subGroupsHTML = '';
-        if (group.subGroups) {
-          subGroupsHTML = group.subGroups.map(sub => {
-            const subHasValue = sub.fields.some(field => data[field]);
-            if (!subHasValue) return '';
-            return `<div class="col-span-full"><h4 class="font-medium mb-2">${sub.title}</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">${
-              sub.fields.map(field => {
-                const value = formatDiameter(data, field, sub.ranges);
-                if (!value) return '';
-                const labelText = field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-                return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
-              }).filter(Boolean).join('')
-            }</div></div>`;
-          }).filter(Boolean).join('');
-        }
-
-        return section + fieldsHTML + subGroupsHTML + '</div></div>';
-      }).join('');
+  resultsContainer.innerHTML = measurementGroups.map(group => {
+    // Cas où il n'y a pas de champs (juste un titre)
+    if (!group.fields.length && !group.subGroups) {
+      return `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
     }
+
+    // Cas particulier pour les groupes avec un seul champ et label vide (Ecartement des roues et bandages)
+    if (group.fields.length === 1 && group.label === "") {
+      const field = group.fields[0];
+      const value = group.compute ? group.compute(data, field) : (data[field] || '');
+      if (!value) return ''; // Ne rien afficher si pas de valeur
+      return `
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-medium mb-2">${group.title}</h3>
+          <p class="text-sm"><span class="font-normal">${value}</span></p>
+        </div>
+      `;
+    }
+
+    // Logique existante pour les autres groupes
+    const hasValue = group.fields?.some(field => group.compute ? group.compute(data, field) : data[field]) || group.subGroups?.some(sub => sub.fields.some(field => data[field]));
+    const section = `<div class="bg-gray-50 p-4 rounded-lg"><h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">`;
+
+    let fieldsHTML = '';
+    if (group.fields?.length) {
+      fieldsHTML = group.fields.map(field => {
+        const value = group.compute ? group.compute(data, field) : (data[field] || '');
+        if (!value) return '';
+        const labelText = group.label ? (field.endsWith('-A') ? 'Côté A' : 'Côté B') : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+        return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+      }).filter(Boolean).join('');
+    }
+
+    let subGroupsHTML = '';
+    if (group.subGroups) {
+      subGroupsHTML = group.subGroups.map(sub => {
+        const subHasValue = sub.fields.some(field => data[field]);
+        if (!subHasValue) return '';
+        return `<div class="col-span-full"><h4 class="font-medium mb-2">${sub.title}</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">${
+          sub.fields.map(field => {
+            const value = formatDiameter(data, field, sub.ranges);
+            if (!value) return '';
+            const labelText = field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+            return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+          }).filter(Boolean).join('')
+        }</div></div>`;
+      }).filter(Boolean).join('');
+    }
+
+    return section + fieldsHTML + subGroupsHTML + '</div></div>';
+  }).join('');
+}
 
     // Gestion du stockage
     function manageStorage() {

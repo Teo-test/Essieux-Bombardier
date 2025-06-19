@@ -102,6 +102,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = getElement(CONFIG.formId);
   const confirmation = getElement(CONFIG.confirmationId);
 
+  // Ajoute ce bloc pour gérer le bouton d'effacement
+  const clearBtn = document.getElementById('clearScreenBtn');
+  if (clearBtn && form) {
+    clearBtn.addEventListener('click', () => {
+      if (confirm("Voulez-vous vraiment effacer toutes les valeurs et toutes les données enregistrées ?")) {
+        form.reset(); // Réinitialise tous les champs du formulaire
+        clearStorage(); // Efface le localStorage lié au formulaire
+        if (confirmation) {
+          confirmation.textContent = "Toutes les valeurs et données enregistrées ont été effacées.";
+          confirmation.style.display = 'block';
+          setTimeout(() => confirmation.style.display = 'none', 1500);
+        }
+      }
+    });
+  }
+
   if (form) {
     loadFormInputs();
     
