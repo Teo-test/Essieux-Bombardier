@@ -98,7 +98,7 @@
 
   <script>
     // Configuration des groupes de mesures
-    const measurementGroups = [
+    const baseMeasurementGroups = [
       { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
       { title: "<b>Côté A</b>", fields: [], label: "" },
@@ -115,55 +115,80 @@
       { title: "<b>Valeurs 'y' mesurées</b> = hauteur grand roulement", fields: ["measured-value-y-A", "measured-value-y-B"], label: "Côté" },
       { title: "<b>Valeurs 'z' mesurées</b> = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"], label: "Côté" },
       { title: "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"], label: "Côté" },
-      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
       { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
       { title: "<b>Valeurs 'd' mesurées</b> = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"], label: "Côté" },
       { title: "<b>Valeurs 'e' mesurées</b> = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"], label: "Côté" },
       { title: "<b>Jeu axial 'jm' Après remise en état</b>", fields: ["axial-play-after-A", "axial-play-after-B"], label: "Côté" },
       { title: "<b>Jeu axial du bandage Après remission en état</b> < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"], label: "Côté" },
       { title: "<b>Jeu radial du bandage après remise en état</b> < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"], label: "Côté" },
+      { title: "<b>Ecartement des roues</b> = distance entre support bandage (1396 +/- 1mm)", fields: ["wheel-ecart-A"], label: "" },
+      { title: "<b>Ecartement des bandages</b> = distance entre bandage (1380mm)", fields: ["bandage-ecart-A"], label: "" },
+    ];
 
-      
-  { title: "<b>Ecartement des roues</b> = distance entre support bandage (1396 +/- 1mm)", fields: ["wheel-ecart-A"], label: "" },
-  { title: "<b>Ecartement des bandages</b> = distance entre bandage (1380mm)", fields: ["bandage-ecart-A"], label: "" },
-];
-
-// Utilitaire pour générer les champs de mesure
-function generateMeasurementFields(container, groups) {
-  groups.forEach(group => {
-    const section = document.createElement('div');
-    section.className = 'mb-6';
-
-    // Cas particulier pour les groupes avec un seul champ (comme Ecartement des roues et bandages)
-    if (group.fields.length === 1 && group.label === "") {
-      section.innerHTML = `
-        <h3 class="text-lg font-medium mb-2">${group.title}</h3>
-        <div>
-          <input type="number" id="${group.fields[0]}" name="${group.fields[0]}" step="0.001" class="mt-1 p-2 w-full border rounded" aria-label="${group.title}">
-        </div>
-      `;
-    } else {
-      // Logique existante pour les autres groupes
-      section.innerHTML = `
-        <h3 class="text-lg font-medium mb-2">${group.title}</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          ${group.fields.map(field => {
-            const labelText = group.label 
-              ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
-              : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-            return `
-              <div>
-                <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
-                <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded" aria-label="${labelText}">
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+    // Fonction pour obtenir les groupes de mesures en fonction de typeNo
+    function getMeasurementGroups(typeNo) {
+      let groups = [...baseMeasurementGroups];
+      if (typeNo === 'BP') {
+        // Supprime la ligne wm pour BM
+        groups = groups.filter(group => group.title !== "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM");
+        // Ajoute les nouvelles lignes pour BP
+        const wmIndex = groups.findIndex(group => group.title === "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés");
+        if (wmIndex !== -1) {
+          groups.splice(wmIndex + 1, 0,
+            { title: "<b>Valeurs 'wm' mesurées</b> = épaisseur cale mesurée", fields: ["measured-value-wm-BP-A", "measured-value-wm-BP-B"], label: "Côté" },
+            { title: "<b>Valeurs 'v' mesurées</b> = profondeur support étrier", fields: ["measured-value-v-A", "measured-value-v-B"], label: "Côté" }
+          );
+        }
+      } else {
+        // Assure que la ligne wm pour BM est présente
+        if (!groups.find(group => group.title === "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM")) {
+          const wmIndex = groups.findIndex(group => group.title === "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés");
+          if (wmIndex !== -1) {
+            groups.splice(wmIndex + 1, 0,
+              { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" }
+            );
+          }
+        }
+      }
+      return groups;
     }
-    container.appendChild(section);
-  });
-}
+
+    // Utilitaire pour générer les champs de mesure
+    function generateMeasurementFields(container, groups) {
+      container.innerHTML = ''; // Vide le conteneur avant de régénérer
+      groups.forEach(group => {
+        const section = document.createElement('div');
+        section.className = 'mb-6';
+
+        // Cas particulier pour les groupes avec un seul champ
+        if (group.fields.length === 1 && group.label === "") {
+          section.innerHTML = `
+            <h3 class="text-lg font-medium mb-2">${group.title}</h3>
+            <div>
+              <input type="number" id="${group.fields[0]}" name="${group.fields[0]}" step="0.001" class="mt-1 p-2 w-full border rounded" aria-label="${group.title}">
+            </div>
+          `;
+        } else {
+          section.innerHTML = `
+            <h3 class="text-lg font-medium mb-2">${group.title}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              ${group.fields.map(field => {
+                const labelText = group.label 
+                  ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
+                  : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+                return `
+                  <div>
+                    <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
+                    <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded" aria-label="${labelText}">
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+        container.appendChild(section);
+      });
+    }
 
     // Calcul des valeurs dérivées (c, w, b)
     function calculateDerivedValues(data) {
@@ -172,6 +197,8 @@ function generateMeasurementFields(container, groups) {
         const y = parseFloat(data[`measured-value-y${suffix}`]) || 0;
         const z = parseFloat(data[`measured-value-z${suffix}`]) || 0;
         const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
+        const v = parseFloat(data[`measured-value-v${suffix}`]) || 0;
+        const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
 
         if (u && y && z) {
           data[`measured-value-c${suffix}`] = (u - y - z).toFixed(3);
@@ -179,10 +206,18 @@ function generateMeasurementFields(container, groups) {
           data[`measured-value-c${suffix}`] = '';
         }
 
-        if (x && u) {
-          data[`measured-value-w${suffix}`] = (x - u - 0.02).toFixed(3);
+        if (typeNo === 'BP') {
+          if (x && u && v) {
+            data[`measured-value-w-BP${suffix}`] = (x - u - v - 0.02).toFixed(3);
+          } else {
+            data[`measured-value-w-BP${suffix}`] = '';
+          }
         } else {
-          data[`measured-value-w${suffix}`] = '';
+          if (x && u) {
+            data[`measured-value-w${suffix}`] = (x - u - 0.02).toFixed(3);
+          } else {
+            data[`measured-value-w${suffix}`] = '';
+          }
         }
 
         const c = parseFloat(data[`measured-value-c${suffix}`]) || 0;
@@ -192,7 +227,7 @@ function generateMeasurementFields(container, groups) {
           data[`measured-value-b${suffix}`] = '';
         }
 
-        // AJOUT : Calcul de measured-value-eu
+        // Calcul de measured-value-eu
         const d = parseFloat(data[`measured-value-d${suffix}`]);
         const e = parseFloat(data[`measured-value-e${suffix}`]);
         if (!isNaN(d) && !isNaN(e)) {
@@ -205,52 +240,48 @@ function generateMeasurementFields(container, groups) {
     }
 
     // Afficher les messages de confirmation ou d'erreur
-function showMessage(message, isError = false) {
-  const modal = document.getElementById('modal-alert');
-  const msg = document.getElementById('modal-alert-message');
-  msg.textContent = message;
-  msg.className = "mb-4 text-lg " + (isError ? "text-red-600" : "text-green-600");
-  // Supprime le bouton Annuler s'il existe
-  const cancelBtn = document.getElementById('modal-alert-cancel');
-  if (cancelBtn) cancelBtn.remove();
-  modal.classList.remove('hidden');
-  document.getElementById('modal-alert-ok').onclick = () => {
-    modal.classList.add('hidden');
-  };
-}
+    function showMessage(message, isError = false) {
+      const modal = document.getElementById('modal-alert');
+      const msg = document.getElementById('modal-alert-message');
+      msg.textContent = message;
+      msg.className = "mb-4 text-lg " + (isError ? "text-red-600" : "text-green-600");
+      const cancelBtn = document.getElementById('modal-alert-cancel');
+      if (cancelBtn) cancelBtn.remove();
+      modal.classList.remove('hidden');
+      document.getElementById('modal-alert-ok').onclick = () => {
+        modal.classList.add('hidden');
+      };
+    }
 
     // Fonction de confirmation avec modal
-function showConfirm(message, onOk, onCancel) {
-  const modal = document.getElementById('modal-alert');
-  const msg = document.getElementById('modal-alert-message');
-  msg.textContent = message;
-  msg.className = "mb-4 text-lg text-yellow-600";
-  // Ajoute le bouton Annuler si pas déjà présent
-  let cancelBtn = document.getElementById('modal-alert-cancel');
-  if (!cancelBtn) {
-    cancelBtn = document.createElement('button');
-    cancelBtn.id = 'modal-alert-cancel';
-    cancelBtn.className = "bg-gray-400 text-white px-4 py-2 rounded ml-2 hover:bg-gray-500";
-    cancelBtn.textContent = "Annuler";
-    document.getElementById('modal-alert-ok').after(cancelBtn);
-  }
-  modal.classList.remove('hidden');
-  // OK
-  document.getElementById('modal-alert-ok').onclick = () => {
-    modal.classList.add('hidden');
-    if (onOk) onOk();
-  };
-  // Annuler
-  cancelBtn.onclick = () => {
-    modal.classList.add('hidden');
-    if (onCancel) onCancel();
-  };
-}
+    function showConfirm(message, onOk, onCancel) {
+      const modal = document.getElementById('modal-alert');
+      const msg = document.getElementById('modal-alert-message');
+      msg.textContent = message;
+      msg.className = "mb-4 text-lg text-yellow-600";
+      let cancelBtn = document.getElementById('modal-alert-cancel');
+      if (!cancelBtn) {
+        cancelBtn = document.createElement('button');
+        cancelBtn.id = 'modal-alert-cancel';
+        cancelBtn.className = "bg-gray-400 text-white px-4 py-2 rounded ml-2 hover:bg-gray-500";
+        cancelBtn.textContent = "Annuler";
+        document.getElementById('modal-alert-ok').after(cancelBtn);
+      }
+      modal.classList.remove('hidden');
+      document.getElementById('modal-alert-ok').onclick = () => {
+        modal.classList.add('hidden');
+        if (onOk) onOk();
+      };
+      cancelBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (onCancel) onCancel();
+      };
+    }
 
     // Sauvegarde des données dans localStorage
     function saveData(data, om, date) {
       if (!om) {
-        showMessage("Merci de renseigner l'OM.", true);
+        showMessage("Merci de renseigner le N° d'intervention.", true);
         return false;
       }
       const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
@@ -260,23 +291,22 @@ function showConfirm(message, onOk, onCancel) {
     }
 
     // Chargement des données depuis localStorage
-function loadData(om, date) {
-  const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
-  const saved = localStorage.getItem(key);
-  if (!saved) {
-    alert(`Aucune mesure trouvée pour ${date ? 'cet OM' : 'cet OM'}.`);
-    showMessage(`Aucune mesure trouvée pour ${date ? 'cet OM' : 'cet OM'}.`, true);
-    return false;
-  }
-  const data = JSON.parse(saved);
-  Object.entries(data).forEach(([k, v]) => {
-    const input = document.querySelector(`[name="${k}"]`);
-    if (input) input.value = v;
-  });
-  localStorage.setItem('mesuresData_last', key);
-  showMessage("Mesures chargées !");
-  return true;
-}
+    function loadData(om, date) {
+      const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
+      const saved = localStorage.getItem(key);
+      if (!saved) {
+        showMessage(`Aucune mesure trouvée pour ${date ? 'cette intervention' : 'cette intervention'}.`, true);
+        return false;
+      }
+      const data = JSON.parse(saved);
+      Object.entries(data).forEach(([k, v]) => {
+        const input = document.querySelector(`[name="${k}"]`);
+        if (input) input.value = v;
+      });
+      localStorage.setItem('mesuresData_last', key);
+      showMessage("Mesures chargées !");
+      return true;
+    }
 
     // Sauvegarde en temps réel
     function saveFormInputsRealtime() {
@@ -304,9 +334,17 @@ function loadData(om, date) {
       const form = document.getElementById('mesuresForm');
       const ouvrirBtn = document.getElementById('OuvrirBtn');
       const validerBtn = document.getElementById('validerBtn');
+      const typeNoInput = document.getElementById('typeNo');
 
       // Sauvegarde en temps réel
       form.addEventListener('input', saveFormInputsRealtime);
+
+      // Mise à jour des champs de mesure en fonction de typeNo
+      typeNoInput.addEventListener('input', () => {
+        const typeNo = typeNoInput.value.trim().toUpperCase();
+        const measurementsContainer = document.getElementById('measurements');
+        generateMeasurementFields(measurementsContainer, getMeasurementGroups(typeNo));
+      });
 
       // Bouton Ouvrir
       ouvrirBtn.addEventListener('click', async (e) => {
@@ -318,29 +356,22 @@ function loadData(om, date) {
           return;
         }
 
-        // 1. Essaye de charger depuis Google Sheet via SheetDB
         try {
           const res = await fetch(`https://sheetdb.io/api/v1/gjfhltg3oglot/search?om=${encodeURIComponent(om)}`);
           const rows = await res.json();
           if (rows.length > 0) {
-            // Si plusieurs lignes, tu peux filtrer par date si besoin
-            const data = date
-              ? rows.find(row => row.date === date) || rows[0]
-              : rows[0];
-            // Remplit le formulaire
+            const data = date ? rows.find(row => row.date === date) || rows[0] : rows[0];
             Object.entries(data).forEach(([k, v]) => {
               const input = document.querySelector(`[name="${k}"]`);
               if (input) input.value = v;
             });
             showMessage("Mesures chargées !");
-            // Enregistre aussi localement pour la suite
             const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
             localStorage.setItem(key, JSON.stringify(data));
             localStorage.setItem('mesuresData_last', key);
             return;
           } else {
-            // Aucun résultat trouvé dans Google Sheet
-            showMessage("Aucune donnée trouvée pour cet OM.", true);
+            showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true);
             return;
           }
         } catch (err) {
@@ -348,9 +379,8 @@ function loadData(om, date) {
           return;
         }
 
-        // 2. Sinon, essaye de charger depuis le localStorage
         if (!loadData(om, date)) {
-          showMessage("Aucune donnée trouvée pour cet OM.", true);
+          showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true);
         }
       });
 
@@ -364,7 +394,6 @@ function loadData(om, date) {
         const date = data.date?.trim();
 
         if (saveData(data, om, date)) {
-          // Vérifie si un OM existe déjà et met à jour, sinon ajoute
           fetch(`https://sheetdb.io/api/v1/gjfhltg3oglot/search?om=${encodeURIComponent(om)}`)
             .then(res => res.json())
             .then(rows => {
@@ -421,34 +450,28 @@ function loadData(om, date) {
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', () => {
-      generateMeasurementFields(document.getElementById('measurements'), measurementGroups);
+      const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
+      generateMeasurementFields(document.getElementById('measurements'), getMeasurementGroups(typeNo));
       loadFormInputsRealtime();
       setupFormEvents();
       setupStorageCleanup();
     });
 
     document.getElementById('clearScreenBtn').onclick = function() {
-  showConfirm(
-    "Voulez-vous vraiment effacer toutes les valeurs et toutes les données enregistrées ?",
-    () => {
-      // Efface tous les champs du formulaire à l'écran
-      const form = document.getElementById('mesuresForm');
-      if (form) form.reset();
-
-      // Efface toutes les données du localStorage liées aux mesures
-      localStorage.removeItem('mesuresData_last');
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('mesuresData_') || k === 'mesuresFormRealtime')
-        .forEach(k => localStorage.removeItem(k));
-
-      // Affiche un message de confirmation
-      showMessage("Toutes les valeurs et données enregistrées ont été effacées.", false);
-
-      // Optionnel : recharge la page pour vider aussi les affichages dynamiques
-      setTimeout(() => window.location.reload(), 1200);
-    }
-  );
-};
+      showConfirm(
+        "Voulez-vous vraiment effacer toutes les valeurs et toutes les données enregistrées ?",
+        () => {
+          const form = document.getElementById('mesuresForm');
+          if (form) form.reset();
+          localStorage.removeItem('mesuresData_last');
+          Object.keys(localStorage)
+            .filter(k => k.startsWith('mesuresData_') || k === 'mesuresFormRealtime')
+            .forEach(k => localStorage.removeItem(k));
+          showMessage("Toutes les valeurs et données enregistrées ont été effacées.", false);
+          setTimeout(() => window.location.reload(), 1200);
+        }
+      );
+    };
   </script>
 </body>
 </html>

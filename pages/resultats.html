@@ -37,8 +37,8 @@
   </main>
 
   <script>
-    // Configuration des groupes de mesures
-    const measurementGroups = [
+    // Configuration des groupes de mesures de base
+    const baseMeasurementGroups = [
       { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
       {
@@ -87,20 +87,6 @@
           const c = u - y - z;
           data[field] = isNaN(c) ? "" : c.toFixed(3);
           return !u && !y && !z ? "" : data[field];
-        }
-      },
-      { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
-      {
-        title: "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>",
-        fields: ["measured-value-w-A", "measured-value-w-B"],
-        label: "Côté",
-        compute: (data, field) => {
-          const suffix = field.endsWith('-A') ? '-A' : '-B';
-          const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
-          const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
-          const w = x - u - 0.02;
-          data[field] = isNaN(w) ? "" : w.toFixed(3);
-          return !x && !u ? "" : data[field];
         }
       },
       { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
@@ -165,6 +151,64 @@
       { title: "<b>Ecartement des bandages</b> distance entre bandage ( 1380 mm )", fields: ["bandage-ecart-A"], label: "" }
     ];
 
+    // Fonction pour obtenir les groupes de mesures en fonction de typeNo
+    function getMeasurementGroups(typeNo) {
+      let groups = [...baseMeasurementGroups];
+      if (typeNo === 'BP') {
+        // Supprime les groupes wm et w pour BM
+        groups = groups.filter(group => 
+          group.title !== "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM" &&
+          group.title !== "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>"
+        );
+        // Trouve l'index où insérer les nouveaux groupes
+        const uIndex = groups.findIndex(group => group.title === "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés");
+        if (uIndex !== -1) {
+          groups.splice(uIndex + 1, 0,
+            { title: "<b>Valeurs 'wm' mesurées</b> = épaisseur cale mesurée", fields: ["measured-value-wm-BP-A", "measured-value-wm-BP-B"], label: "Côté" },
+            { title: "<b>Valeurs 'v' mesurées</b> = profondeur support étrier", fields: ["measured-value-v-A", "measured-value-v-B"], label: "Côté" },
+            {
+              title: "<b><u>Valeurs 'w' calculée</b> = épaisseur cale à usiner = x - u - v - 0,02mm</u>",
+              fields: ["measured-value-w-BP-A", "measured-value-w-BP-B"],
+              label: "Côté",
+              compute: (data, field) => {
+                const suffix = field.endsWith('-A') ? '-A' : '-B';
+                const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
+                const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
+                const v = parseFloat(data[`measured-value-v${suffix}`]) || 0;
+                const w = x - u - v - 0.02;
+                data[field] = isNaN(w) ? "" : w.toFixed(3);
+                return !x && !u && !v ? "" : data[field];
+              }
+            }
+          );
+        }
+      } else {
+        // Assure que les groupes wm et w pour BM sont présents
+        if (!groups.find(group => group.title === "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM")) {
+          const uIndex = groups.findIndex(group => group.title === "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés");
+          if (uIndex !== -1) {
+            groups.splice(uIndex + 1, 0,
+              { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+              {
+                title: "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>",
+                fields: ["measured-value-w-A", "measured-value-w-B"],
+                label: "Côté",
+                compute: (data, field) => {
+                  const suffix = field.endsWith('-A') ? '-A' : '-B';
+                  const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
+                  const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
+                  const w = x - u - 0.02;
+                  data[field] = isNaN(w) ? "" : w.toFixed(3);
+                  return !x && !u ? "" : data[field];
+                }
+              }
+            );
+          }
+        }
+      }
+      return groups;
+    }
+
     // Fonction utilitaire pour formater les valeurs selon les plages
     function formatRange(value, min, max, target) {
       if (!value && value !== 0) return "";
@@ -226,67 +270,63 @@
       `;
     }
 
+    // Affichage des résultats
+    function displayResults(data, measurementGroups) {
+      const resultsContainer = document.getElementById('results-container');
+      if (!Object.keys(data).length) {
+        resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
+        return;
+      }
 
-// Affichage des résultats
-function displayResults(data) {
-  const resultsContainer = document.getElementById('results-container');
-  if (!Object.keys(data).length) {
-    resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
-    return;
-  }
+      resultsContainer.innerHTML = measurementGroups.map(group => {
+        if (!group.fields.length && !group.subGroups) {
+          return `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
+        }
 
-  resultsContainer.innerHTML = measurementGroups.map(group => {
-    // Cas où il n'y a pas de champs (juste un titre)
-    if (!group.fields.length && !group.subGroups) {
-      return `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
-    }
+        if (group.fields.length === 1 && group.label === "") {
+          const field = group.fields[0];
+          const value = group.compute ? group.compute(data, field) : (data[field] || '');
+          if (!value) return '';
+          return `
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-medium mb-2">${group.title}</h3>
+              <p class="text-sm"><span class="font-normal">${value}</span></p>
+            </div>
+          `;
+        }
 
-    // Cas particulier pour les groupes avec un seul champ et label vide (Ecartement des roues et bandages)
-    if (group.fields.length === 1 && group.label === "") {
-      const field = group.fields[0];
-      const value = group.compute ? group.compute(data, field) : (data[field] || '');
-      if (!value) return ''; // Ne rien afficher si pas de valeur
-      return `
-        <div class="bg-gray-50 p-4 rounded-lg">
-          <h3 class="font-medium mb-2">${group.title}</h3>
-          <p class="text-sm"><span class="font-normal">${value}</span></p>
-        </div>
-      `;
-    }
+        const hasValue = group.fields?.some(field => group.compute ? group.compute(data, field) : data[field]) || group.subGroups?.some(sub => sub.fields.some(field => data[field]));
+        const section = `<div class="bg-gray-50 p-4 rounded-lg"><h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">`;
 
-    // Logique existante pour les autres groupes
-    const hasValue = group.fields?.some(field => group.compute ? group.compute(data, field) : data[field]) || group.subGroups?.some(sub => sub.fields.some(field => data[field]));
-    const section = `<div class="bg-gray-50 p-4 rounded-lg"><h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">`;
-
-    let fieldsHTML = '';
-    if (group.fields?.length) {
-      fieldsHTML = group.fields.map(field => {
-        const value = group.compute ? group.compute(data, field) : (data[field] || '');
-        if (!value) return '';
-        const labelText = group.label ? (field.endsWith('-A') ? 'Côté A' : 'Côté B') : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
-        return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
-      }).filter(Boolean).join('');
-    }
-
-    let subGroupsHTML = '';
-    if (group.subGroups) {
-      subGroupsHTML = group.subGroups.map(sub => {
-        const subHasValue = sub.fields.some(field => data[field]);
-        if (!subHasValue) return '';
-        return `<div class="col-span-full"><h4 class="font-medium mb-2">${sub.title}</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">${
-          sub.fields.map(field => {
-            const value = formatDiameter(data, field, sub.ranges);
+        let fieldsHTML = '';
+        if (group.fields?.length) {
+          fieldsHTML = group.fields.map(field => {
+            const value = group.compute ? group.compute(data, field) : (data[field] || '');
             if (!value) return '';
-            const labelText = field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+            const labelText = group.label ? (field.endsWith('-A') ? 'Côté A' : 'Côté B') : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
             return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
-          }).filter(Boolean).join('')
-        }</div></div>`;
-      }).filter(Boolean).join('');
-    }
+          }).filter(Boolean).join('');
+        }
 
-    return section + fieldsHTML + subGroupsHTML + '</div></div>';
-  }).join('');
-}
+        let subGroupsHTML = '';
+        if (group.subGroups) {
+          subGroupsHTML = group.subGroups.map(sub => {
+            const subHasValue = sub.fields.some(field => data[field]);
+            if (!subHasValue) return '';
+            return `<div class="col-span-full"><h4 class="font-medium mb-2">${sub.title}</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">${
+              sub.fields.map(field => {
+                const value = formatDiameter(data, field, sub.ranges);
+                if (!value) return '';
+                const labelText = field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+                return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+              }).filter(Boolean).join('')
+            }</div></div>`;
+          }).filter(Boolean).join('');
+        }
+
+        return section + fieldsHTML + subGroupsHTML + '</div></div>';
+      }).join('');
+    }
 
     // Gestion du stockage
     function manageStorage() {
@@ -304,11 +344,15 @@ function displayResults(data) {
     }
 
     // Initialisation
-    const savedData = getLastMesuresData();
-    displayGeneralInfo(savedData);
-    displayLocationInfo(savedData);
-    displayResults(savedData);
-    manageStorage();
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedData = getLastMesuresData();
+      const typeNo = savedData.typeNo?.toUpperCase() || 'BM';
+      const measurementGroups = getMeasurementGroups(typeNo);
+      displayGeneralInfo(savedData);
+      displayLocationInfo(savedData);
+      displayResults(savedData, measurementGroups);
+      manageStorage();
+    });
   </script>
 </body>
 </html>

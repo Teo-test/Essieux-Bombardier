@@ -64,8 +64,14 @@
       return [u, y, z].every(v => !v) ? "" : c.toFixed(3);
     };
     const calcW = suffix => {
+      const typeNo = val('typeNo').toUpperCase();
       const x = parseFloat(val(`measured-value-x${suffix}`)) || 0;
       const u = parseFloat(val(`measured-value-u${suffix}`)) || 0;
+      if (typeNo === 'BP') {
+        const v = parseFloat(val(`measured-value-v${suffix}`)) || 0;
+        const w = x - u - v - 0.02;
+        return [x, u, v].every(v => !v) ? "" : w.toFixed(3);
+      }
       const w = x - u - 0.02;
       return [x, u].every(v => !v) ? "" : w.toFixed(3);
     };
@@ -107,12 +113,51 @@
       return num >= 1395 && num <= 1397 ? "color:green;font-weight:bold" : "color:red;font-weight:bold";
     };
 
+    // Measurement groups configuration
+    const getMeasurementGroups = (typeNo) => {
+      const baseGroups = [
+        { title: "Jeu axial 'jm' mesuré avant démontage", fields: ["axial-play-A", "axial-play-B"] },
+        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
+        { title: "Valeurs 'x' mesurées = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"] },
+        { title: "Valeurs 'y' mesurées = hauteur mesurées = valeur du grand roulement-re", fields: ["measured-value-y-A", "measured-value-y-B"] },
+        { title: "Valeurs de 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"] },
+        { title: "Valeurs de 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"] },
+        { title: "Valeurs de 'c' calculée = u - y - z", fields: ["measured-value-c-A", "measured-value-c-B"], compute: calcC },
+        { title: "Valeurs 'bm' mesurées = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
+        { title: "Valeurs 'b' calculées = c + 0,2mm", fields: ["measured-value-b-A", "measured-value-b-B"], compute: calcB },
+        { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"] },
+        { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"] },
+        { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"], compute: calcEU },
+        { title: "Jeu axial 'jm' après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
+        { title: "Jeu axial du bandage après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
+        { title: "Jeu radial du bandage après remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
+        { title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A"] },
+        { title: "Ecartement des bandages distance entre bandage ( 1380mm )", fields: ["bandage-ecart-A"] }
+      ];
+      if (typeNo === 'BP') {
+        return [
+          ...baseGroups.slice(0, 7),
+          { title: "Valeurs 'wm' mesurées = épaisseur cale mesurée", fields: ["measured-value-wm-BP-A", "measured-value-wm-BP-B"] },
+          { title: "Valeurs 'v' mesurées = profondeur support étrier", fields: ["measured-value-v-A", "measured-value-v-B"] },
+          { title: "Valeurs 'w' calculée = x - u - v - 0,02mm", fields: ["measured-value-w-BP-A", "measured-value-w-BP-B"], compute: calcW },
+          ...baseGroups.slice(7)
+        ];
+      }
+      return [
+        ...baseGroups.slice(0, 7),
+        { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
+        { title: "Valeurs 'w' calculée = x - u - 0,02mm", fields: ["measured-value-w-A", "measured-value-w-B"], compute: calcW },
+        ...baseGroups.slice(7)
+      ];
+    };
+
     // HTML generation
     const generateHTML = () => {
       if (!Object.keys(savedData).length) {
         document.getElementById('rapportContent').innerHTML = '';
         return '';
       }
+      const typeNo = val('typeNo').toUpperCase();
       const generalInfo = `
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div><span class="font-medium">Date:</span> ${val('date')}</div>
@@ -193,12 +238,12 @@
             </thead>
             <tbody>
               <tr>
-                <td>Couvercle : Valeur <b>w</b></td>
+                <td>${typeNo === 'BP' ? 'Cale' : 'Couvercle'} : Valeur <b>w</b></td>
                 <td class="text-center">${calcW('-A')}</td>
                 <td class="text-center">${calcW('-B')}</td>
               </tr>
               <tr>
-                <td>Douille d'écatrement : Valeur <b>b</b></td>
+                <td>Douille d'écartement : Valeur <b>b</b></td>
                 <td class="text-center">${calcB('-A')}</td>
                 <td class="text-center">${calcB('-B')}</td>
               </tr>
@@ -206,28 +251,7 @@
           </table>
         </div>`;
 
-      const measurementGroups = [
-        { title: "Jeu axial 'jm' mesuré avant démontage", fields: ["axial-play-A", "axial-play-B"] },
-        { title: "Contrôle visuel des soudures", fields: ["soud-vis-A", "soud-vis-B"] },
-        { title: "Valeurs 'x' mesurées = longueur torillon", fields: ["measured-value-x-A", "measured-value-x-B"] },
-        { title: "Valeurs 'y' mesurées = hauteur mesurées = valeur du grand roulement-re", fields: ["measured-value-y-A", "measured-value-y-B"] },
-        { title: "Valeurs de 'z' mesurées = hauteur petit roulement", fields: ["measured-value-z-A", "measured-value-z-B"] },
-        { title: "Valeurs de 'u' mesurées = hauteur roulements montés", fields: ["measured-value-u-A", "measured-value-u-B"] },
-        { title: "Valeurs de 'c' calculée = u - y - z", fields: ["measured-value-c-A", "measured-value-c-B"], compute: calcC },
-        { title: "Valeurs 'wm' mesurées = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"] },
-        { title: "Valeurs 'w' calculée = x - u - 0,02mm", fields: ["measured-value-w-A", "measured-value-w-B"], compute: calcW },
-        { title: "Valeurs 'bm' mesurées = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"] },
-        { title: "Valeurs 'b' calculées = c + 0,2mm", fields: ["measured-value-b-A", "measured-value-b-B"], compute: calcB },
-        { title: "Valeurs 'd' mesurées = hauteur épaulement torillon", fields: ["measured-value-d-A", "measured-value-d-B"] },
-        { title: "Valeurs 'e' mesurées = hauteur flasque", fields: ["measured-value-e-A", "measured-value-e-B"] },
-        { title: "Valeurs 'eu' usinées", fields: ["measured-value-eu-A", "measured-value-eu-B"], compute: calcEU },
-        { title: "Jeu axial 'jm' après remise en état", fields: ["axial-play-after-A", "axial-play-after-B"] },
-        { title: "Jeu axial du bandage après remise en état < 0.7mm", fields: ["axial-bandage-after-A", "axial-bandage-after-B"] },
-        { title: "Jeu radial du bandage après remise en état < 0.5mm", fields: ["radial-bandage-after-A", "radial-bandage-after-B"] },
-        { title: "<b>Ecartement des roues</b> = distance entre support bandage ( 1396 +/- 1mm )", fields: ["wheel-ecart-A"] },
-        { title: "Ecartement des bandages distance entre bandage ( 1380mm )", fields: ["bandage-ecart-A"] }
-      ];
-
+      const measurementGroups = getMeasurementGroups(typeNo);
       const measurementsTable = `
         <div class="overflow-x-auto">
           <table class="min-w-full text-xs">
@@ -239,8 +263,7 @@
               </tr>
             </thead>
             <tbody>
-${measurementGroups.map(group => {
-                // Cas particulier pour les groupes avec un seul champ (Ecartement des roues et bandages)
+              ${measurementGroups.map(group => {
                 if (group.fields.length === 1) {
                   const value = val(group.fields[0]);
                   const trimZeros = val => {
@@ -257,8 +280,6 @@ ${measurementGroups.map(group => {
                     </tr>
                   `;
                 }
-
-                // Logique existante pour les autres groupes
                 const [valueA, valueB] = group.compute
                   ? [group.compute('-A'), group.compute('-B')]
                   : [val(group.fields[0]), val(group.fields[1])];
