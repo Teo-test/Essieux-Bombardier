@@ -30,7 +30,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label for="date" class="block text-sm font-medium">Date :</label>
-            <input type="date" id="date" name="date" class="mt-1 p-2 w-full border rounded">
+            <input type="date" id="date" name="date" required class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
             <label for="om" class="block text-sm font-medium">N° de l'intervention GHH :</label>
@@ -38,11 +38,11 @@
           </div>
           <div>
             <label for="bogieNo" class="block text-sm font-medium">Bogie N° :</label>
-            <input type="number" id="bogieNo" name="bogieNo" class="mt-1 p-2 w-full border rounded">
+            <input type="number" id="bogieNo" name="bogieNo" required class="mt-1 p-2 w-full border rounded">
           </div>
           <div>
-            <label for="typeNo" class="block text-sm font-medium">Type :</label>
-            <input type="text" id="typeNo" name="typeNo" class="mt-1 p-2 w-full border rounded uppercase" oninput="this.value = this.value.toUpperCase()">
+            <label for="typeNo" class="block text-sm font-medium">Type (BM/BP):</label>
+            <input type="text" id="typeNo" name="typeNo" required class="mt-1 p-2 w-full border rounded uppercase" oninput="this.value = this.value.toUpperCase()">
           </div>
           <div>
             <label for="Fabrick" class="block text-sm font-medium">N° de Fabrication :</label>
@@ -357,7 +357,7 @@
         }
 
         try {
-          const res = await fetch(`https://sheetdb.io/api/v1/gjfhltg3oglot/search?om=${encodeURIComponent(om)}`);
+          const res = await fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`);
           const rows = await res.json();
           if (rows.length > 0) {
             const data = date ? rows.find(row => row.date === date) || rows[0] : rows[0];
@@ -394,13 +394,14 @@
         const date = data.date?.trim();
 
         if (saveData(data, om, date)) {
-          fetch(`https://sheetdb.io/api/v1/gjfhltg3oglot/search?om=${encodeURIComponent(om)}`)
+          console.log(JSON.stringify(data))
+          fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
             .then(res => res.json())
             .then(rows => {
               const method = rows.length > 0 ? 'PUT' : 'POST';
               const url = rows.length > 0
-                ? `https://sheetdb.io/api/v1/gjfhltg3oglot/om/${encodeURIComponent(om)}`
-                : `https://sheetdb.io/api/v1/gjfhltg3oglot`;
+                ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
+                : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
               return fetch(url, {
                 method: method,
                 headers: {'Content-Type': 'application/json'},
