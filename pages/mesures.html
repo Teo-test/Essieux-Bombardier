@@ -239,19 +239,36 @@
       return data;
     }
 
-    // Afficher les messages de confirmation ou d'erreur
-    function showMessage(message, isError = false) {
-      const modal = document.getElementById('modal-alert');
-      const msg = document.getElementById('modal-alert-message');
-      msg.textContent = message;
-      msg.className = "mb-4 text-lg " + (isError ? "text-red-600" : "text-green-600");
-      const cancelBtn = document.getElementById('modal-alert-cancel');
-      if (cancelBtn) cancelBtn.remove();
-      modal.classList.remove('hidden');
-      document.getElementById('modal-alert-ok').onclick = () => {
-        modal.classList.add('hidden');
-      };
-    }
+// Afficher les messages de confirmation ou d'erreur
+function showMessage(message, isError = false, autoClose = false) {
+  const modal = document.getElementById('modal-alert');
+  const msg = document.getElementById('modal-alert-message');
+  const okBtn = document.getElementById('modal-alert-ok');
+  msg.textContent = message;
+  msg.className = "mb-4 text-lg " + (isError ? "text-red-600" : "text-green-600");
+
+  // Masquer le bouton Annuler s'il existe
+  const cancelBtn = document.getElementById('modal-alert-cancel');
+  if (cancelBtn) cancelBtn.remove();
+
+  if (autoClose) {
+    // Masquer le bouton OK pour les messages temporaires
+    okBtn.classList.add('hidden');
+    modal.classList.remove('hidden');
+    // Fermer automatiquement après 1 seconde
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      okBtn.classList.remove('hidden'); // Rétablir le bouton OK pour les futurs messages
+    }, 1500);
+  } else {
+    // Afficher le bouton OK pour les messages nécessitant une confirmation
+    okBtn.classList.remove('hidden');
+    modal.classList.remove('hidden');
+    okBtn.onclick = () => {
+      modal.classList.add('hidden');
+    };
+  }
+}
 
     // Fonction de confirmation avec modal
     function showConfirm(message, onOk, onCancel) {
@@ -278,35 +295,37 @@
       };
     }
 
-    // Sauvegarde des données dans localStorage
-    function saveData(data, om, date) {
-      if (!om) {
-        showMessage("Merci de renseigner le N° d'intervention.", true);
-        return false;
-      }
-      const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
-      localStorage.setItem(key, JSON.stringify(data));
-      localStorage.setItem('mesuresData_last', key);
-      return true;
-    }
 
-    // Chargement des données depuis localStorage
-    function loadData(om, date) {
-      const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
-      const saved = localStorage.getItem(key);
-      if (!saved) {
-        showMessage(`Aucune mesure trouvée pour ${date ? 'cette intervention' : 'cette intervention'}.`, true);
-        return false;
-      }
-      const data = JSON.parse(saved);
-      Object.entries(data).forEach(([k, v]) => {
-        const input = document.querySelector(`[name="${k}"]`);
-        if (input) input.value = v;
-      });
-      localStorage.setItem('mesuresData_last', key);
-      showMessage("Mesures chargées !");
-      return true;
-    }
+// Sauvegarde des données dans localStorage
+function saveData(data, om) {
+  if (!om) {
+    showMessage("Merci de renseigner le N° d'intervention.", true);
+    return false;
+  }
+  const key = `mesuresData_${om}`;
+  localStorage.setItem(key, JSON.stringify(data));
+  localStorage.setItem('mesuresData_last', key);
+  // Sauvegarder également dans mesuresFormRealtime pour la persistance en temps réel
+  localStorage.setItem('mesuresFormRealtime', JSON.stringify(data));
+  return true;
+}
+
+// Chargement des données depuis localStorage
+function loadData(om) {
+  const key = `mesuresData_${om}`;
+  const saved = localStorage.getItem(key);
+  if (!saved) {
+    return false; // Pas de données locales, pas de message d'erreur
+  }
+  const data = JSON.parse(saved);
+  Object.entries(data).forEach(([k, v]) => {
+    const input = document.querySelector(`[name="${k}"]`);
+    if (input) input.value = v;
+  });
+  localStorage.setItem('mesuresData_last', key);
+  showMessage("Mesures chargées !", false, true); // Message temporaire de 1 seconde
+  return true;
+}
 
     // Sauvegarde en temps réel
     function saveFormInputsRealtime() {
@@ -338,6 +357,7 @@
 
       // Sauvegarde en temps réel
       form.addEventListener('input', saveFormInputsRealtime);
+      form.addEventListener('change', saveFormInputsRealtime);
 
       // Mise à jour des champs de mesure en fonction de typeNo
       typeNoInput.addEventListener('input', () => {
@@ -346,87 +366,85 @@
         generateMeasurementFields(measurementsContainer, getMeasurementGroups(typeNo));
       });
 
-      // Bouton Ouvrir
-      ouvrirBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const om = document.getElementById('om').value.trim();
-        const date = document.getElementById('date').value.trim();
-        if (!om) {
-          showMessage("Merci de renseigner le n° Intervention pour ouvrir un dossier.", true);
-          return;
-        }
+// Bouton Ouvrir
+ouvrirBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  const om = document.getElementById('om').value.trim();
+  if (!om) {
+    showMessage("Merci de renseigner le n° Intervention pour ouvrir un dossier.", true);
+    return;
+  }
 
-        try {
-          const res = await fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`);
-          const rows = await res.json();
-          if (rows.length > 0) {
-            const data = date ? rows.find(row => row.date === date) || rows[0] : rows[0];
-            Object.entries(data).forEach(([k, v]) => {
-              const input = document.querySelector(`[name="${k}"]`);
-              if (input) input.value = v;
-            });
-            showMessage("Mesures chargées !");
-            const key = date ? `mesuresData_${om}_${date}` : `mesuresData_${om}`;
-            localStorage.setItem(key, JSON.stringify(data));
-            localStorage.setItem('mesuresData_last', key);
-            return;
-          } else {
-            showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true);
-            return;
-          }
-        } catch (err) {
-          showMessage("Erreur lors de la récupération.", true);
-          return;
-        }
+  // Tenter de charger depuis localStorage d'abord
+  if (loadData(om)) {
+    return; // Données chargées localement, pas besoin de continuer
+  }
 
-        if (!loadData(om, date)) {
-          showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true);
-        }
+  // Si pas trouvé localement, tenter de récupérer depuis l'API
+  try {
+    const res = await fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`);
+    const rows = await res.json();
+    if (rows.length > 0) {
+      const data = rows[0];
+      Object.entries(data).forEach(([k, v]) => {
+        const input = document.querySelector(`[name="${k}"]`);
+        if (input) input.value = v;
       });
+      const key = `mesuresData_${om}`;
+      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem('mesuresData_last', key);
+      localStorage.setItem('mesuresFormRealtime', JSON.stringify(data));
+      showMessage("Mesures chargées depuis le réseau !", false, true); // Message temporaire de 1 seconde
+    } else {
+      showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true); // Erreur si rien dans l'API
+    }
+  } catch (err) {
+    showMessage("Erreur lors de la récupération depuis le réseau.", true); // Erreur réseau
+  }
+});
 
-      // Bouton Valider
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        let data = Object.fromEntries(formData);
-        data = calculateDerivedValues(data);
-        const om = data.om?.trim();
-        const date = data.date?.trim();
+// Bouton Valider
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  let data = Object.fromEntries(formData);
+  data = calculateDerivedValues(data);
+  const om = data.om?.trim();
 
-        if (saveData(data, om, date)) {
-          console.log(JSON.stringify(data))
-          fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
-            .then(res => res.json())
-            .then(rows => {
-              const method = rows.length > 0 ? 'PUT' : 'POST';
-              const url = rows.length > 0
-                ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
-                : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
-              return fetch(url, {
-                method: method,
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({data: [data]})
-              });
-            })
-            .then(res => res.json())
-            .then(res => {
-              showMessage("Mesures enregistrées localement et envoyées au réseau !");
-              validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-              validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-              setTimeout(() => {
-                validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                window.location.href = "resultats.html";
-              }, 1500);
-            })
-            .catch(() => {
-              showMessage("Erreur lors de l'envoi au réseau, mais les données sont enregistrées localement.", true);
-              setTimeout(() => {
-                window.location.href = "resultats.html";
-              }, 1500);
-            });
-        }
+  if (saveData(data, om)) {
+    console.log(JSON.stringify(data));
+    fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
+      .then(res => res.json())
+      .then(rows => {
+        const method = rows.length > 0 ? 'PUT' : 'POST';
+        const url = rows.length > 0
+          ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
+          : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
+        return fetch(url, {
+          method: method,
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({data: [data]})
+        });
+      })
+      .then(res => res.json())
+      .then(res => {
+        showMessage("Mesures enregistrées localement et envoyées au réseau !", false, true);
+        validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+        setTimeout(() => {
+          validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+          validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+          window.location.href = "resultats.html";
+        }, 1500);
+      })
+      .catch(() => {
+        showMessage("Erreur lors de l'envoi au réseau, mais les données sont enregistrées localement.", true);
+        setTimeout(() => {
+          window.location.href = "resultats.html";
+        }, 1500);
       });
+  }
+});
     }
 
     // Gestion du nettoyage de localStorage
@@ -449,14 +467,24 @@
       });
     }
 
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', () => {
-      const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
-      generateMeasurementFields(document.getElementById('measurements'), getMeasurementGroups(typeNo));
-      loadFormInputsRealtime();
-      setupFormEvents();
-      setupStorageCleanup();
-    });
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+  const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
+  generateMeasurementFields(document.getElementById('measurements'), getMeasurementGroups(typeNo));
+  setupFormEvents();
+  setupStorageCleanup();
+
+  // Tenter de charger les données du dernier om utilisé
+  const lastKey = localStorage.getItem('mesuresData_last');
+  if (lastKey) {
+    const om = lastKey.replace('mesuresData_', '');
+    if (loadData(om)) {
+      return; // Si les données validées sont chargées, ne pas charger les données en temps réel
+    }
+  }
+  // Si aucune donnée validée n'est trouvée, charger les données en temps réel
+  loadFormInputsRealtime();
+});
 
     document.getElementById('clearScreenBtn').onclick = function() {
       showConfirm(
@@ -468,8 +496,8 @@
           Object.keys(localStorage)
             .filter(k => k.startsWith('mesuresData_') || k === 'mesuresFormRealtime')
             .forEach(k => localStorage.removeItem(k));
-          showMessage("Toutes les valeurs et données enregistrées ont été effacées.", false);
-          setTimeout(() => window.location.reload(), 1200);
+          showMessage("Toutes les valeurs et données enregistrées ont été effacées.", false, true);
+          setTimeout(() => window.location.reload(), 2000);
         }
       );
     };

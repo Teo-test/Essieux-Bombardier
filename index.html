@@ -61,6 +61,22 @@
   </main>
 
   <script>
+    // Clear local storage and reset form inputs when the page loads
+    window.onload = function() {
+      // Clear all data in local storage
+      localStorage.clear();
+
+      // Reset all form input values on the page
+      const inputs = document.querySelectorAll('input, select, textarea');
+      inputs.forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          input.checked = false;
+        } else {
+          input.value = '';
+        }
+      });
+    };
+
     // Exemple de script pour afficher un résumé des résultats
     document.addEventListener('DOMContentLoaded', function() {
       const summaryContainer = document.getElementById('results-summary');
