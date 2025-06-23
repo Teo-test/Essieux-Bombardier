@@ -7,10 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col" id="page-mesures">
+  <!-- Confirmation message container -->
   <div id="confirmation" class="hidden text-center my-2"></div>
+
+  <!-- Clear screen button -->
   <button id="clearScreenBtn" class="bg-red-600 text-white px-4 py-2 rounded m-4 hover:bg-red-700">
     Effacer les valeurs à l'écran
   </button>
+
+  <!-- Navigation bar -->
   <nav class="bg-gray-800 text-white p-4">
     <div class="container mx-auto flex justify-around">
       <a href="../index.html" class="hover:underline">Accueil</a>
@@ -20,11 +25,16 @@
       <a href="pdf.html" class="underline">PDF</a>
     </div>
   </nav>
+
+  <!-- Header -->
   <header class="bg-blue-600 text-white p-4">
     <h1 class="text-2xl font-bold">Formulaire de Mesures</h1>
   </header>
+
+  <!-- Main content -->
   <main class="flex-grow container mx-auto p-4">
     <form id="mesuresForm" class="space-y-6">
+      <!-- General Information Section -->
       <section class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -62,6 +72,7 @@
         </div>
       </section>
 
+      <!-- Localization Section -->
       <section class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Localisation</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -76,11 +87,13 @@
         </div>
       </section>
 
+      <!-- Measurements Section -->
       <section class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Mesures (0,001 mm près pour le torillon)</h2>
         <div id="measurements"></div>
       </section>
 
+      <!-- Submit Button -->
       <div class="flex justify-end">
         <button type="submit" id="validerBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Valider</button>
       </div>
@@ -88,13 +101,13 @@
     <div id="confirmation" class="hidden text-center my-2"></div>
   </main>
 
-  <!-- Fenêtre modale d'avertissement -->
-<div id="modal-alert" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded shadow-lg p-6 max-w-sm w-full text-center">
-    <div id="modal-alert-message" class="mb-4 text-lg"></div>
-    <button id="modal-alert-ok" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+  <!-- Alert Modal -->
+  <div id="modal-alert" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded shadow-lg p-6 max-w-sm w-full text-center">
+      <div id="modal-alert-message" class="mb-4 text-lg"></div>
+      <button id="modal-alert-ok" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">OK</button>
+    </div>
   </div>
-</div>
 
   <script>
     // Configuration des groupes de mesures
@@ -125,13 +138,13 @@
       { title: "<b>Ecartement des bandages</b> = distance entre bandage (1380mm)", fields: ["bandage-ecart-A"], label: "" },
     ];
 
-    // Fonction pour obtenir les groupes de mesures en fonction de typeNo
+    // Génère les groupes de mesures selon le type (BM/BP)
     function getMeasurementGroups(typeNo) {
       let groups = [...baseMeasurementGroups];
       if (typeNo === 'BP') {
         // Supprime la ligne wm pour BM
         groups = groups.filter(group => group.title !== "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM");
-        // Ajoute les nouvelles lignes pour BP
+        // Ajoute les lignes spécifiques pour BP
         const wmIndex = groups.findIndex(group => group.title === "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés");
         if (wmIndex !== -1) {
           groups.splice(wmIndex + 1, 0,
@@ -153,7 +166,7 @@
       return groups;
     }
 
-    // Utilitaire pour générer les champs de mesure
+    // Génère dynamiquement les champs de mesure dans le DOM
     function generateMeasurementFields(container, groups) {
       container.innerHTML = ''; // Vide le conteneur avant de régénérer
       groups.forEach(group => {
@@ -190,7 +203,7 @@
       });
     }
 
-    // Calcul des valeurs dérivées (c, w, b)
+    // Calcule les valeurs dérivées (c, w, b, eu)
     function calculateDerivedValues(data) {
       ['-A', '-B'].forEach(suffix => {
         const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
@@ -200,82 +213,63 @@
         const v = parseFloat(data[`measured-value-v${suffix}`]) || 0;
         const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
 
-        if (u && y && z) {
-          data[`measured-value-c${suffix}`] = (u - y - z).toFixed(3);
-        } else {
-          data[`measured-value-c${suffix}`] = '';
-        }
+        // Calcul de c
+        data[`measured-value-c${suffix}`] = (u && y && z) ? (u - y - z).toFixed(3) : '';
 
+        // Calcul de w (selon type BM/BP)
         if (typeNo === 'BP') {
-          if (x && u && v) {
-            data[`measured-value-w-BP${suffix}`] = (x - u - v - 0.02).toFixed(3);
-          } else {
-            data[`measured-value-w-BP${suffix}`] = '';
-          }
+          data[`measured-value-w-BP${suffix}`] = (x && u && v) ? (x - u - v - 0.02).toFixed(3) : '';
         } else {
-          if (x && u) {
-            data[`measured-value-w${suffix}`] = (x - u - 0.02).toFixed(3);
-          } else {
-            data[`measured-value-w${suffix}`] = '';
-          }
+          data[`measured-value-w${suffix}`] = (x && u) ? (x - u - 0.02).toFixed(3) : '';
         }
 
+        // Calcul de b
         const c = parseFloat(data[`measured-value-c${suffix}`]) || 0;
-        if (c) {
-          data[`measured-value-b${suffix}`] = (c + 0.2).toFixed(3);
-        } else {
-          data[`measured-value-b${suffix}`] = '';
-        }
+        data[`measured-value-b${suffix}`] = c ? (c + 0.2).toFixed(3) : '';
 
-        // Calcul de measured-value-eu
+        // Calcul de eu
         const d = parseFloat(data[`measured-value-d${suffix}`]);
         const e = parseFloat(data[`measured-value-e${suffix}`]);
-        if (!isNaN(d) && !isNaN(e)) {
-          data[`measured-value-eu${suffix}`] = d > e ? "OK" : "A usiner";
-        } else {
-          data[`measured-value-eu${suffix}`] = "";
-        }
+        data[`measured-value-eu${suffix}`] = (!isNaN(d) && !isNaN(e)) ? (d > e ? "OK" : "A usiner") : "";
       });
       return data;
     }
 
-// Afficher les messages de confirmation ou d'erreur
-function showMessage(message, isError = false, autoClose = false) {
-  const modal = document.getElementById('modal-alert');
-  const msg = document.getElementById('modal-alert-message');
-  const okBtn = document.getElementById('modal-alert-ok');
-  msg.textContent = message;
-  msg.className = "mb-4 text-lg " + (isError ? "text-red-600" : "text-green-600");
+    // Affiche les messages de confirmation ou d'erreur
+    function showMessage(message, isError = false, autoClose = false) {
+      const modal = document.getElementById('modal-alert');
+      const msg = document.getElementById('modal-alert-message');
+      const okBtn = document.getElementById('modal-alert-ok');
+      msg.textContent = message;
+      msg.className = `mb-4 text-lg ${isError ? "text-red-600" : "text-green-600"}`;
 
-  // Masquer le bouton Annuler s'il existe
-  const cancelBtn = document.getElementById('modal-alert-cancel');
-  if (cancelBtn) cancelBtn.remove();
+      // Supprime le bouton Annuler s'il existe
+      const cancelBtn = document.getElementById('modal-alert-cancel');
+      if (cancelBtn) cancelBtn.remove();
 
-  if (autoClose) {
-    // Masquer le bouton OK pour les messages temporaires
-    okBtn.classList.add('hidden');
-    modal.classList.remove('hidden');
-    // Fermer automatiquement après 1 seconde
-    setTimeout(() => {
-      modal.classList.add('hidden');
-      okBtn.classList.remove('hidden'); // Rétablir le bouton OK pour les futurs messages
-    }, 1500);
-  } else {
-    // Afficher le bouton OK pour les messages nécessitant une confirmation
-    okBtn.classList.remove('hidden');
-    modal.classList.remove('hidden');
-    okBtn.onclick = () => {
-      modal.classList.add('hidden');
-    };
-  }
-}
+      if (autoClose) {
+        // Masque le bouton OK et ferme automatiquement après 1 seconde
+        okBtn.classList.add('hidden');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          okBtn.classList.remove('hidden');
+        }, 1000);
+      } else {
+        // Affiche le bouton OK pour les messages nécessitant confirmation
+        okBtn.classList.remove('hidden');
+        modal.classList.remove('hidden');
+        okBtn.onclick = () => modal.classList.add('hidden');
+      }
+    }
 
-    // Fonction de confirmation avec modal
+    // Affiche une modale de confirmation avec options OK/Annuler
     function showConfirm(message, onOk, onCancel) {
       const modal = document.getElementById('modal-alert');
       const msg = document.getElementById('modal-alert-message');
       msg.textContent = message;
       msg.className = "mb-4 text-lg text-yellow-600";
+
       let cancelBtn = document.getElementById('modal-alert-cancel');
       if (!cancelBtn) {
         cancelBtn = document.createElement('button');
@@ -284,6 +278,7 @@ function showMessage(message, isError = false, autoClose = false) {
         cancelBtn.textContent = "Annuler";
         document.getElementById('modal-alert-ok').after(cancelBtn);
       }
+
       modal.classList.remove('hidden');
       document.getElementById('modal-alert-ok').onclick = () => {
         modal.classList.add('hidden');
@@ -295,39 +290,36 @@ function showMessage(message, isError = false, autoClose = false) {
       };
     }
 
+    // Sauvegarde les données dans localStorage
+    function saveData(data, om) {
+      if (!om) {
+        showMessage("Merci de renseigner le N° d'intervention.", true);
+        return false;
+      }
+      const key = `mesuresData_${om}`;
+      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem('mesuresData_last', key);
+      localStorage.setItem('mesuresFormRealtime', JSON.stringify(data));
+      return true;
+    }
 
-// Sauvegarde des données dans localStorage
-function saveData(data, om) {
-  if (!om) {
-    showMessage("Merci de renseigner le N° d'intervention.", true);
-    return false;
-  }
-  const key = `mesuresData_${om}`;
-  localStorage.setItem(key, JSON.stringify(data));
-  localStorage.setItem('mesuresData_last', key);
-  // Sauvegarder également dans mesuresFormRealtime pour la persistance en temps réel
-  localStorage.setItem('mesuresFormRealtime', JSON.stringify(data));
-  return true;
-}
+    // Charge les données depuis localStorage
+    function loadData(om) {
+      const key = `mesuresData_${om}`;
+      const saved = localStorage.getItem(key);
+      if (!saved) return false;
 
-// Chargement des données depuis localStorage
-function loadData(om) {
-  const key = `mesuresData_${om}`;
-  const saved = localStorage.getItem(key);
-  if (!saved) {
-    return false; // Pas de données locales, pas de message d'erreur
-  }
-  const data = JSON.parse(saved);
-  Object.entries(data).forEach(([k, v]) => {
-    const input = document.querySelector(`[name="${k}"]`);
-    if (input) input.value = v;
-  });
-  localStorage.setItem('mesuresData_last', key);
-  showMessage("Mesures chargées !", false, true); // Message temporaire de 1 seconde
-  return true;
-}
+      const data = JSON.parse(saved);
+      Object.entries(data).forEach(([k, v]) => {
+        const input = document.querySelector(`[name="${k}"]`);
+        if (input) input.value = v;
+      });
+      localStorage.setItem('mesuresData_last', key);
+      showMessage("Mesures chargées !", false, true);
+      return true;
+    }
 
-    // Sauvegarde en temps réel
+    // Sauvegarde les entrées du formulaire en temps réel
     function saveFormInputsRealtime() {
       const form = document.getElementById('mesuresForm');
       const inputs = form.querySelectorAll('input');
@@ -336,7 +328,7 @@ function loadData(om) {
       localStorage.setItem('mesuresFormRealtime', JSON.stringify(formData));
     }
 
-    // Chargement des données en temps réel
+    // Charge les entrées du formulaire en temps réel
     function loadFormInputsRealtime() {
       const saved = localStorage.getItem('mesuresFormRealtime');
       if (saved) {
@@ -348,106 +340,104 @@ function loadData(om) {
       }
     }
 
-    // Gestion des événements du formulaire
+    // Configure les gestionnaires d'événements du formulaire
     function setupFormEvents() {
       const form = document.getElementById('mesuresForm');
       const ouvrirBtn = document.getElementById('OuvrirBtn');
-      const validerBtn = document.getElementById('validerBtn');
       const typeNoInput = document.getElementById('typeNo');
 
       // Sauvegarde en temps réel
       form.addEventListener('input', saveFormInputsRealtime);
       form.addEventListener('change', saveFormInputsRealtime);
 
-      // Mise à jour des champs de mesure en fonction de typeNo
+      // Mise à jour des champs de mesure selon typeNo
       typeNoInput.addEventListener('input', () => {
         const typeNo = typeNoInput.value.trim().toUpperCase();
         const measurementsContainer = document.getElementById('measurements');
         generateMeasurementFields(measurementsContainer, getMeasurementGroups(typeNo));
       });
 
-// Bouton Ouvrir
-ouvrirBtn.addEventListener('click', async (e) => {
-  e.preventDefault();
-  const om = document.getElementById('om').value.trim();
-  if (!om) {
-    showMessage("Merci de renseigner le n° Intervention pour ouvrir un dossier.", true);
-    return;
-  }
+      // Gestion du bouton Ouvrir
+      ouvrirBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const om = document.getElementById('om').value.trim();
+        if (!om) {
+          showMessage("Merci de renseigner le n° Intervention pour ouvrir un dossier.", true);
+          return;
+        }
 
-  // Tenter de charger depuis localStorage d'abord
-  if (loadData(om)) {
-    return; // Données chargées localement, pas besoin de continuer
-  }
+        // Tente de charger depuis localStorage
+        if (loadData(om)) return;
 
-  // Si pas trouvé localement, tenter de récupérer depuis l'API
-  try {
-    const res = await fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`);
-    const rows = await res.json();
-    if (rows.length > 0) {
-      const data = rows[0];
-      Object.entries(data).forEach(([k, v]) => {
-        const input = document.querySelector(`[name="${k}"]`);
-        if (input) input.value = v;
+        // Tente de charger depuis l'API
+        try {
+          const res = await fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`);
+          const rows = await res.json();
+          if (rows.length > 0) {
+            const data = rows[0];
+            Object.entries(data).forEach(([k, v]) => {
+              const input = document.querySelector(`[name="${k}"]`);
+              if (input) input.value = v;
+            });
+            const key = `mesuresData_${om}`;
+            localStorage.setItem(key, JSON.stringify(data));
+            localStorage.setItem('mesuresData_last', key);
+            localStorage.setItem('mesuresFormRealtime', JSON.stringify(data));
+            showMessage("Mesures chargées depuis le réseau !", false, true);
+          } else {
+            showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true);
+          }
+        } catch (err) {
+          showMessage("Erreur lors de la récupération depuis le réseau.", true);
+        }
       });
-      const key = `mesuresData_${om}`;
-      localStorage.setItem(key, JSON.stringify(data));
-      localStorage.setItem('mesuresData_last', key);
-      localStorage.setItem('mesuresFormRealtime', JSON.stringify(data));
-      showMessage("Mesures chargées depuis le réseau !", false, true); // Message temporaire de 1 seconde
-    } else {
-      showMessage("Aucune donnée trouvée pour ce N° d'intervention.", true); // Erreur si rien dans l'API
-    }
-  } catch (err) {
-    showMessage("Erreur lors de la récupération depuis le réseau.", true); // Erreur réseau
-  }
-});
 
-// Bouton Valider
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const formData = new FormData(form);
-  let data = Object.fromEntries(formData);
-  data = calculateDerivedValues(data);
-  const om = data.om?.trim();
+      // Gestion du bouton Valider
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        let data = Object.fromEntries(formData);
+        data = calculateDerivedValues(data);
+        const om = data.om?.trim();
 
-  if (saveData(data, om)) {
-    console.log(JSON.stringify(data));
-    fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
-      .then(res => res.json())
-      .then(rows => {
-        const method = rows.length > 0 ? 'PUT' : 'POST';
-        const url = rows.length > 0
-          ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
-          : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
-        return fetch(url, {
-          method: method,
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({data: [data]})
-        });
-      })
-      .then(res => res.json())
-      .then(res => {
-        showMessage("Mesures enregistrées localement et envoyées au réseau !", false, true);
-        validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-        setTimeout(() => {
-          validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-          validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-          window.location.href = "resultats.html";
-        }, 1500);
-      })
-      .catch(() => {
-        showMessage("Erreur lors de l'envoi au réseau, mais les données sont enregistrées localement.", true);
-        setTimeout(() => {
-          window.location.href = "resultats.html";
-        }, 1500);
+        if (saveData(data, om)) {
+          console.log(JSON.stringify(data));
+          fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
+            .then(res => res.json())
+            .then(rows => {
+              const method = rows.length > 0 ? 'PUT' : 'POST';
+              const url = rows.length > 0
+                ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
+                : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
+              return fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: [data] })
+              });
+            })
+            .then(res => res.json())
+            .then(() => {
+              showMessage("Mesures enregistrées localement et envoyées au réseau !", false, true);
+              const validerBtn = document.getElementById('validerBtn');
+              validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+              validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+              setTimeout(() => {
+                validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                window.location.href = "resultats.html";
+              }, 1500);
+            })
+            .catch(() => {
+              showMessage("Erreur lors de l'envoi au réseau, mais les données sont enregistrées localement.", true);
+              setTimeout(() => {
+                window.location.href = "resultats.html";
+              }, 1500);
+            });
+        }
       });
-  }
-});
     }
 
-    // Gestion du nettoyage de localStorage
+    // Gère le nettoyage de localStorage à la fin de la session
     function setupStorageCleanup() {
       if (!sessionStorage.getItem('sessionActive')) {
         localStorage.removeItem('mesuresData_last');
@@ -467,26 +457,25 @@ form.addEventListener('submit', (e) => {
       });
     }
 
-// Initialisation
-document.addEventListener('DOMContentLoaded', () => {
-  const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
-  generateMeasurementFields(document.getElementById('measurements'), getMeasurementGroups(typeNo));
-  setupFormEvents();
-  setupStorageCleanup();
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+      const typeNo = document.getElementById('typeNo').value.trim().toUpperCase();
+      generateMeasurementFields(document.getElementById('measurements'), getMeasurementGroups(typeNo));
+      setupFormEvents();
+      setupStorageCleanup();
 
-  // Tenter de charger les données du dernier om utilisé
-  const lastKey = localStorage.getItem('mesuresData_last');
-  if (lastKey) {
-    const om = lastKey.replace('mesuresData_', '');
-    if (loadData(om)) {
-      return; // Si les données validées sont chargées, ne pas charger les données en temps réel
-    }
-  }
-  // Si aucune donnée validée n'est trouvée, charger les données en temps réel
-  loadFormInputsRealtime();
-});
+      // Charge les données du dernier om utilisé
+      const lastKey = localStorage.getItem('mesuresData_last');
+      if (lastKey) {
+        const om = lastKey.replace('mesuresData_', '');
+        if (loadData(om)) return;
+      }
+      // Charge les données en temps réel si aucune donnée validée
+      loadFormInputsRealtime();
+    });
 
-    document.getElementById('clearScreenBtn').onclick = function() {
+    // Gestion du bouton Effacer
+    document.getElementById('clearScreenBtn').addEventListener('click', () => {
       showConfirm(
         "Voulez-vous vraiment effacer toutes les valeurs et toutes les données enregistrées ?",
         () => {
@@ -497,10 +486,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .filter(k => k.startsWith('mesuresData_') || k === 'mesuresFormRealtime')
             .forEach(k => localStorage.removeItem(k));
           showMessage("Toutes les valeurs et données enregistrées ont été effacées.", false, true);
-          setTimeout(() => window.location.reload(), 2000);
+          setTimeout(() => window.location.reload(), 1200);
         }
       );
-    };
+    });
   </script>
 </body>
 </html>
