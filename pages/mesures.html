@@ -310,6 +310,17 @@
       if (!saved) return false;
 
       const data = JSON.parse(saved);
+      // Étape 1 : Récupérer typeNo depuis les données
+      const typeNo = data.typeNo ? data.typeNo.trim().toUpperCase() : document.getElementById('typeNo').value.trim().toUpperCase();
+      // Étape 2 : Valider typeNo
+      if (!['BM', 'BP'].includes(typeNo)) {
+        showMessage("TypeNo invalide. Veuillez spécifier 'BM' ou 'BP'.", true);
+        return false;
+      }
+      // Étape 3 : Régénérer les champs de mesure
+      const measurementsContainer = document.getElementById('measurements');
+      generateMeasurementFields(measurementsContainer, getMeasurementGroups(typeNo));
+      // Étape 4 : Assigner les valeurs
       Object.entries(data).forEach(([k, v]) => {
         const input = document.querySelector(`[name="${k}"]`);
         if (input) input.value = v;
@@ -375,6 +386,14 @@
           const rows = await res.json();
           if (rows.length > 0) {
             const data = rows[0];
+            console.log('Données API reçues :', data); // Débogage
+            const typeNo = data.typeNo ? data.typeNo.trim().toUpperCase() : document.getElementById('typeNo').value.trim().toUpperCase();
+            if (!['BM', 'BP'].includes(typeNo)) {
+              showMessage("TypeNo invalide. Veuillez spécifier 'BM' ou 'BP'.", true);
+              return;
+            }
+            const measurementsContainer = document.getElementById('measurements');
+            generateMeasurementFields(measurementsContainer, getMeasurementGroups(typeNo));
             Object.entries(data).forEach(([k, v]) => {
               const input = document.querySelector(`[name="${k}"]`);
               if (input) input.value = v;
