@@ -365,7 +365,7 @@
         const om = val('om') || 'unknown';
         const typeNo = val('typeNo').toUpperCase() || 'unknown';
         const bogieNo = val('bogieNo') || 'unknown';
-        const filename = `${formattedDate}_${om}_${typeNo}_${bogieNo}.pdf`;
+        const filename = `${om}_${formattedDate}_${typeNo}_${bogieNo}.pdf`;
 
         html2pdf().set({
           margin: [0.5, 0.2, 0.5, 0.2],
