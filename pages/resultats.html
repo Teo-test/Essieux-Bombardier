@@ -351,7 +351,7 @@
               sub.fields.map(field => {
                 const value = formatDiameter(data, field, sub.ranges);
                 if (!value) return '';
-                const labelText = field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+                const labelText = field.replace(/^(GD-|PD-)/, '').replace(/(-A|-B)?-Avant-usinage$/, '').replace(/-A$|-B$/, '');
                 return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
               }).filter(Boolean).join('')
             }</div></div>`;
