@@ -114,6 +114,20 @@
     const baseMeasurementGroups = [
       { title: "<b>Jeu axial 'Jm' mesuré Avant Démontage</b>", fields: ["axial-play-A", "axial-play-B"], label: "Côté" },
       { title: "<b>Contrôle visuel des soudures</b>", fields: ["soud-vis-A", "soud-vis-B"], label: "Côté", type: "text" },
+      { title: "", fields: [], label: "" },
+      { title: "<b>Mesures du Tourillon AVANT usinage chez Dalic", fields: [], label: "" },
+      { title: "<b>Côté A</b>", fields: [], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A-Avant-usinage", "GD-Côte Verticale 2-A-Avant-usinage", "GD-Côte Verticale 3-A-Avant-usinage"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-A-Avant-usinage", "GD-Côte Horizontale 5-A-Avant-usinage", "GD-Côte Horizontale 6-A-Avant-usinage"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-A-Avant-usinage", "PD-Côte Verticale 2-A-Avant-usinage", "PD-Côte Verticale 3-A-Avant-usinage"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-A-Avant-usinage", "PD-Côte Horizontale 5-A-Avant-usinage", "PD-Côte Horizontale 6-A-Avant-usinage"], label: "" },
+      { title: "<b>Côté B</b>", fields: [], label: "" },
+      { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-B-Avant-usinage", "GD-Côte Verticale 2-B-Avant-usinage", "GD-Côte Verticale 3-B-Avant-usinage"], label: "" },
+      { title: "", fields: ["GD-Côte Horizontale 4-B-Avant-usinage", "GD-Côte Horizontale 5-B-Avant-usinage", "GD-Côte Horizontale 6-B-Avant-usinage"], label: "" },
+      { title: "<i>Petit Diamètre</i>", fields: ["PD-Côte Verticale 1-B-Avant-usinage", "PD-Côte Verticale 2-B-Avant-usinage", "PD-Côte Verticale 3-B-Avant-usinage"], label: "" },
+      { title: "", fields: ["PD-Côte Horizontale 4-B-Avant-usinage", "PD-Côte Horizontale 5-B-Avant-usinage", "PD-Côte Horizontale 6-B-Avant-usinage"], label: "" },
+      { title: "", fields: [], label: "" },
+      { title: "<b>Mesures du Tourillon APRES usinage chez Dalic", fields: [], label: "" },
       { title: "<b>Côté A</b>", fields: [], label: "" },
       { title: "<i>Grand Diamètre</i>", fields: ["GD-Côte Verticale 1-A", "GD-Côte Verticale 2-A", "GD-Côte Verticale 3-A"], label: "" },
       { title: "", fields: ["GD-Côte Horizontale 4-A", "GD-Côte Horizontale 5-A", "GD-Côte Horizontale 6-A"], label: "" },
@@ -188,7 +202,7 @@
               ${group.fields.map(field => {
                 const labelText = group.label 
                   ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
-                  : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+                  : field.replace(/^(GD-|PD-)/, '').replace(/(-A|-B)?-Avant-usinage$/, '').replace(/-A$|-B$/, '');
                 return `
                   <div>
                     <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
