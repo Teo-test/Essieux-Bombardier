@@ -169,6 +169,64 @@
           <div><span class="font-medium">Année de Fabrication:</span> ${val('Baujahr')}</div>
         </div>`;
 
+      const diameterTableDalic = `
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-base">
+            <thead>
+              <tr>
+                <th rowspan="2" style="width:100px;"></th>
+                <th colspan="4" class="bg-gray-200 text-center">Côté A</th>
+                <th colspan="4" class="bg-gray-200 text-center">Côté B</th>
+                <th rowspan="2" style="width:100px;">
+                  <img src="../image/plan-point-mesure.jpg" alt="Plan point de mesure" style="max-width:200px;max-height:90px;display:block;margin:auto;">
+                </th>
+              </tr>
+              <tr>
+                <th colspan="2" class="bg-gray-100 text-center">vertical</th>
+                <th colspan="2" class="bg-gray-100 text-center">horizontal</th>
+                <th colspan="2" class="bg-gray-100 text-center">vertical</th>
+                <th colspan="2" class="bg-gray-100 text-center">horizontal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${['Grand Diamètre', 'Petit Diamètre'].map((type, idx) => {
+                const prefix = type === 'Grand Diamètre' ? 'GD' : 'PD';
+                const colorFn = type === 'Grand Diamètre' ? colorGD : colorPD;
+                const range = type === 'Grand Diamètre' ? '117,475<br> > Ø > <br>117,450' : '89,945<br> > Ø > <br>89,920';
+                return `
+                  ${[1, 2, 3].map(i => `
+                    <tr>
+                      ${i === 1 ? `<td rowspan="3" class="text-center" style="width:100px;">${type}</td>` : ''}
+                      <td class="text-center" style="width:24px;">${i}</td>
+                      <td class="text-right ${colorFn(val(`${prefix}-Côte Verticale ${i}-A-Avant-usinage`))}" style="width:76px;">${val(`${prefix}-Côte Verticale ${i}-A-Avant-usinage`) ? Number(val(`${prefix}-Côte Verticale ${i}-A-Avant-usinage`)).toFixed(3) : ""}</td>
+                      <td class="text-center" style="width:24px;">${i + 3}</td>
+                      <td class="text-right ${colorFn(val(`${prefix}-Côte Horizontale ${i + 3}-A-Avant-usinage`))}" style="width:76px;">${val(`${prefix}-Côte Horizontale ${i + 3}-A-Avant-usinage`) ? Number(val(`${prefix}-Côte Horizontale ${i + 3}-A-Avant-usinage`)).toFixed(3) : ""}</td>
+                      <td class="text-center" style="width:24px;">${i}</td>
+                      <td class="text-right ${colorFn(val(`${prefix}-Côte Verticale ${i}-B-Avant-usinage`))}" style="width:76px;">${val(`${prefix}-Côte Verticale ${i}-B-Avant-usinage`) ? Number(val(`${prefix}-Côte Verticale ${i}-B-Avant-usinage`)).toFixed(3) : ""}</td>
+                      <td class="text-center" style="width:24px;">${i + 3}</td>
+                      <td class="text-right ${colorFn(val(`${prefix}-Côte Horizontale ${i + 3}-B-Avant-usinage`))}" style="width:76px;">${val(`${prefix}-Côte Horizontale ${i + 3}-B-Avant-usinage`) ? Number(val(`${prefix}-Côte Horizontale ${i + 3}-B-Avant-usinage`)).toFixed(3) : ""}</td>
+                      ${i === 1 ? `<td rowspan="4" class="text-center text-red-600 font-bold text-xs" style="width:50px;">${range}</td>` : ''}
+                    </tr>
+                  `).join('')}
+                  <tr>
+                    <td class="font-bold bg-gray-100 text-center">moyenne:</td>
+                    <td></td>
+                    <td class="font-bold bg-gray-100 text-right">${calcAverage([1, 2, 3].map(i => val(`${prefix}-Côte Verticale ${i}-A`)))}</td>
+                    <td></td>
+                    <td class="font-bold bg-gray-100 text-right">${calcAverage([4, 5, 6].map(i => val(`${prefix}-Côte Horizontale ${i}-A`)))}</td>
+                    <td></td>
+                    <td class="font-bold bg-gray-100 text-right">${calcAverage([1, 2, 3].map(i => val(`${prefix}-Côte Verticale ${i}-B`)))}</td>
+                    <td></td>
+                    <td class="font-bold bg-gray-100 text-right">${calcAverage([4, 5, 6].map(i => val(`${prefix}-Côte Horizontale ${i}-B`)))}</td>
+                  </tr>
+                  ${idx === 0 ? '<tr><td colspan="10"></td></tr>' : ''}
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`;
+
+
       const diameterTable = `
         <div class="overflow-x-auto">
           <table class="min-w-full text-base">
@@ -192,7 +250,7 @@
               ${['Grand Diamètre', 'Petit Diamètre'].map((type, idx) => {
                 const prefix = type === 'Grand Diamètre' ? 'GD' : 'PD';
                 const colorFn = type === 'Grand Diamètre' ? colorGD : colorPD;
-                const range = type === 'Grand Diamètre' ? '117,450<br> < Ø < <br>117,475' : '89,920<br> < Ø < <br>89,945';
+                const range = type === 'Grand Diamètre' ? '117,475<br> > Ø > <br>117,450' : '89,945<br> > Ø > <br>89,920';
                 return `
                   ${[1, 2, 3].map(i => `
                     <tr>
@@ -314,23 +372,32 @@
         <div id="firstPageContent" class="no-break">
           <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
           ${generalInfo}
-          <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers</h3>
+          <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers AVANT usinage chez Dalic</h3>
+          ${diameterTableDalic}
+        </div>
+        <div class="page-break"></div>
+
+        <div id="secondPageContent" class="no-break">
+          <h3 class="text-lg font-semibold mb-2 mt-8">Diamètre des appuis des paliers APRES usinage chez Dalic</h3>
           ${diameterTable}
         </div>
         <div class="page-break"></div>
+
         <div class="no-break flex flex-col items-center justify-center p-8">
           <h2 class="text-xl font-semibold mb-4">Plan du bogie</h2>
           <img src="../image/plan-du-bogie.jpg" alt="Plan du bogie" style="max-width:100%;height:auto;">
         </div>
         <div class="page-break"></div>
-        <div id="secondPageContent" class="no-break">
+
+        <div id="thirdPageContent" class="no-break">
           <h2 class="text-xl font-semibold mb-4">Informations Générales</h2>
           ${generalInfo}
           <h2 class="text-xl font-semibold mb-4">Usinage des pièces</h2>
           ${machiningTable}
         </div>
         <div class="page-break"></div>
-        <div id="thirdPageContent" class="no-break">
+        
+        <div id="fourthPageContent" class="no-break">
           <h2 class="text-xl font-semibold mb-4">Localisation</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div><span class="font-medium">N° de série roue droite (Côté A):</span> ${val('series-wheel-A')}</div>
@@ -365,7 +432,7 @@
         const om = val('om') || 'unknown';
         const typeNo = val('typeNo').toUpperCase() || 'unknown';
         const bogieNo = val('bogieNo') || 'unknown';
-        const filename = `${om}_${formattedDate}_${typeNo}_${bogieNo}.pdf`;
+        const filename = `${om}_${typeNo}_${bogieNo}_${formattedDate}.pdf`;
 
         html2pdf().set({
           margin: [0.5, 0.2, 0.5, 0.2],
