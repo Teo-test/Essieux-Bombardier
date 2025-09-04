@@ -48,12 +48,12 @@
         subGroups: [
           {
             title: "<i>Grand Diamètre</i>",
-            fields: ["GD-Côte Verticale 1-A-Avant-usinage", "GD-Côte Verticale 2-A-Avant-usinage", "GD-Côte Verticale 3-A-Avant-usinage", "MOY-GD-Côte-Verticale-A-Avant-usinage", "GD-Côte Horizontale 4-A-Avant-usinage", "GD-Côte Horizontale 5-A-Avant-usinage", "GD-Côte Horizontale 6-A-Avant-usinage", "MOY-GD-Côte-Horizontale-A-Avant-usinage"],
+            fields: ["GD-Côte Verticale 1-A-Avant-usinage", "GD-Côte Verticale 2-A-Avant-usinage", "GD-Côte Verticale 3-A-Avant-usinage", "GD-Côte Horizontale 4-A-Avant-usinage", "GD-Côte Horizontale 5-A-Avant-usinage", "GD-Côte Horizontale 6-A-Avant-usinage"],
             ranges: { green: [117.460, 117.475], orange: [117.450, 117.460] }
           },
           {
             title: "<i>Petit Diamètre</i>",
-            fields: ["PD-Côte Verticale 1-A-Avant-usinage", "PD-Côte Verticale 2-A-Avant-usinage", "PD-Côte Verticale 3-A-Avant-usinage", "MOY-PD-Côte-Verticale-A-Avant-usinage", "PD-Côte Horizontale 4-A-Avant-usinage", "PD-Côte Horizontale 5-A-Avant-usinage", "PD-Côte Horizontale 6-A-Avant-usinage", "MOY-PD-Côte-Horizontale-A-Avant-usinage"],
+            fields: ["PD-Côte Verticale 1-A-Avant-usinage", "PD-Côte Verticale 2-A-Avant-usinage", "PD-Côte Verticale 3-A-Avant-usinage", "PD-Côte Horizontale 4-A-Avant-usinage", "PD-Côte Horizontale 5-A-Avant-usinage", "PD-Côte Horizontale 6-A-Avant-usinage"],
             ranges: { green: [89.930, 89.945], orange: [89.920, 89.930] }
           }
         ]
@@ -63,12 +63,12 @@
         subGroups: [
           {
             title: "<i>Grand Diamètre</i>",
-            fields: ["GD-Côte Verticale 1-B-Avant-usinage", "GD-Côte Verticale 2-B-Avant-usinage", "GD-Côte Verticale 3-B-Avant-usinage", "MOY-GD-Côte-Verticale-B-Avant-usinage", "GD-Côte Horizontale 4-B-Avant-usinage", "GD-Côte Horizontale 5-B-Avant-usinage", "GD-Côte Horizontale 6-B-Avant-usinage", "MOY-GD-Côte-Horizontale-B-Avant-usinage"],
+            fields: ["GD-Côte Verticale 1-B-Avant-usinage", "GD-Côte Verticale 2-B-Avant-usinage", "GD-Côte Verticale 3-B-Avant-usinage", "GD-Côte Horizontale 4-B-Avant-usinage", "GD-Côte Horizontale 5-B-Avant-usinage", "GD-Côte Horizontale 6-B-Avant-usinage"],
             ranges: { green: [117.460, 117.475], orange: [117.450, 117.460] }
           },
           {
             title: "<i>Petit Diamètre</i>",
-            fields: ["PD-Côte Verticale 1-B-Avant-usinage", "PD-Côte Verticale 2-B-Avant-usinage", "PD-Côte Verticale 3-B-Avant-usinage", "MOY-PD-Côte-Verticale-B-Avant-usinage", "PD-Côte Horizontale 4-B-Avant-usinage", "PD-Côte Horizontale 5-B-Avant-usinage", "PD-Côte Horizontale 6-B-Avant-usinage", "MOY-PD-Côte-Horizontale-B-Avant-usinage"],
+            fields: ["PD-Côte Verticale 1-B-Avant-usinage", "PD-Côte Verticale 2-B-Avant-usinage", "PD-Côte Verticale 3-B-Avant-usinage", "PD-Côte Horizontale 4-B-Avant-usinage", "PD-Côte Horizontale 5-B-Avant-usinage", "PD-Côte Horizontale 6-B-Avant-usinage"],
             ranges: { green: [89.930, 89.945], orange: [89.920, 89.930] }
           }
         ]
@@ -125,9 +125,7 @@
       },
       { title: "<b>Valeurs 'bm' mesurées</b> = hauteur douille d'écartement", fields: ["measured-value-bm-A", "measured-value-bm-B"], label: "Côté" },
       {
-        title: "<b><u>'Valeurs 'b' calculées'</b> = hauteur douille d'écartement à us并不
-
-System: usiner = c + 0,2mm</u>",
+        title: "<b><u>'Valeurs 'b' calculées'</b> = hauteur douille d'écartement à usiner = c + 0,2mm</u>",
         fields: ["measured-value-b-A", "measured-value-b-B"],
         label: "Côté",
         compute: (data, field) => {
@@ -173,7 +171,7 @@ System: usiner = c + 0,2mm</u>",
         compute: (data, field) => formatRange(data[field], 0, 0.7, 0.7)
       },
       {
-        title: "<b>Jeu radial du bandage après remise en état</b> < 0.5mm",
+        title: "<b>Jeu radial du bandage près remise en état</b> < 0.5mm",
         fields: ["radial-bandage-after-A", "radial-bandage-after-B"],
         label: "Côté",
         compute: (data, field) => formatRange(data[field], 0, 0.5, 0.5)
@@ -220,24 +218,168 @@ System: usiner = c + 0,2mm</u>",
         }
       } else {
         // Assure que les groupes wm et w pour BM sont présents
-        if (!groups.find*('sessionActive')) {
+        if (!groups.find(group => group.title === "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM")) {
+          const uIndex = groups.findIndex(group => group.title === "<b>Valeurs 'u' mesurées</b> = hauteur roulements montés");
+          if (uIndex !== -1) {
+            groups.splice(uIndex + 1, 0,
+              { title: "<b>Valeurs 'wm' mesurées</b> = profondeur couvercle BM", fields: ["measured-value-wm-A", "measured-value-wm-B"], label: "Côté" },
+              {
+                title: "<b><u>Valeurs 'w' calculée</b> = profondeur du couvercle à usiner = x - u - 0,02mm</u>",
+                fields: ["measured-value-w-A", "measured-value-w-B"],
+                label: "Côté",
+                compute: (data, field) => {
+                  const suffix = field.endsWith('-A') ? '-A' : '-B';
+                  const x = parseFloat(data[`measured-value-x${suffix}`]) || 0;
+                  const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
+                  const w = x - u - 0.02;
+                  data[field] = isNaN(w) ? "" : w.toFixed(3);
+                  return !x && !u ? "" : data[field];
+                }
+              }
+            );
+          }
+        }
+      }
+      return groups;
+    }
+
+    // Fonction utilitaire pour formater les valeurs selon les plages
+    function formatRange(value, min, max, target) {
+      if (!value && value !== 0) return "";
+      const num = parseFloat(value);
+      if (isNaN(num)) return value;
+      const isInRange = num >= min && num <= max;
+      return `<span style="color:${isInRange ? 'green' : 'red'};font-weight:bold">${value}</span>`;
+    }
+
+    // Fonction utilitaire pour formater les diamètres
+    function formatDiameter(data, field, ranges) {
+      const value = data[field];
+      if (!value && value !== 0) return "";
+      const num = parseFloat(value);
+      if (isNaN(num)) return value;
+      if (num > ranges.green[0] && num <= ranges.green[1]) {
+        return `<span style="color:green;font-weight:bold">${value}</span>`;
+      } else if (num >= ranges.orange[0] && num <= ranges.orange[1]) {
+        return `<span style="color:orange;font-weight:bold">${value}</span>`;
+      }
+      return `<span style="color:red;font-weight:bold">${value}</span>`;
+    }
+
+    // Récupération des données
+    function getLastMesuresData() {
+      const key = localStorage.getItem('mesuresData_last');
+      return key ? JSON.parse(localStorage.getItem(key) || '{}') : {};
+    }
+
+    // Affichage des informations générales
+    function displayGeneralInfo(data) {
+      const fields = [
+        { id: 'display-date', key: 'date', label: 'Date' },
+        { id: 'display-om', key: 'om', label: 'N° intervention GHH' },
+        { id: 'display-bogieNo', key: 'bogieNo', label: 'Bogie N°' },
+        { id: 'display-typeNo', key: 'typeNo', label: 'Type', transform: v => v.toUpperCase() },
+        { id: 'display-Fabrick', key: 'Fabrick', label: 'N° de Fabrication' },
+        { id: 'display-Auftrags', key: 'Auftrags', label: 'N° de Cde' },
+        { id: 'display-Baujahr', key: 'Baujahr', label: 'Année de Fabrication' }
+      ];
+      const container = document.getElementById('general-info');
+      container.innerHTML = fields.map(field => `
+        <div>
+          <p class="text-sm font-medium">${field.label}:<span class="font-normal ml-4">${field.transform ? field.transform(data[field.key] || '') : (data[field.key] || '')}</span></p>
+        </div>
+      `).join('');
+    }
+
+    // Affichage des numéros de série
+    function displayLocationInfo(data) {
+      const container = document.getElementById('location-info');
+      container.innerHTML = `
+        <div>
+          <p class="text-sm font-medium">N° de série roue droite (Côté A):<span class="font-normal ml-4">${data['series-wheel-A'] || ''}</span></p>
+        </div>
+        <div>
+          <p class="text-sm font-medium">N° de série roue gauche (Côté B):<span class="font-normal ml-4">${data['series-wheel-B'] || ''}</span></p>
+        </div>
+      `;
+    }
+
+    // Affichage des résultats
+    function displayResults(data, measurementGroups) {
+      const resultsContainer = document.getElementById('results-container');
+      if (!Object.keys(data).length) {
+        resultsContainer.innerHTML = '<p class="text-center text-gray-500">Aucune donnée de mesure disponible.</p>';
+        return;
+      }
+
+      resultsContainer.innerHTML = measurementGroups.map(group => {
+        if (!group.fields.length && !group.subGroups) {
+          return `<div class="mt-6 mb-2 text-lg font-bold">${group.title}</div>`;
+        }
+
+        if (group.fields.length === 1 && group.label === "") {
+          const field = group.fields[0];
+          const value = group.compute ? group.compute(data, field) : (data[field] || '');
+          if (!value) return '';
+          return `
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-medium mb-2">${group.title}</h3>
+              <p class="text-sm"><span class="font-normal">${value}</span></p>
+            </div>
+          `;
+        }
+
+        const hasValue = group.fields?.some(field => group.compute ? group.compute(data, field) : data[field]) || group.subGroups?.some(sub => sub.fields.some(field => data[field]));
+        const section = `<div class="bg-gray-50 p-4 rounded-lg"><h3 class="font-medium mb-2${!hasValue ? ' text-orange-500' : ''}">${group.title}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">`;
+
+        let fieldsHTML = '';
+        if (group.fields?.length) {
+          fieldsHTML = group.fields.map(field => {
+            const value = group.compute ? group.compute(data, field) : (data[field] || '');
+            if (!value) return '';
+            const labelText = group.label ? (field.endsWith('-A') ? 'Côté A' : 'Côté B') : field.replace(/^(GD-|PD-)/, '').replace(/-A$|-B$/, '');
+            return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+          }).filter(Boolean).join('');
+        }
+
+        let subGroupsHTML = '';
+        if (group.subGroups) {
+          subGroupsHTML = group.subGroups.map(sub => {
+            const subHasValue = sub.fields.some(field => data[field]);
+            if (!subHasValue) return '';
+            return `<div class="col-span-full"><h4 class="font-medium mb-2">${sub.title}</h4><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">${
+              sub.fields.map(field => {
+                const value = formatDiameter(data, field, sub.ranges);
+                if (!value) return '';
+                const labelText = field.replace(/^(GD-|PD-)/, '').replace(/(-A|-B)?-Avant-usinage$/, '').replace(/-A$|-B$/, '');
+                return `<div><p class="text-sm font-medium">${labelText}:<span class="font-normal ml-4">${value}</span></p></div>`;
+              }).filter(Boolean).join('')
+            }</div></div>`;
+          }).filter(Boolean).join('');
+        }
+
+        return section + fieldsHTML + subGroupsHTML + '</div></div>';
+      }).join('');
+    }
+
+    // Gestion du stockage
+    function manageStorage() {
+      if (!sessionStorage.getItem('sessionActive')) {
+        localStorage.removeItem('mesuresData_last');
+        Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
+        sessionStorage.setItem('sessionActive', '1');
+      }
+      window.addEventListener('unload', () => {
+        if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
           localStorage.removeItem('mesuresData_last');
           Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
-          sessionStorage.setItem('sessionActive', '1');
         }
-        window.addEventListener('unload', () => {
-          if (sessionStorage.length === 1 && sessionStorage.getItem('sessionActive')) {
-            localStorage.removeItem('mesuresData_last');
-            Object.keys(localStorage).filter(k => k.startsWith('mesuresData_')).forEach(k => localStorage.removeItem(k));
-          }
-        });
       });
     }
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', () => {
       const savedData = getLastMesuresData();
-      console.log('Données chargées :', savedData); // Débogage pour vérifier les données
       const typeNo = savedData.typeNo?.toUpperCase() || 'BM';
       const measurementGroups = getMeasurementGroups(typeNo);
       displayGeneralInfo(savedData);
