@@ -217,7 +217,7 @@
       });
     }
 
-    // Calcule les valeurs dérivées (c, w, b, eu)
+    // Calcule les valeurs dérivées (c, w, b, eu) et les moyennes demandées
     function calculateDerivedValues(data) {
       ['-A', '-B'].forEach(suffix => {
         const u = parseFloat(data[`measured-value-u${suffix}`]) || 0;
@@ -246,6 +246,52 @@
         const e = parseFloat(data[`measured-value-e${suffix}`]);
         data[`measured-value-eu${suffix}`] = (!isNaN(d) && !isNaN(e)) ? (d > e ? "OK" : "A usiner") : "";
       });
+
+      // Calcul des moyennes pour les champs spécifiés
+      const averages = [
+        {
+          fields: ['GD-Côte Verticale 1-A-Avant-usinage', 'GD-Côte Verticale 2-A-Avant-usinage', 'GD-Côte Verticale 3-A-Avant-usinage'],
+          output: 'MOY-GD-Côte-Verticale-A-Avant-usinage'
+        },
+        {
+          fields: ['GD-Côte Horizontale 4-A-Avant-usinage', 'GD-Côte Horizontale 5-A-Avant-usinage', 'GD-Côte Horizontale 6-A-Avant-usinage'],
+          output: 'MOY-GD-Côte-Horizontale-A-Avant-usinage'
+        },
+        {
+          fields: ['PD-Côte Verticale 1-A-Avant-usinage', 'PD-Côte Verticale 2-A-Avant-usinage', 'PD-Côte Verticale 3-A-Avant-usinage'],
+          output: 'MOY-PD-Côte-Verticale-A-Avant-usinage'
+        },
+        {
+          fields: ['PD-Côte Horizontale 4-A-Avant-usinage', 'PD-Côte Horizontale 5-A-Avant-usinage', 'PD-Côte Horizontale 6-A-Avant-usinage'],
+          output: 'MOY-PD-Côte-Horizontale-A-Avant-usinage'
+        },
+        {
+          fields: ['GD-Côte Verticale 1-B-Avant-usinage', 'GD-Côte Verticale 2-B-Avant-usinage', 'GD-Côte Verticale 3-B-Avant-usinage'],
+          output: 'MOY-GD-Côte-Verticale-B-Avant-usinage'
+        },
+        {
+          fields: ['GD-Côte Horizontale 4-B-Avant-usinage', 'GD-Côte Horizontale 5-B-Avant-usinage', 'GD-Côte Horizontale 6-B-Avant-usinage'],
+          output: 'MOY-GD-Côte-Horizontale-B-Avant-usinage'
+        },
+        {
+          fields: ['PD-Côte Verticale 1-B-Avant-usinage', 'PD-Côte Verticale 2-B-Avant-usinage', 'PD-Côte Verticale 3-B-Avant-usinage'],
+          output: 'MOY-PD-Côte-Verticale-B-Avant-usinage'
+        },
+        {
+          fields: ['PD-Côte Horizontale 4-B-Avant-usinage', 'PD-Côte Horizontale 5-B-Avant-usinage', 'PD-Côte Horizontale 6-B-Avant-usinage'],
+          output: 'MOY-PD-Côte-Horizontale-B-Avant-usinage'
+        }
+      ];
+
+      averages.forEach(({ fields, output }) => {
+        const validValues = fields
+          .map(field => parseFloat(data[field]))
+          .filter(value => !isNaN(value) && value !== '');
+        data[output] = validValues.length > 0
+          ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length).toFixed(3)
+          : '';
+      });
+
       return data;
     }
 
