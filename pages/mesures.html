@@ -514,14 +514,14 @@ form.addEventListener('submit', (e) => {
         validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
         validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
         window.location.href = "resultats.html";
-      }, 1500);
+      }, 51500);
     })
     .catch(error => {
       console.error('Erreur lors de l\'envoi au réseau :', error);
       showMessage(`Erreur lors de l'envoi au réseau : ${error.message}. Données enregistrées localement.`, true);
       setTimeout(() => {
         window.location.href = "resultats.html";
-      }, 51500);
+      }, 1500);
     });
 });
 
