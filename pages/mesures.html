@@ -472,58 +472,49 @@
       });
 
       // Gestion du bouton Valider
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const formData = new FormData(form);
-  let data = Object.fromEntries(formData);
-  data = calculateDerivedValues(data);
-  const om = data.om?.trim();
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        let data = Object.fromEntries(formData);
+        data = calculateDerivedValues(data);
+        const om = data.om?.trim();
 
-  if (!saveData(data, om)) {
-    return;
-  }
-
-  console.log('Données envoyées à SheetDB :', JSON.stringify({ data: [data] }));
-
-  fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
-    .then(res => {
-      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(rows => {
-      const method = rows.length > 0 ? 'PUT' : 'POST';
-      const url = rows.length > 0
-        ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
-        : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
-      return fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: [data] })
+        if (saveData(data, om)) {
+          console.log(JSON.stringify(data));
+          fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
+            .then(res => res.json())
+            .then(rows => {
+              const method = rows.length > 0 ? 'PUT' : 'POST';
+              const url = rows.length > 0
+                ? `https://sheetdb.io/api/v1/bqsfc4ijhuerx/om/${encodeURIComponent(om)}`
+                : `https://sheetdb.io/api/v1/bqsfc4ijhuerx`;
+              return fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: [data] })
+              });
+            })
+            .then(res => res.json())
+            .then(() => {
+              showMessage("Mesures enregistrées localement et envoyées au réseau !", false, true);
+              const validerBtn = document.getElementById('validerBtn');
+              validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+              validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+              setTimeout(() => {
+                validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                window.location.href = "resultats.html";
+              }, 1500);
+            })
+            .catch(() => {
+              showMessage("Erreur lors de l'envoi au réseau, mais les données sont enregistrées localement.", true);
+              setTimeout(() => {
+                window.location.href = "resultats.html";
+              }, 1500);
+            });
+        }
       });
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(() => {
-      showMessage("Mesures enregistrées localement et envoyées au réseau !", false, true);
-      const validerBtn = document.getElementById('validerBtn');
-      validerBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-      validerBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-      setTimeout(() => {
-        validerBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-        validerBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-        window.location.href = "resultats.html";
-      }, 51500);
-    })
-    .catch(error => {
-      console.error('Erreur lors de l\'envoi au réseau :', error);
-      showMessage(`Erreur lors de l'envoi au réseau : ${error.message}. Données enregistrées localement.`, true);
-      setTimeout(() => {
-        window.location.href = "resultats.html";
-      }, 1500);
-    });
-});
+    }
 
     // Gère le nettoyage de localStorage à la fin de la session
     function setupStorageCleanup() {
