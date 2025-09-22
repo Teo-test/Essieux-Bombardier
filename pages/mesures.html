@@ -487,9 +487,8 @@
         data = calculateDerivedValues(data);
         const om = data.om?.trim();
 
-        // Conversion des champs numériques en nombre (hors contrôle visuel des soudures)
+        // Conversion des champs numériques en nombre (hors contrôle visuel des soudures), sans toucher aux cases vides
         Object.keys(data).forEach(key => {
-          // Exclure les champs de contrôle visuel des soudures (type texte)
           if (
             !key.startsWith('soud-vis') &&
             data[key] !== '' &&
