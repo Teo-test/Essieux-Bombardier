@@ -487,18 +487,6 @@
         data = calculateDerivedValues(data);
         const om = data.om?.trim();
 
-        // Conversion des champs numériques en nombre (hors contrôle visuel des soudures), sans toucher aux cases vides
-        Object.keys(data).forEach(key => {
-          if (
-            !key.startsWith('soud-vis') &&
-            data[key] !== '' &&
-            !isNaN(data[key]) &&
-            typeof data[key] === 'string'
-          ) {
-            data[key] = Number(data[key]);
-          }
-        });
-
         if (saveData(data, om)) {
           console.log(JSON.stringify(data));
           fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
