@@ -189,14 +189,10 @@
 
         // Cas particulier pour les groupes avec un seul champ
         if (group.fields.length === 1 && group.label === "") {
-          // Vérifie si c'est le groupe "Contrôle visuel des soudures"
-          const isSoudure = group.title.includes("Contrôle visuel des soudures");
           section.innerHTML = `
             <h3 class="text-lg font-medium mb-2">${group.title}</h3>
             <div>
-              <input type="${isSoudure ? 'text' : 'number'}" id="${group.fields[0]}" name="${group.fields[0]}"
-                ${isSoudure ? '' : 'required step="0.001"'}
-                class="mt-1 p-2 w-full border rounded" aria-label="${group.title}">
+              <input type="number" id="${group.fields[0]}" name="${group.fields[0]}" step="0.001" class="mt-1 p-2 w-full border rounded" aria-label="${group.title}">
             </div>
           `;
         } else {
@@ -207,14 +203,10 @@
                 const labelText = group.label 
                   ? (field.endsWith('-A') ? 'Côté A' : field.endsWith('-B') ? 'Côté B' : field.replace(/^(GD-|PD-)/, ''))
                   : field.replace(/^(GD-|PD-)/, '').replace(/(-A|-B)?-Avant-usinage$/, '').replace(/-A$|-B$/, '');
-                // Vérifie si c'est le groupe "Contrôle visuel des soudures"
-                const isSoudure = group.title.includes("Contrôle visuel des soudures");
                 return `
                   <div>
                     <label for="${field}" class="block text-sm font-medium">${labelText}:</label>
-                    <input type="${isSoudure ? 'text' : (group.type || 'number')}" id="${field}" name="${field}"
-                      ${isSoudure ? '' : 'required step="0.001"'}
-                      class="mt-1 p-2 w-full border rounded" aria-label="${labelText}">
+                    <input type="${group.type || 'number'}" id="${field}" name="${field}" step="${group.type ? '' : '0.001'}" class="mt-1 p-2 w-full border rounded" aria-label="${labelText}">
                   </div>
                 `;
               }).join('')}
