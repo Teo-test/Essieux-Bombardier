@@ -395,7 +395,17 @@
       const form = document.getElementById('mesuresForm');
       const inputs = form.querySelectorAll('input');
       const formData = {};
-      inputs.forEach(input => formData[input.name] = input.value);
+      inputs.forEach(input => {
+        // Convertir en nombre pour les champs numériques, sauf pour soud-vis-A et soud-vis-B
+        if (input.name === 'soud-vis-A' || input.name === 'soud-vis-B') {
+          formData[input.name] = input.value;
+        } else if (input.type === 'number' && input.value !== '') {
+          const numValue = parseFloat(input.value);
+          formData[input.name] = isNaN(numValue) ? '' : numValue;
+        } else {
+          formData[input.name] = input.value;
+        }
+      });
       localStorage.setItem('mesuresFormRealtime', JSON.stringify(formData));
     }
 
@@ -476,11 +486,26 @@
         e.preventDefault();
         const formData = new FormData(form);
         let data = Object.fromEntries(formData);
-        data = calculateDerivedValues(data);
-        const om = data.om?.trim();
 
-        if (saveData(data, om)) {
-          console.log(JSON.stringify(data));
+        // Convertir les valeurs en nombres, sauf pour soud-vis-A et soud-vis-B
+        const convertedData = {};
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'soud-vis-A' || key === 'soud-vis-B') {
+            convertedData[key] = value; // Garder en texte
+          } else if (key === 'typeNo' || key === 'Fabrick' || key === 'Auftrags' || key === 'Baujahr' || key === 'date') {
+            convertedData[key] = value; // Garder les champs texte tels quels
+          } else {
+            const numValue = parseFloat(value);
+            convertedData[key] = value !== '' && !isNaN(numValue) ? numValue : ''; // Convertir en nombre ou laisser vide
+          }
+        });
+
+        // Calculer les valeurs dérivées
+        const calculatedData = calculateDerivedValues(convertedData);
+        const om = calculatedData.om?.trim();
+
+        if (saveData(calculatedData, om)) {
+          console.log(JSON.stringify(calculatedData));
           fetch(`https://sheetdb.io/api/v1/bqsfc4ijhuerx/search?om=${encodeURIComponent(om)}`)
             .then(res => res.json())
             .then(rows => {
@@ -491,7 +516,7 @@
               return fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [data] })
+                body: JSON.stringify({ data: [calculatedData] })
               });
             })
             .then(res => res.json())
