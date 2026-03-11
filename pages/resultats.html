@@ -254,17 +254,19 @@
 
     // Fonction utilitaire pour formater les diamètres
     function formatDiameter(data, field, ranges) {
-      const value = data[field];
-      if (!value && value !== 0) return "";
-      const num = parseFloat(value);
-      if (isNaN(num)) return value;
-      if (num > ranges.green[0] && num <= ranges.green[1]) {
-        return `<span style="color:green;font-weight:bold">${value}</span>`;
-      } else if (num >= ranges.orange[0] && num <= ranges.orange[1]) {
-        return `<span style="color:orange;font-weight:bold">${value}</span>`;
-      }
-      return `<span style="color:red;font-weight:bold">${value}</span>`;
-    }
+  const value = data[field];
+  if (!value && value !== 0) return "";
+  const num = parseFloat(value);
+  if (isNaN(num)) return value;
+  if (num > ranges.green[0] && num <= ranges.green[1]) {
+    return `<span style="color:green;font-weight:bold">${value}</span>`;
+  } else if (num >= ranges.orange[0] && num <= ranges.orange[1]) {
+    return `<span style="color:orange;font-weight:bold">${value}</span>`;
+  } else if (num > ranges.green[1]) {
+    return `<span style="color:blue;font-weight:bold">${value}</span>`;
+  }
+  return `<span style="color:red;font-weight:bold">${value}</span>`;
+}
 
     // Récupération des données
     function getLastMesuresData() {
